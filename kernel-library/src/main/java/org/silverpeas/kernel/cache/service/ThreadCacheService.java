@@ -38,22 +38,7 @@ import org.silverpeas.kernel.cache.model.SimpleCache;
  */
 public class ThreadCacheService implements CacheService<SimpleCache> {
 
-  private static final ThreadCacheService instance = new ThreadCacheService();
-
-  /**
-   * Gets the single instance of this service.
-   *
-   * @return the {@link ThreadCacheService} single instance.
-   */
-  public static ThreadCacheService getInstance() {
-    return instance;
-  }
-
   private final ThreadCache cache = new ThreadCache();
-
-  ThreadCacheService() {
-
-  }
 
   @Override
   public SimpleCache getCache() {

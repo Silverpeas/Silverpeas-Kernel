@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2023 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,18 +22,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test.extention;
+package org.silverpeas.kernel;
 
-import java.lang.annotation.*;
+import org.silverpeas.kernel.annotation.Base;
+import org.silverpeas.kernel.annotation.Managed;
 
-/**
- * Annotation to indicate that the annotated method is a provider of a user that has to be used as
- * the current requester in each unit tests of the test class of the provider. This annotation is
- * used by the {@link SilverTestEnv} extension and cannot be used without this extension.
- * @author mmoquillon
- */
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface RequesterProvider {
+import javax.inject.Singleton;
+
+@Managed
+@Base
+@Singleton
+public class MyBean1 implements MyBean {
 }

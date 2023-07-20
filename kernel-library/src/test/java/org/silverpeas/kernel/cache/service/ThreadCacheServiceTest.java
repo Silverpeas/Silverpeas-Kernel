@@ -25,7 +25,9 @@ package org.silverpeas.kernel.cache.service;
 
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.silverpeas.kernel.util.Mutable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,10 +36,11 @@ import static org.hamcrest.Matchers.*;
 
 /**
  * Tests the {@link ThreadCacheService} single instance and checks it manages only a single cache per thread.
+ *
  * @author mmoquillon
  */
 class ThreadCacheServiceTest {
-  private static final ThreadCacheService service = ThreadCacheService.getInstance();
+  private final ThreadCacheService service = new ThreadCacheService();
   private static final String Object1 = "";
   private static final Object Object2 = new Object();
 
@@ -68,6 +71,44 @@ class ThreadCacheServiceTest {
     };
     performTestInTwoThreads(testPerformer, true);
     performTestInTwoThreads(testPerformer, false);
+  }
+
+  @Test
+  @DisplayName("Put an object with a given cache service and get it with another cache service has to work")
+  void useTwoCacheServicesInTheSameThread() {
+    ThreadCacheService service1 = new ThreadCacheService();
+    ThreadCacheService service2 = new ThreadCacheService();
+
+    String key = service1.getCache().add(Object2);
+    Object actual = service2.getCache().get(key);
+    assertThat(actual, is(Object2));
+  }
+
+  @Test
+  @DisplayName("Put an object with a given cache service in one thread and get it with another cache service in " +
+      "another thread doesn't work")
+  void useTwoCacheServicesInTwoDifferentThreads() throws InterruptedException {
+    Mutable<String> key = Mutable.empty();
+    Thread t1 = new Thread(() -> {
+      ThreadCacheService service1 = new ThreadCacheService();
+      String k = service1.getCache().add(Object2);
+      key.set(k);
+    });
+
+    Mutable<Object> actual = Mutable.empty();
+    Thread t2 = new Thread(() -> {
+      ThreadCacheService service2 = new ThreadCacheService();
+      Object o = service2.getCache().get(key.get());;
+      actual.set(o);
+    });
+
+    t1.start();
+    Awaitility.await().pollDelay(10, TimeUnit.MILLISECONDS).until(() -> true);
+    t2.start();
+    t1.join();
+    t2.join();
+
+    assertThat(actual.orElseGet(() -> null), nullValue());
   }
 
   @Test
@@ -149,9 +190,9 @@ class ThreadCacheServiceTest {
       Assertions.fail(e);
     }
   }
-  
+
   private int itemsCountInCache() {
-    return ((ThreadCache)service.getCache()).getAll().size();
+    return ((ThreadCache) service.getCache()).getAll().size();
   }
 
   private interface TestPerformer {

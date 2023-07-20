@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2023 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,21 +22,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test.extention;
-
-import java.lang.annotation.*;
+package org.silverpeas.kernel.test;
 
 /**
- * Annotation used to declare a set of properties to set among the system properties within the
- * {@link org.silverpeas.kernel.util.SystemWrapper}. By using this annotation, the properties
- * will be available to all managed beans and mocks declared in a test.
+ * A managed bean to use for testing the IoC/IoD mechanism dedicated to the unit tests.
  * @author mmoquillon
  */
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Inherited
-@Documented
-public @interface SystemProperties {
+public class MyBean1 implements MyBean {
 
-  SystemProperty[] value();
+  private String foo;
+
+  @Override
+  public String getFoo() {
+    return foo;
+  }
+
+  public MyBean1 setFoo(String foo) {
+    this.foo = foo;
+    return this;
+  }
 }

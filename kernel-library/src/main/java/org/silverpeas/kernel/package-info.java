@@ -22,15 +22,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * The technical foundation of all of the Silverpeas projects. It provides all the technical bricks
- * upon which a more functional foundation can be built for Silverpeas. All the interfaces and
- * abstract classes have to be implemented by choosing the more appropriate software solution.
- * Utility classes are also provided for common tasks or needs.
+ * The technical foundation of all of the Silverpeas projects. It provides all the technical bricks upon which a more
+ * functional foundation can be built for Silverpeas. All the interfaces and abstract classes have to be implemented by
+ * choosing the more appropriate software solution and the implementations should be available through the Java Service
+ * Provider Interface (SPI). Utility classes are also provided for common tasks or needs.
  * <p>
- * The Silverpeas kernel is built upon an IoC (Inversion of Control) and IoD (Injection of
- * Dependencies) solution that has to be provided by an external framework. The code of Silverpeas
- * Kernel must be agnostic of all technical implementation choices so all of the classes defined
- * here must not be managed by the IoC and IoD solution.
+ * The base key of Silverpeas Kernel is its API that abstracts an IoC (Inversion of Control) by IoD (Injection of
+ * Dependencies) solution. The idea here is to grant the control flow to frameworks that then delegate functional
+ * details to the implementations of some of their API. These implementations are custom codes provided by the
+ * Silverpeas projects. For doing, the IoC mechanism allows the Silverpeas projects to provide their own framework by
+ * exposing the business interfaces for others projects which propose then an implementation of them, and to get also
+ * transparently an instance of an implementation of such interfaces. All the details are taken in charge under the hood
+ * by the IoC/IoD solution. Because the code of Silverpeas Kernel must be agnostic to all technical implementation
+ * choices, and because there are several and incompatible solutions of an IoC by IoD mechanism, the API is built only
+ * upon JSR-365 and provides a simple way to get programmatically an object satisfying a given type and some qualifiers.
+ * The IoC/IoD solution has to be provided through the Java SPI by implementing the
+ * {@link org.silverpeas.kernel.BeanContainer} interface.
  * </p>
  *
  * @author mmoquillon

@@ -27,9 +27,7 @@ package org.silverpeas.kernel.test;
 import org.silverpeas.kernel.BeanContainer;
 
 import java.lang.annotation.Annotation;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -40,23 +38,27 @@ public class TestScopedBeanContainer implements BeanContainer {
 
   private final Map<String, Set<?>> beans = new ConcurrentHashMap<>();
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> T getBeanByName(String name) throws IllegalStateException {
+  public <T> Optional<T> getBeanByName(String name) throws IllegalStateException {
     try {
       Set<?> theBeans = getBeans(name);
-      return (T) theBeans.iterator().next();
+      if (theBeans.size() > 1) {
+        throw new IllegalStateException("Several available beans: " + name);
+      }
+      return getSingleBean(theBeans);
     } catch (ClassCastException e) {
       throw new IllegalStateException(e);
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> T getBeanByType(Class<T> type, Annotation... qualifiers) throws IllegalStateException {
+  public <T> Optional<T> getBeanByType(Class<T> type, Annotation... qualifiers) throws IllegalStateException {
     try {
       Set<?> theBeans = getBeans(type.getName());
-      return (T) theBeans.iterator().next();
+      if (theBeans.size() > 1) {
+        throw new IllegalStateException("Several available beans: " + type.getName());
+      }
+      return getSingleBean(theBeans);
     } catch (ClassCastException e) {
       throw new IllegalStateException(e);
     }
@@ -75,13 +77,18 @@ public class TestScopedBeanContainer implements BeanContainer {
 
   private Set<?> getBeans(String key) {
     Set<?> theBeans = beans.get(key);
-    if (theBeans == null || theBeans.isEmpty()) {
-      throw new IllegalStateException("No bean found: " + key);
-    }
-    if (theBeans.size() > 1) {
-      throw new IllegalStateException("Several available beans: " + key);
-    }
-    return theBeans;
+    return theBeans == null ? Set.of() : theBeans;
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> Optional<T> getSingleBean(Set<?> beans) {
+    return beans.stream()
+        .map(b -> (T) b)
+        .findAny();
+  }
+
+  public <T> void putBean(Class<T> type, T bean) {
+    putBean(type.getName(), bean);
   }
 
   @SuppressWarnings("unchecked")
@@ -90,9 +97,7 @@ public class TestScopedBeanContainer implements BeanContainer {
     theBeans.add(bean);
   }
 
-  @SuppressWarnings("unchecked")
-  public <T> void putBean(Class<T> type, T bean) {
-    Set<T> theBeans = (Set<T>) beans.computeIfAbsent(type.getName(), k -> new HashSet<>());
-    theBeans.add(bean);
+  public void clear() {
+    beans.clear();
   }
 }

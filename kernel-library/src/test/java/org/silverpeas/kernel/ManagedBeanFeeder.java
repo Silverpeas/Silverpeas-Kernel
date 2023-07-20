@@ -24,6 +24,7 @@
 
 package org.silverpeas.kernel;
 
+import org.silverpeas.kernel.cache.service.ThreadCacheService;
 import org.silverpeas.kernel.test.TestScopedBeanContainer;
 
 import java.lang.reflect.Constructor;
@@ -36,18 +37,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public final class ManagedBeanFeeder {
 
-  private ManagedBeanProvider provider = ManagedBeanProvider.getInstance();
-
-  public void manageBeanUnderName(final Class<?> beanClass, final String name) {
-    try {
-      Constructor<?> constructor = beanClass.getConstructor();
-      constructor.trySetAccessible();
-      Object bean = constructor.newInstance();
-      getBeanContainer().putBean(name, bean);
-    } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
+  private final BeanContainer container = ManagedBeanProvider.getInstance().beanContainer();
 
   public <T, U extends T> void manageBeanForType(final Class<U> beanClass, final Class<T> type) {
     try {
@@ -60,7 +50,27 @@ public final class ManagedBeanFeeder {
     }
   }
 
+  public <T, U extends T> void manageBeanWithName(final Class<U> beanClass, final String name) {
+    try {
+      U bean = instantiate(beanClass);
+      getBeanContainer().putBean(name, bean);
+    } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void clearAllManagedBeans() {
+    getBeanContainer().clear();
+  }
+
+  private static <T, U extends T> U instantiate(Class<U> beanClass) throws NoSuchMethodException,
+      InstantiationException, IllegalAccessException, InvocationTargetException {
+    Constructor<U> constructor = beanClass.getConstructor();
+    constructor.trySetAccessible();
+    return constructor.newInstance();
+  }
+
   private TestScopedBeanContainer getBeanContainer() {
-    return (TestScopedBeanContainer) provider.beanContainer();
+    return (TestScopedBeanContainer) container;
   }
 }

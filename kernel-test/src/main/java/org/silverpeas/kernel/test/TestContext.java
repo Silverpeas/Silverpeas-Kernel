@@ -30,10 +30,19 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Properties;
 
-public final class TestContext {
+/**
+ * Context of a unit test. Used to access the information of the context of such a test. This class can be extended to
+ * add other information required by unit tests for their execution.
+ * @author mmoquillon
+ */
+public class TestContext {
 
   private Properties mavenProperties;
 
+  /**
+   * Gets the properties of the project with which the unit test is configured.
+   * @return the Maven properties
+   */
   public Properties getMavenProperties() {
     if (mavenProperties == null) {
       mavenProperties = loadMavenProperties();
@@ -51,6 +60,11 @@ public final class TestContext {
     return mavenProperties;
   }
 
+  /**
+   * Gets the path of the directory in which are located the resources available to the unit test during its execution.
+   *
+   * @return the path of the test resources root directory.
+   */
   public Path getPathOfTestResources() {
     Properties testProperties = getMavenProperties();
     String pathProperty = testProperties.getProperty("test.resources.directory", "");

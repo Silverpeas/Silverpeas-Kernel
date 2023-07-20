@@ -35,7 +35,7 @@ import java.util.Map;
  */
 class ThreadCache extends AbstractSimpleCache {
 
-  private final ThreadLocal<Map<Object, Object>> cache = new ThreadLocal<>();
+  private static final ThreadLocal<Map<Object, Object>> cache = new ThreadLocal<>();
 
   ThreadCache() {
 

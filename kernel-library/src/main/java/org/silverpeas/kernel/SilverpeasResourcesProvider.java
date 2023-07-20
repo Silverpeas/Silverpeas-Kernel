@@ -42,7 +42,7 @@ import java.util.ServiceLoader;
 public interface SilverpeasResourcesProvider {
 
   static SilverpeasResourcesProvider getInstance() {
-    CacheService cacheService = ApplicationCacheService.getInstance();
+    CacheService<?> cacheService = ApplicationCacheService.getInstance();
     return cacheService.getCache().computeIfAbsent(
         SilverpeasResourcesProvider.class.getSimpleName() + "#instance",
         SilverpeasResourcesProvider.class,

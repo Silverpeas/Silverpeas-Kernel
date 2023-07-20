@@ -22,37 +22,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.logging.sys;
+package org.silverpeas.kernel.test;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Vector;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
+public interface MyBean {
 
-public class BufferHandler extends Handler {
-
-  private final List<String> buffer = new Vector<>();
-
-  @Override
-  public void publish(LogRecord logRecord) {
-    String message = logRecord.getMessage();
-    if (this.isLoggable(logRecord)) {
-      buffer.add(message);
-    }
-  }
-
-  @Override
-  public synchronized void flush() {
-    // nothing to do
-  }
-
-  @Override
-  public void close() throws SecurityException {
-    // nothing to do
-  }
-
-  public List<String> getBufferLines() {
-    return Collections.unmodifiableList(buffer);
-  }
+  String getFoo();
 }

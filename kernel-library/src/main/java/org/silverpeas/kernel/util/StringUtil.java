@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 import static java.util.Optional.ofNullable;
 
 /**
- * Utility class providing useful operations on {@link String}.
+ * Utility class providing useful operations on {@link String}s.
  */
 public class StringUtil {
 

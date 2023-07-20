@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2022-2023 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,37 +22,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.logging.sys;
+package org.silverpeas.kernel.test.annotations;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Vector;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
+import java.lang.annotation.*;
 
-public class BufferHandler extends Handler {
+/**
+ * Annotation used to declare a set of classes to mock. The resulting mock will be put into the IoC container in order
+ * to satisfy the dependencies of the managed beans used in the unit tests.
+ * @author mmoquillon
+ */
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface TestManagedMocks {
 
-  private final List<String> buffer = new Vector<>();
-
-  @Override
-  public void publish(LogRecord logRecord) {
-    String message = logRecord.getMessage();
-    if (this.isLoggable(logRecord)) {
-      buffer.add(message);
-    }
-  }
-
-  @Override
-  public synchronized void flush() {
-    // nothing to do
-  }
-
-  @Override
-  public void close() throws SecurityException {
-    // nothing to do
-  }
-
-  public List<String> getBufferLines() {
-    return Collections.unmodifiableList(buffer);
-  }
+  Class<?>[] value();
 }

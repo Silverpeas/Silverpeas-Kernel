@@ -12,8 +12,8 @@
   <url>https://www.silverpeas.org/docs/kernel</url>
 
   <description>
-    Silverpeas Kernel is the technical foundation of all of the Silverpeas projects. It is built upon an IoC and IoD
-    system that has to be provided by an external framework.
+    Silverpeas Kernel is the technical foundation of all of the Silverpeas projects. It is built upon an IoC by IoD
+    mechanism that has to be provided by an external framework.
   </description>
 
   <modules>

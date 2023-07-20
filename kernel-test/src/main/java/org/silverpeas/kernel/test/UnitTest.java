@@ -28,6 +28,7 @@ import java.lang.annotation.*;
 
 /**
  * Annotation to mark a test as being a unit test.
+ *
  * @author mmoquillon
  */
 @Target({ElementType.TYPE})

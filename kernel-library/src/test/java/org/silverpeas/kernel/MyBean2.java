@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2023 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -21,30 +21,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.silverpeas.kernel.annotation;
 
-import java.lang.annotation.*;
+package org.silverpeas.kernel;
 
-/**
- * This annotation has to be used to tag a package to define the Silverpeas module the package
- * belongs to.
- * <p>
- * Silverpeas is made up of several modules, each of them defining both a given business model and a
- * functional service on it. A module is uniquely identified by a simple name. Each module in
- * Silverpeas provides a set of interfaces that can be used by others modules to realize their
- * responsibilities; codes in modules shouldn't use the classes in others modules but the
- * interfaces.
- * <p>
- * The annotation can be used by some transverse services to perform some dedicated operations based
- * upon the module a code belongs to. For example, the Silverpeas Logging API uses this annotation
- * to figure out the module a given object or class belongs to.
- *
- * @author mmoquillon
- */
-@Target(ElementType.PACKAGE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface Module {
+import org.silverpeas.kernel.annotation.Managed;
 
-  String value();
+@Managed
+public class MyBean2 implements MyBean {
 }

@@ -24,6 +24,7 @@
 
 package org.silverpeas.kernel.test;
 
+import org.silverpeas.kernel.annotation.Base;
 import org.silverpeas.kernel.annotation.Managed;
 import org.silverpeas.kernel.annotation.Technical;
 import org.silverpeas.kernel.util.SystemWrapper;
@@ -36,15 +37,17 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Simple implementation of the {@link SystemWrapper} to be used in the unit tests. It wraps {@link System} by allowing
  * to set additional both system properties and environment variables.
+ *
+ * @author mmoquillon
  */
 @Technical
 @Managed
 @Singleton
-public class TestScopedSystemWrapper implements SystemWrapper {
+public class TestSystemWrapper implements SystemWrapper {
 
   private final Map<String, String> extendedEnvs = new ConcurrentHashMap<>();
 
-  public TestScopedSystemWrapper() {
+  public TestSystemWrapper() {
     extendedEnvs.putAll(System.getenv());
   }
 
@@ -80,6 +83,6 @@ public class TestScopedSystemWrapper implements SystemWrapper {
 
   @Override
   public String getProperty(String key, String def) {
-    return getProperty(key, def);
+    return System.getProperty(key, def);
   }
 }

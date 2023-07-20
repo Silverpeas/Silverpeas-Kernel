@@ -24,11 +24,13 @@
 
 package org.silverpeas.kernel.logging;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.silverpeas.kernel.logging.sys.BufferHandler;
 import org.silverpeas.kernel.logging.test.MyTestBean3;
+
+import java.util.logging.LogManager;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,100 +43,108 @@ import static org.silverpeas.kernel.logging.Level.*;
  */
 class LoggingTest {
 
-  @BeforeAll
-  public static void redirectLoggingOutput() {
-    java.util.logging.Logger logger = java.util.logging.Logger.getLogger("silverpeas");
-    logger.addHandler(new BufferHandler());
-    logger.setUseParentHandlers(false);
-  }
+  private final BufferHandler bufferHandler = new BufferHandler();
 
-  @AfterEach
-  void clearLog() {
-    BufferHandler.clearBuffer();
+  @BeforeEach
+  void redirectLoggingOutput() {
+    Stream.of("silverpeas", "silverpeas.kernel", "silverpeas.kernel.logging", "silverpeas.kernel.logging.test")
+        .forEach(n -> {
+          java.util.logging.Logger logger = java.util.logging.Logger.getLogger(n);
+          logger.addHandler(bufferHandler);
+        });
   }
 
   @Test
   void logMessageWithLoggableLevel() {
     MyTestBean1 bean = new MyTestBean1();
-    assertThatLevelIsLoggable(INFO, bean);
+    assertNamespaceMatches("silverpeas.kernel.logging", bean);
+    assertLevelIsLoggable(INFO, bean);
 
     String message = "Hello World 1!!";
     bean.writeMessageIntoLog(INFO, message);
 
-    assertThatMessageIsLogged(message);
+    assertMessageIsLogged(message);
   }
 
   @Test
   void logMessageWithNonLoggableLevel() {
     MyTestBean1 bean = new MyTestBean1();
-    assertThatLevelIsNotLoggable(DEBUG, bean);
+    assertNamespaceMatches("silverpeas.kernel.logging", bean);
+    assertLevelIsNotLoggable(DEBUG, bean);
 
     String message = "Hello World 2!!";
     bean.writeMessageIntoLog(DEBUG, message);
 
-    assertThatMessageIsNotLogged(message);
+    assertMessageIsNotLogged(message);
   }
 
   @Test
   void annotatedBeanLogsMessageWithLoggableLevel() {
     MyTestBean2 bean = new MyTestBean2();
-    assertThatLevelIsLoggable(WARNING, bean);
+    assertNamespaceMatches("silverpeas.kernel.logging.test", bean);
+    assertLevelIsLoggable(WARNING, bean);
 
     String message = "Hello World 3!!";
     bean.writeMessageIntoLog(WARNING, message);
 
-    assertThatMessageIsLogged(message);
+    assertMessageIsLogged(message);
   }
 
   @Test
   void annotatedBeanLogsMessageWithNonLoggableLevel() {
     MyTestBean2 bean = new MyTestBean2();
-    assertThatLevelIsNotLoggable(DEBUG, bean);
+    assertNamespaceMatches("silverpeas.kernel.logging.test", bean);
+    assertLevelIsNotLoggable(DEBUG, bean);
 
     String message = "Hello World 4!!";
     bean.writeMessageIntoLog(DEBUG, message);
 
-    assertThatMessageIsNotLogged(message);
+    assertMessageIsNotLogged(message);
   }
 
   @Test
   void beanInAnnotatedPackageLogsMessageWithLoggableLevel() {
     MyTestBean3 bean = new MyTestBean3();
-    assertThatLevelIsLoggable(WARNING, bean);
+    assertNamespaceMatches("silverpeas.kernel", bean);
+    assertLevelIsLoggable(WARNING, bean);
 
     String message = "Hello World 5!!";
     bean.writeMessageIntoLog(WARNING, message);
 
-    assertThatMessageIsLogged(message);
+    assertMessageIsLogged(message);
   }
 
   @Test
   void beanInAnnotatedPackageLogsMessageWithNonLoggableLevel() {
     MyTestBean3 bean = new MyTestBean3();
-    Level l = SilverLogger.getLogger(bean).getLevel();
-    assertThatLevelIsNotLoggable(INFO, bean);
+    assertNamespaceMatches("silverpeas.kernel", bean);
+    assertLevelIsNotLoggable(INFO, bean);
 
     String message = "Hello World 6!!";
     bean.writeMessageIntoLog(INFO, message);
 
-    assertThatMessageIsNotLogged(message);
+    assertMessageIsNotLogged(message);
   }
 
-  private void assertThatMessageIsLogged(String message) {
-    boolean hasMessage = BufferHandler.getBufferLines().anyMatch(l -> l.contains(message));
+  private void assertMessageIsLogged(String message) {
+    boolean hasMessage = bufferHandler.getBufferLines().contains(message);
     assertThat(hasMessage, is(true));
   }
 
-  private void assertThatMessageIsNotLogged(String message) {
-    boolean hasMessage = BufferHandler.getBufferLines().anyMatch(l -> l.contains(message));
+  private void assertMessageIsNotLogged(String message) {
+    boolean hasMessage = bufferHandler.getBufferLines().contains(message);
     assertThat(hasMessage, is(false));
   }
 
-  private void assertThatLevelIsLoggable(Level level, Object object) {
+  private void assertLevelIsLoggable(Level level, Object object) {
     assertThat(SilverLogger.getLogger(object).isLoggable(level), is(true));
   }
 
-  private void assertThatLevelIsNotLoggable(Level level, Object object) {
+  private void assertLevelIsNotLoggable(Level level, Object object) {
     assertThat(SilverLogger.getLogger(object).isLoggable(level), is(false));
+  }
+
+  private void assertNamespaceMatches(String namespace, Object object) {
+    assertThat(SilverLogger.getLogger(object).getNamespace(), is(namespace));
   }
 }

@@ -38,6 +38,7 @@ import static org.silverpeas.kernel.logging.SilverLoggerProvider.ROOT_NAMESPACE;
 
 /**
  * JUnit 5 extension to take care of the logger levels to set in a given unit test.
+ *
  * @author mmoquillon
  */
 public class LoggerExtension implements BeforeEachCallback {
@@ -83,9 +84,9 @@ public class LoggerExtension implements BeforeEachCallback {
 
   private void setLoggerHandler(final Handler handler) {
     Logger.getLogger(ROOT_NAMESPACE).setUseParentHandlers(false);
-    if (Arrays.stream(Logger.getLogger(ROOT_NAMESPACE).getHandlers())
-        .filter(h -> handler.getClass().isInstance(h))
-        .count() == 0) {
+    if (Arrays.stream(
+        Logger.getLogger(ROOT_NAMESPACE).getHandlers())
+        .noneMatch(h -> handler.getClass().isInstance(h))) {
       Logger.getLogger(ROOT_NAMESPACE).addHandler(handler);
     }
   }

@@ -24,10 +24,11 @@
 
 package org.silverpeas.kernel.annotation;
 
+import javax.annotation.ManagedBean;
 import java.lang.annotation.*;
 
 /**
- * This annotation is to tag a class as to be managed by the underlying IoC and IoD container. This
+ * This annotation is to tag a class as to be managed by the underlying IoC/IoD container. This
  * means the life-cycle of the  objects of the annotated class are taken in charge by the container.
  * All classes whose the objects have to be managed by such a bean container must be annotated with
  * this annotation, otherwise their instantiation and the life-cycle of their instances is done in
@@ -44,6 +45,7 @@ import java.lang.annotation.*;
  */
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@ManagedBean
 @Documented
 @Inherited
 public @interface Managed {

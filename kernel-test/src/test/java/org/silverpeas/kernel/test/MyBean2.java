@@ -22,37 +22,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.logging.sys;
+package org.silverpeas.kernel.test;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Vector;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
+import javax.inject.Inject;
 
-public class BufferHandler extends Handler {
+/**
+ * A managed bean to use for testing the IoC/IoD mechanism dedicated to the unit tests.
+ * @author mmoquillon
+ */
+public class MyBean2 {
 
-  private final List<String> buffer = new Vector<>();
+  @Inject
+  private MyBean myBean;
 
-  @Override
-  public void publish(LogRecord logRecord) {
-    String message = logRecord.getMessage();
-    if (this.isLoggable(logRecord)) {
-      buffer.add(message);
-    }
-  }
-
-  @Override
-  public synchronized void flush() {
-    // nothing to do
-  }
-
-  @Override
-  public void close() throws SecurityException {
-    // nothing to do
-  }
-
-  public List<String> getBufferLines() {
-    return Collections.unmodifiableList(buffer);
+  public MyBean getMyBean() {
+    return myBean;
   }
 }

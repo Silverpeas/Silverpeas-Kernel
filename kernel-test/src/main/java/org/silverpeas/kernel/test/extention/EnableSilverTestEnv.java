@@ -26,14 +26,20 @@ package org.silverpeas.kernel.test.extention;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.silverpeas.kernel.test.UnitTest;
+import org.silverpeas.kernel.test.TestBeanContainer;
 
 import java.lang.annotation.*;
 
 /**
- * Enables the Silverpeas environment dedicated to the unit tests. It extends the unit test with
- * the {@link SilverTestEnv} JUnit extension.
- * @see SilverTestEnv
+ * Enables the Silverpeas environment dedicated to the unit tests. It extends the unit test with the
+ * {@link SilverTestEnv} JUnit extension. This annotation is used to ask for an IoC/IoD environment to be bootstrapped
+ * for the beans managed by the IoC container as well as the resolution of their dependencies to be taken in charge
+ * during the execution of a unit test. This environment supports the JSR-365 annotations in business or technical
+ * codes. The IoC/IoD subsystem is implemented by the {@link TestBeanContainer} container that provides a simple
+ * solution dedicated only to the unit tests.
+ *
  * @author mmoquillon
+ * @see SilverTestEnv
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
@@ -42,4 +48,12 @@ import java.lang.annotation.*;
 @UnitTest
 @ExtendWith(SilverTestEnv.class)
 public @interface EnableSilverTestEnv {
+
+  /**
+   * The test environment context to use when bootstrapping the Silverpeas unit test environment with an IoC/IoD
+   * subsystem. This environment context provides a way to customize the behaviour of the IoC/IoD system.
+   *
+   * @return the test context to use for the unit test class.
+   */
+  Class<? extends SilverTestEnvContext> context() default SilverTestEnvContext.class;
 }

@@ -38,11 +38,11 @@ import java.util.Properties;
  * @author mmoquillon
  */
 public class TestScopedResourcesProvider implements SilverpeasResourcesProvider {
-  private Properties mavenProperties;
+  private final TestContext context = new TestContext();
 
   @Override
   public Path getLoggersRootPath() {
-    Path resourcesDirPath = getPathOfTestResources();
+    Path resourcesDirPath = context.getPathOfTestResources();
     return resourcesDirPath.resolve(Path.of("org", "silverpeas", "test", "logging"));
   }
 
@@ -53,29 +53,7 @@ public class TestScopedResourcesProvider implements SilverpeasResourcesProvider 
 
   @Override
   public Path getConfigurationFilesRootPath() {
-    return getPathOfTestResources();
+    return context.getPathOfTestResources();
   }
 
-  public Properties getMavenProperties() {
-    if (mavenProperties == null) {
-      mavenProperties = loadMavenProperties();
-    }
-    return mavenProperties;
-  }
-
-  private Properties loadMavenProperties() {
-    mavenProperties = new Properties();
-    try (InputStream is = getClass().getClassLoader().getResourceAsStream("maven.properties")) {
-      mavenProperties.load(is);
-    } catch (Exception e) {
-      throw new SilverpeasRuntimeException("Unable to load maven.properties for unit tests!", e);
-    }
-    return mavenProperties;
-  }
-
-  private Path getPathOfTestResources() {
-    Properties testProperties = getMavenProperties();
-    String pathProperty = testProperties.getProperty("test.resources.directory", "");
-    return Path.of(pathProperty);
-  }
 }

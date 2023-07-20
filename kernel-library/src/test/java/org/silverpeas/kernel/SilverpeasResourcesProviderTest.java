@@ -27,6 +27,7 @@ package org.silverpeas.kernel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.silverpeas.kernel.cache.service.ApplicationCacheService;
+import org.silverpeas.kernel.test.TestContext;
 import org.silverpeas.kernel.test.TestScopedResourcesProvider;
 
 import java.nio.file.Path;
@@ -77,23 +78,25 @@ class SilverpeasResourcesProviderTest {
   @DisplayName("For the unit tests, the root path of all the l10n resource bundles are located in" +
       " the Maven test target directory")
   void getL10nBundlesRootPath() {
+    TestContext context = new TestContext();
     TestScopedResourcesProvider provider =
         (TestScopedResourcesProvider) SilverpeasResourcesProvider.getInstance();
     Path rootPath = provider.getL10nBundlesRootPath();
     assertThat(rootPath, notNullValue());
     assertThat(rootPath.toString(),
-        is(provider.getMavenProperties().getProperty("test.resources.directory")));
+        is(context.getMavenProperties().getProperty("test.resources.directory")));
   }
 
   @Test
   @DisplayName("For the unit tests, the root path of all the configuration resource bundles are " +
       "located in the Maven test target directory")
   void getConfigurationFilesRootPath() {
+    TestContext context = new TestContext();
     TestScopedResourcesProvider provider =
         (TestScopedResourcesProvider) SilverpeasResourcesProvider.getInstance();
     Path rootPath = provider.getL10nBundlesRootPath();
     assertThat(rootPath, notNullValue());
     assertThat(rootPath.toString(),
-        is(provider.getMavenProperties().getProperty("test.resources.directory")));
+        is(context.getMavenProperties().getProperty("test.resources.directory")));
   }
 }

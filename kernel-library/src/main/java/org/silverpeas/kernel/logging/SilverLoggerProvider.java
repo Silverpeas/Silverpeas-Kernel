@@ -96,19 +96,18 @@ public class SilverLoggerProvider {
    * @see SilverLoggerProvider#getLogger(String)
    */
   public SilverLogger getLogger(Object object) {
-    Package pkg =
-        object instanceof Class ? ((Class<?>) object).getPackage() : object.getClass().getPackage();
-    String namespace = pkg.getName();
-    if (namespace.startsWith("org.silverpeas")) {
-      namespace = namespace.substring(namespace.indexOf('.') + 1);
+    Class<?> type = object instanceof Class ? (Class<?>) object : object.getClass();
+    Package pkg = type.getPackage();
+    String fqn;
+    Logger logger = pkg.isAnnotationPresent(Logger.class) ? pkg.getAnnotation(Logger.class) :
+        type.getAnnotation(Logger.class);
+    if (logger != null) {
+      fqn = logger.value();
+
+    } else {
+      fqn = pkg.getName();
     }
-    Logger annotation = pkg.getAnnotation(Logger.class);
-    if (annotation == null && object instanceof Class) {
-      annotation = ((Class<?>) object).getAnnotation(Logger.class);
-    }
-    if (annotation != null) {
-      namespace = annotation.value();
-    }
+    String namespace = fqn.startsWith("org.silverpeas") ? fqn.substring(fqn.indexOf('.') + 1) : fqn;
     return getLogger(namespace);
   }
 

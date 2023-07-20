@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2023 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,22 +22,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test.extention;
+package org.silverpeas.kernel.test;
 
-import java.lang.annotation.*;
+import javax.inject.Inject;
 
-/**
- * Annotation to indicate that a field in a unit test class is a bean being tested. This
- * annotation is taken in charge by the {@link SilverTestEnv} extension. When such an annotation
- * is discovered by the extension, it will be automatically instantiated (if not yet done) and all
- * of its dependencies (id est fields annotated with @{@link javax.inject.Inject}) will be either
- * resolved or mocked.
- * Finally, the {@link javax.annotation.PostConstruct} annotated method will be invoked.
- * @author mmoquillon
- */
-@Target({ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface TestedBean {
+public class MyBean3 {
+
+  @Inject
+  private MyBean1 myBean1;
+
+
+  public MyBean1 getMyBean1() {
+    return myBean1;
+  }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2022-2023 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,20 +22,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test.extention;
+package org.silverpeas.kernel.test.annotations;
 
 import java.lang.annotation.*;
 
 /**
- * Annotation used to declare a set of classes to mock and to register into the
- * {@link org.silverpeas.core.util.BeanContainer} used in the unit tests.
+ * Annotation used to declare a set of properties to set among the system properties within the
+ * {@link org.silverpeas.kernel.util.SystemWrapper}. By using this annotation, the properties will be available to all
+ * managed beans and mocks declared in a test.
+ *
  * @author mmoquillon
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface TestManagedMocks {
+public @interface SystemProperties {
 
-  Class<?>[] value();
+  SystemProperty[] value();
 }
