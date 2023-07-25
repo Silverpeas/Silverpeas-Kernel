@@ -24,16 +24,17 @@
 
 package org.silverpeas.kernel.test;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.internal.util.MockUtil;
 import org.silverpeas.kernel.TestManagedBeanFeeder;
+import org.silverpeas.kernel.exception.MultipleCandidateException;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@UnitTest
+@DisplayName("Test the dependencies resolution of the beans managed by the IoC/IoD container dedicated to unit tests")
 class DependencyResolverTest {
 
   private final DependencyResolver resolver = DependencyResolver.get();
@@ -100,6 +101,15 @@ class DependencyResolverTest {
     assertThat(myBean, notNullValue());
     assertThat(myBean, instanceOf(MyBean1.class));
     assertThat(myBean.getFoo(), is(foo));
+  }
+
+  @Test
+  @DisplayName("The injection fails if there are several available beans satisfying the dependency")
+  void severalCandidateForOneDependency() {
+    feeder.manageBeanForType(MyBean1.class, MyBean.class);
+    feeder.manageBeanForType(MyBean1.class, MyBean.class);
+    MyBean2 myBean = new MyBean2();
+    assertThrows(MultipleCandidateException.class, () -> resolver.resolve(myBean));
   }
 
 }

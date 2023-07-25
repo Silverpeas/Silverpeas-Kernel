@@ -22,7 +22,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test.extention;
+package org.silverpeas.kernel.test.extension;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.silverpeas.kernel.test.UnitTest;
@@ -34,7 +34,7 @@ import java.lang.annotation.*;
  * Enables the Silverpeas environment dedicated to the unit tests. It extends the unit test with the
  * {@link SilverTestEnv} JUnit extension. This annotation is used to ask for an IoC/IoD environment to be bootstrapped
  * for the beans managed by the IoC container as well as the resolution of their dependencies to be taken in charge
- * during the execution of a unit test. This environment supports the JSR-365 annotations in business or technical
+ * during the execution of a unit test. This environment supports the JSR-330 annotations in business or technical
  * codes. The IoC/IoD subsystem is implemented by the {@link TestBeanContainer} container that provides a simple
  * solution dedicated only to the unit tests.
  *
@@ -42,7 +42,7 @@ import java.lang.annotation.*;
  * @see SilverTestEnv
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(ElementType.TYPE)
 @Documented
 @Inherited
 @UnitTest

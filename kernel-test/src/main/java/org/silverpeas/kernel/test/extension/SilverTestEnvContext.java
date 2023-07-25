@@ -22,9 +22,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test.extention;
+package org.silverpeas.kernel.test.extension;
 
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.silverpeas.kernel.cache.service.ApplicationCacheService;
 import org.silverpeas.kernel.cache.service.ThreadCacheService;
 
@@ -33,7 +32,7 @@ import java.util.List;
 
 /**
  * Context of the Silverpeas testing environment enabled by the
- * {@link org.silverpeas.kernel.test.extention.EnableSilverTestEnv} Junit extension. Such context is a way to customize
+ * {@link org.silverpeas.kernel.test.extension.EnableSilverTestEnv} Junit extension. Such context is a way to customize
  * the environment.
  *
  * @author mmoquillon
@@ -79,7 +78,7 @@ public abstract class SilverTestEnvContext {
 
   /**
    * Initializes the test environment context. This method is usually invoked by the Silverpeas unit test environment
-   * that was enabled with the @{@link org.silverpeas.kernel.test.extention.EnableSilverTestEnv} annotation once this
+   * that was enabled with the @{@link org.silverpeas.kernel.test.extension.EnableSilverTestEnv} annotation once this
    * one is bootstrapped and initialized.
    */
   public abstract void init();

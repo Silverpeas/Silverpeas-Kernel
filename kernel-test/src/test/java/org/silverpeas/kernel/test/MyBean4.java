@@ -24,15 +24,19 @@
 
 package org.silverpeas.kernel.test;
 
-import javax.inject.Inject;
+import org.silverpeas.kernel.annotation.Managed;
 
-public class MyBean3 {
+@Managed
+public class MyBean4 implements MyBean {
 
-  @Inject
-  private MyBean1 myBean1;
+  private String foo = "";
 
-  public MyBean1 getMyBean1() {
-    return myBean1;
+  @Override
+  public String getFoo() {
+    return foo;
   }
 
+  public void setFoo(String foo) {
+    this.foo = foo;
+  }
 }

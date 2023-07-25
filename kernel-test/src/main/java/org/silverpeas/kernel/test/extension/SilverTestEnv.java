@@ -22,7 +22,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test.extention;
+package org.silverpeas.kernel.test.extension;
 
 import org.junit.jupiter.api.extension.*;
 import org.mockito.internal.util.MockUtil;
@@ -32,7 +32,7 @@ import org.silverpeas.kernel.TestManagedBeanFeeder;
 import org.silverpeas.kernel.annotation.NonNull;
 import org.silverpeas.kernel.test.TestSystemWrapper;
 import org.silverpeas.kernel.test.annotations.*;
-import org.silverpeas.kernel.test.extention.SilverTestEnvContext.TestExecutionContext;
+import org.silverpeas.kernel.test.extension.SilverTestEnvContext.TestExecutionContext;
 import org.silverpeas.kernel.test.util.Reflections;
 import org.silverpeas.kernel.util.SystemWrapper;
 
@@ -43,7 +43,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -148,9 +147,9 @@ public class SilverTestEnv
     Reflections.loopInheritance(testInstance.getClass(), type -> {
       Field[] fields = type.getDeclaredFields();
       for (Field field : fields) {
-        processMockedBeanAnnotation(field, testInstance);
-        processTestManagedBeanAnnotation(field, testInstance);
-        processTestedBeanAnnotation(field, testInstance);
+        processMockedBeanAnnotation(type, field, testInstance);
+        processTestManagedBeanAnnotation(type, field, testInstance);
+        processTestedBeanAnnotation(type, field, testInstance);
       }
     });
   }
@@ -235,6 +234,7 @@ public class SilverTestEnv
 
   /**
    * Invokes {@link SilverTestEnvContext#beforeTest(TestExecutionContext)}
+   *
    * @param ctx the current extension context
    */
   @Override
@@ -246,6 +246,7 @@ public class SilverTestEnv
 
   /**
    * Invokes {@link SilverTestEnvContext#afterTest(TestExecutionContext)} and then clear the IoC container.
+   *
    * @param ctx the current extension context
    */
   @Override
@@ -256,45 +257,40 @@ public class SilverTestEnv
     beanFeeder.removeAllManagedBeans();
   }
 
-  private void processTestManagedBeanAnnotation(final Field field, final Object testInstance)
+  private void processTestManagedBeanAnnotation(final Class<?> type, final Field field, final Object testInstance)
       throws ReflectiveOperationException {
     if (field.isAnnotationPresent(TestManagedBean.class)) {
-      setupInstanceField(field, testInstance);
+      setupTestInstanceField(type, field, testInstance);
     }
   }
 
-  private void processMockedBeanAnnotation(final Field field, final Object testInstance)
-      throws IllegalAccessException {
+  private void processMockedBeanAnnotation(final Class<?> type, final Field field, final Object testInstance) {
     if (field.isAnnotationPresent(TestManagedMock.class)) {
       TestManagedMock annotation = field.getAnnotation(TestManagedMock.class);
       Object bean = annotation.stubbed() ? mock(field.getType()) : spy(field.getType());
-      field.trySetAccessible();
-      field.set(testInstance, bean);
+      Reflections.setField(type, testInstance, field, bean);
       registerInBeanContainer(bean);
       registerInBeanContainerByName(bean, field);
     }
   }
 
-  private void processTestedBeanAnnotation(final Field field, final Object testInstance)
+  private void processTestedBeanAnnotation(final Class<?> type, final Field field, final Object testInstance)
       throws ReflectiveOperationException {
     if (field.isAnnotationPresent(TestedBean.class)) {
-      setupInstanceField(field, testInstance);
+      setupTestInstanceField(type, field, testInstance);
     }
   }
 
-  private void setupInstanceField(final Field field, final Object testInstance)
+  private void setupTestInstanceField(final Class<?> type, final Field field, final Object testInstance)
       throws ReflectiveOperationException {
+    field.trySetAccessible();
     Object bean = field.get(testInstance);
     if (bean == null) {
-      registerInBeanContainer(field.getType());
-      bean = beanProvider.getManagedBean(field.getType());
-      Objects.requireNonNull(bean);
-    } else {
-      registerInBeanContainer(bean);
-      registerInBeanContainerByName(bean, field);
+      bean = Reflections.instantiate(field.getType());
     }
-    field.trySetAccessible();
-    field.set(testInstance, bean);
+    registerInBeanContainer(bean);
+    registerInBeanContainerByName(bean, field);
+    Reflections.setField(type, testInstance, field, bean);
   }
 
   private Annotation[] getQualifiers(final AnnotatedElement element) {

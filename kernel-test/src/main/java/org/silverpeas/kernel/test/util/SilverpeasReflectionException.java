@@ -22,17 +22,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test;
+package org.silverpeas.kernel.test.util;
 
-import javax.inject.Inject;
+import org.silverpeas.kernel.SilverpeasRuntimeException;
 
-public class MyBean3 {
-
-  @Inject
-  private MyBean1 myBean1;
-
-  public MyBean1 getMyBean1() {
-    return myBean1;
+/**
+ * Exception thrown when an error occurs while performing reflection operation on an object.
+ * @author mmoquillon
+ */
+public class SilverpeasReflectionException extends SilverpeasRuntimeException {
+  public SilverpeasReflectionException(String message) {
+    super(message);
   }
 
+  public SilverpeasReflectionException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public SilverpeasReflectionException(Throwable t) {
+    super(t);
+  }
 }

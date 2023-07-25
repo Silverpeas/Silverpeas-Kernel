@@ -22,17 +22,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test;
+package org.silverpeas.kernel.exception;
 
-import javax.inject.Inject;
+import org.silverpeas.kernel.SilverpeasRuntimeException;
 
-public class MyBean3 {
+/**
+ * Exception thrown when an expected object hasn't been found in a container or a repository. This exception is used by
+ * the {@link org.silverpeas.kernel.ManagedBeanProvider} when no candidate is found for a given name or satisfying a
+ * give type and qualifiers.
+ *
+ * @author mmoquillon
+ */
+public class NotFoundException extends SilverpeasRuntimeException {
 
-  @Inject
-  private MyBean1 myBean1;
 
-  public MyBean1 getMyBean1() {
-    return myBean1;
+  public NotFoundException(String message) {
+    super(message);
   }
 
+  public NotFoundException(String message, Throwable t) {
+    super(message, t);
+  }
 }

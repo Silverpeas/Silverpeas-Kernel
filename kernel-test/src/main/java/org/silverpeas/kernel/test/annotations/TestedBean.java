@@ -24,7 +24,7 @@
 
 package org.silverpeas.kernel.test.annotations;
 
-import org.silverpeas.kernel.test.extention.SilverTestEnv;
+import org.silverpeas.kernel.test.extension.SilverTestEnv;
 
 import java.lang.annotation.*;
 

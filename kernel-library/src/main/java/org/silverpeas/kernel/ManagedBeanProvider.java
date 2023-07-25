@@ -24,6 +24,8 @@
 package org.silverpeas.kernel;
 
 import org.silverpeas.kernel.cache.service.ThreadCacheService;
+import org.silverpeas.kernel.exception.InvalidStateException;
+import org.silverpeas.kernel.exception.NotFoundException;
 
 import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
@@ -97,7 +99,9 @@ public class ManagedBeanProvider {
    * @param qualifiers zero, one or more qualifiers annotating the bean to look for.
    * @param <T> the type of the bean to return.
    * @return the bean satisfying the expected type and, if any, the expected qualifiers.
-   * @throws IllegalStateException if no bean of the specified type and with the specified qualifiers can be found.
+   * @throws NotFoundException if no bean of the specified type and with the specified qualifiers can be found.
+   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one bean matching the
+   * given type and qualifiers as there is an ambiguous decision in selecting the bean to return.
    * @see BeanContainer#getBeanByType(Class, Annotation...)
    */
   public <T> T getManagedBean(Class<T> type, Annotation... qualifiers) {
@@ -105,7 +109,7 @@ public class ManagedBeanProvider {
         .orElseThrow(() -> {
           String q = qualifiers.length > 0 ? " and qualifiers " +
               Stream.of(qualifiers).map(a -> a.getClass().getName()).collect(Collectors.joining(", ")) : "";
-          return new IllegalStateException("No such bean satisfying type " + type.getName() + q);
+          return new NotFoundException("No such bean satisfying type " + type.getName() + q);
         });
   }
 
@@ -121,8 +125,11 @@ public class ManagedBeanProvider {
    * @param qualifiers zero, one or more qualifiers annotating the bean to look for.
    * @param <T> the type of the bean to return.
    * @return the singleton bean satisfying the expected type and, if any, the expected qualifiers.
-   * @throws IllegalStateException if no bean of the specified type and with the specified qualifiers can be found or if
-   * the class satisfying the give type and with the specified qualifiers isn't a singleton.
+   * @throws NotFoundException if no bean of the specified type and with the specified qualifiers can be found.
+   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one bean matching the
+   * given type and qualifiers as there is an ambiguous decision in selecting the bean to return.
+   * @throws InvalidStateException if the class satisfying the give type and with the specified qualifiers isn't a
+   * singleton.
    * @implNote The bean provided by this method is the single instance of the specified class within the current
    * thread.
    * @implSpec for singletons, their single bean is cached in the cache of the current thread so that it can be latter
@@ -144,7 +151,9 @@ public class ManagedBeanProvider {
    * @param name the unique name identifying the bean in the container.
    * @param <T> the type of the bean to return.
    * @return the bean matching the specified name.
-   * @throws IllegalStateException if no bean can be found with the specified name.
+   * @throws NotFoundException if no bean can be found with the specified name.
+   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one bean with the given
+   * name as the name must be unique for each bean.
    * @see BeanContainer#getBeanByName(String)
    */
   public <T> T getManagedBean(String name) {
@@ -152,7 +161,7 @@ public class ManagedBeanProvider {
     return beanContainer()
         .getBeanByName(name)
         .map(b -> (T) b)
-        .orElseThrow(() -> new IllegalStateException("No such bean named " + name));
+        .orElseThrow(() -> new NotFoundException("No such bean named " + name));
   }
 
 
@@ -167,8 +176,11 @@ public class ManagedBeanProvider {
    * @param name the unique name identifying the bean in the container.
    * @param <T> the type of the bean to return.
    * @return the bean matching the specified name.
-   * @throws IllegalStateException if no bean can be found with the specified name  or if the class satisfying the give
-   * type and with the specified qualifiers isn't a singleton.
+   * @throws NotFoundException if no bean can be found with the specified name.
+   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one bean with the given
+   * name as the name must be unique for each bean.
+   * @throws InvalidStateException if the class satisfying the give type and with the specified qualifiers isn't a
+   * singleton.
    * @implNote The bean provided by this method is the single instance of the class that is qualified by the given name
    * and within the current thread.
    * @implSpec for singletons, their single bean is cached in the cache of the current thread so that it can be latter
@@ -201,7 +213,7 @@ public class ManagedBeanProvider {
 
   protected <T> T ensureIsSingleBean(final T bean) {
     if (!bean.getClass().isAnnotationPresent(Singleton.class)) {
-      throw new IllegalStateException(bean.getClass() + " isn't a singleton");
+      throw new InvalidStateException(bean.getClass() + " isn't a singleton");
     }
     return bean;
   }

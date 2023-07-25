@@ -22,7 +22,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test.extention;
+package org.silverpeas.kernel.test.extension;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.extension.AfterEachCallback;

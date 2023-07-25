@@ -22,17 +22,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test;
-
-import javax.inject.Inject;
-
-public class MyBean3 {
-
-  @Inject
-  private MyBean1 myBean1;
-
-  public MyBean1 getMyBean1() {
-    return myBean1;
-  }
-
-}
+/**
+ * Exceptions used by Silverpeas Kernel.
+ * @author mmoquillon
+ */
+package org.silverpeas.kernel.exception;

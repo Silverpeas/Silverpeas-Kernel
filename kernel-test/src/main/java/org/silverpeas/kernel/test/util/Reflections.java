@@ -26,9 +26,14 @@ package org.silverpeas.kernel.test.util;
 
 import org.silverpeas.kernel.SilverpeasRuntimeException;
 import org.silverpeas.kernel.annotation.NonNull;
+import org.silverpeas.kernel.annotation.Nullable;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -38,6 +43,8 @@ import java.util.stream.Stream;
  * @author mmoquillon
  */
 public final class Reflections {
+
+  private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
 
   private Reflections() {
   }
@@ -78,6 +85,73 @@ public final class Reflections {
     return Stream.of(element.getDeclaredAnnotations())
         .filter(a -> a.annotationType().getAnnotationsByType(annotationType).length > 0)
         .toArray(Annotation[]::new);
+  }
+
+  /**
+   * Constructs an instance of the specified concrete class by using its default non-arguments constructor. The
+   * constructor can be private, package-private, protected or public.
+   *
+   * @param clazz the class to instantiate.
+   * @param <T> the type of the object to construct.
+   * @return the new instance of the given class.
+   * @throws SilverpeasReflectionException if an error occurs while instantiating the specified class.
+   */
+  @NonNull
+  public static <T> T instantiate(@NonNull Class<T> clazz) {
+    try {
+      Objects.requireNonNull(clazz);
+      MethodHandles.Lookup beanTypeLookup = MethodHandles.privateLookupIn(clazz, lookup);
+      MethodType defaultConstructor = MethodType.methodType(void.class);
+      MethodHandle constructorHandle = beanTypeLookup.findConstructor(clazz, defaultConstructor);
+      //noinspection unchecked
+      return (T) constructorHandle.invoke();
+    } catch (Throwable t) {
+      throw new SilverpeasReflectionException(t);
+    }
+  }
+
+  /**
+   * Sets the specified value to the given field of the specified object.
+   *
+   * @param object the object having the field to set with the given value.
+   * @param field the field of the object to set with the given value.
+   * @param value the value to set.
+   * @throws SilverpeasReflectionException if an error occurs while setting the field of the object with the value.
+   */
+  public static void setField(@NonNull Object object, @NonNull Field field, @Nullable Object value) {
+    try {
+      Objects.requireNonNull(object);
+      Objects.requireNonNull(field);
+      MethodHandles.Lookup fieldLookup = MethodHandles.privateLookupIn(object.getClass(), lookup);
+      field.trySetAccessible();
+      MethodHandle fieldSetter = fieldLookup.unreflectSetter(field);
+      fieldSetter.invoke(object, value);
+    } catch (Throwable e) {
+      throw new SilverpeasRuntimeException(e);
+    }
+  }
+
+  /**
+   * Sets the specified value to the given field of the specified object inherited from the given type of the object.
+   *
+   * @param type a type the object satisfies and that is extended by its class.
+   * @param object the object having the field to set with the given value.
+   * @param field the field of the object to set with the given value.
+   * @param value the value to set.
+   * @throws SilverpeasReflectionException if an error occurs while setting the field of the object with the value.
+   */
+  public static void setField(@NonNull Class<?> type, @NonNull Object object, @NonNull Field field, @Nullable Object value) {
+    try {
+      Objects.requireNonNull(type);
+      Objects.requireNonNull(object);
+      Objects.requireNonNull(field);
+      MethodHandles.Lookup fieldLookup = MethodHandles.privateLookupIn(type, lookup);
+      field.trySetAccessible();
+      MethodHandle fieldSetter = fieldLookup.unreflectSetter(field);
+      fieldSetter.invoke(object, value);
+    } catch (Throwable e) {
+      throw new SilverpeasRuntimeException(e);
+    }
   }
 
   /**

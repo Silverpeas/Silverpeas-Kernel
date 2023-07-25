@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2023 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,10 +22,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+package org.silverpeas.kernel.exception;
+
+import org.silverpeas.kernel.SilverpeasRuntimeException;
+
 /**
- * Provides various JUnit 5 extensions to prepare and configure the context of execution of unit
- * tests. These extensions use the Mockito framework and as such they cannot be used (and shouldn't
- * be used) in the integration tests.
+ * Exception thrown when an operation has been invoked on an object that is in a state that doesn't match with the
+ * expectation of the operation execution. This exception is thrown for example by the
+ * {@link org.silverpeas.kernel.ManagedBeanProvider} when the single instance of a non-singleton class is asked.
+ *
  * @author mmoquillon
  */
-package org.silverpeas.kernel.test.extention;
+public class InvalidStateException extends SilverpeasRuntimeException {
+
+  public InvalidStateException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public InvalidStateException(String message) {
+    super(message);
+  }
+}

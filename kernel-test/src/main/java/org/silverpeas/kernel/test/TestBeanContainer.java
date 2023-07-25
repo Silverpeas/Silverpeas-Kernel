@@ -25,14 +25,17 @@ package org.silverpeas.kernel.test;
 
 import org.mockito.internal.util.MockUtil;
 import org.silverpeas.kernel.BeanContainer;
-import org.silverpeas.kernel.SilverpeasRuntimeException;
 import org.silverpeas.kernel.annotation.NonNull;
+import org.silverpeas.kernel.exception.MultipleCandidateException;
+import org.silverpeas.kernel.test.util.Reflections;
+import org.silverpeas.kernel.test.util.SilverpeasReflectionException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,30 +68,26 @@ import java.util.stream.Stream;
  * @author mmoquillon
  */
 public class TestBeanContainer implements BeanContainer {
+
+  private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
   private final Map<String, Set<ElectiveBean<?>>> container = new ConcurrentHashMap<>();
 
   @Override
-  public <T> Optional<T> getBeanByName(String name) throws IllegalStateException {
-    try {
-      Set<ElectiveBean<T>> theBeans = getBeans(name);
-      checkUniqueness(theBeans, name);
-      ElectiveBean<T> theBean = theBeans.iterator().next();
-      return Optional.of(theBean.make());
-    } catch (ClassCastException e) {
-      throw new IllegalStateException(e);
-    }
+  public <T> Optional<T> getBeanByName(String name) {
+    Set<ElectiveBean<T>> theBeans = getBeans(name);
+    checkUniqueness(theBeans, name);
+    return theBeans.stream()
+        .map(ElectiveBean::make)
+        .findAny();
   }
 
   @Override
-  public <T> Optional<T> getBeanByType(Class<T> type, Annotation... qualifiers) throws IllegalStateException {
-    try {
-      Set<ElectiveBean<T>> theBeans = getBeans(type.getName(), qualifiers);
-      checkUniqueness(theBeans, type.getName());
-      ElectiveBean<T> theBean = theBeans.iterator().next();
-      return Optional.of(theBean.make());
-    } catch (ClassCastException e) {
-      throw new IllegalStateException(e);
-    }
+  public <T> Optional<T> getBeanByType(Class<T> type, Annotation... qualifiers) {
+    Set<ElectiveBean<T>> theBeans = getBeans(type.getName(), qualifiers);
+    checkUniqueness(theBeans, type.getName());
+    return theBeans.stream()
+        .map(ElectiveBean::make)
+        .findAny();
   }
 
   @Override
@@ -99,25 +98,24 @@ public class TestBeanContainer implements BeanContainer {
           .map(ElectiveBean::make)
           .collect(Collectors.toSet());
     } catch (ClassCastException e) {
-      throw new IllegalStateException(e);
+      return Set.of();
     }
   }
 
   private <T> Set<ElectiveBean<T>> getBeans(String key, Annotation... qualifiers) {
     Set<ElectiveBean<?>> electiveBeans = container.get(key);
     if (electiveBeans == null || electiveBeans.isEmpty()) {
-      throw new IllegalStateException("No bean found: " + key);
+      return Set.of();
     }
-    //noinspection unchecked
-    Set<ElectiveBean<T>> beans = electiveBeans.stream()
-        .filter(e -> e.satisfies(qualifiers))
-        .map(e -> (ElectiveBean<T>) e)
-        .collect(Collectors.toSet());
-    if (beans.isEmpty()) {
-      String q = qualifiersToMsg(qualifiers);
-      throw new IllegalStateException("No bean found: " + key + q);
+    try {
+      //noinspection unchecked
+      return electiveBeans.stream()
+          .filter(e -> e.satisfies(qualifiers))
+          .map(e -> (ElectiveBean<T>) e)
+          .collect(Collectors.toSet());
+    } catch (ClassCastException e) {
+      return Set.of();
     }
-    return beans;
   }
 
   /**
@@ -126,13 +124,27 @@ public class TestBeanContainer implements BeanContainer {
    *
    * @param bean the bean to manage.
    * @param name the name inder which the bean will be put into the container.
+   * @param <T> the concrete type of the bean
    */
-  public void putBean(Object bean, String name) {
+  public <T> void putBean(T bean, String name) {
     Set<ElectiveBean<?>> beans = container.computeIfAbsent(name, k -> new HashSet<>());
     //noinspection unchecked
-    Class<Object> type = (Class<Object>) bean.getClass();
+    Class<T> type = (Class<T>) bean.getClass();
     var electiveBean = new ElectiveBean<>(bean, type);
     beans.add(electiveBean);
+  }
+
+  /**
+   * Asks to manage the specified class of beans under the given name so that the beans could be retrieved later with
+   * that name.
+   *
+   * @param beanType the type of beans to manage.
+   * @param name the name with which the beans will be created.
+   * @param <T> the concrete type of the beans
+   */
+  public <T> void putBean(Class<T> beanType, String name) {
+    Set<ElectiveBean<?>> beans = container.computeIfAbsent(name, k -> new HashSet<>());
+    beans.add(new ElectiveBean<>(beanType));
   }
 
   /**
@@ -177,7 +189,7 @@ public class TestBeanContainer implements BeanContainer {
   private static <T> void checkUniqueness(Set<ElectiveBean<T>> theBeans, String key, Annotation... qualifiers) {
     if (theBeans.size() > 1) {
       String q = qualifiersToMsg(qualifiers);
-      throw new IllegalStateException("More than one elective bean available: " + key + q);
+      throw new MultipleCandidateException("More than one elective bean available: " + key + q);
     }
   }
 
@@ -226,16 +238,16 @@ public class TestBeanContainer implements BeanContainer {
         return bean;
       }
       try {
-        Constructor<T> constructor = type.getDeclaredConstructor();
-        constructor.trySetAccessible();
-        bean = constructor.newInstance();
+        bean = Reflections.instantiate(type);
         DependencyResolver resolver = DependencyResolver.get();
         resolver.resolve(bean);
         invokePostConstruction(bean);
         return bean;
-      } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
-               InvocationTargetException e) {
-        throw new IllegalStateException("A default constructor without any parameters should be available");
+      } catch (SilverpeasReflectionException | MultipleCandidateException e) {
+        throw e;
+      } catch (Throwable e) {
+        throw new SilverpeasReflectionException("A default constructor without any parameters should be available in " +
+            type.getName(), e);
       }
     }
 
@@ -250,29 +262,31 @@ public class TestBeanContainer implements BeanContainer {
       Method[] methods = bean.getClass().getDeclaredMethods();
       for (Method method : methods) {
         if (method.isAnnotationPresent(PostConstruct.class)) {
-          method.trySetAccessible();
-          try {
-            method.invoke(bean);
-          } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new SilverpeasRuntimeException(e);
-          }
+          invoke(method);
           break;
         }
       }
     }
 
     private void invokePreDestruction(final Object bean) {
-      try {
-        Method[] methods = bean.getClass().getDeclaredMethods();
-        for (Method method : methods) {
-          if (method.isAnnotationPresent(PreDestroy.class)) {
-            method.trySetAccessible();
-            method.invoke(bean);
-            break;
-          }
+      Method[] methods = bean.getClass().getDeclaredMethods();
+      for (Method method : methods) {
+        if (method.isAnnotationPresent(PreDestroy.class)) {
+          invoke(method);
+          break;
         }
-      } catch (InvocationTargetException | IllegalAccessException e) {
-        throw new SilverpeasRuntimeException(e);
+      }
+    }
+
+    private void invoke(Method method) throws SilverpeasReflectionException {
+      try {
+        MethodHandles.Lookup beanTypeLookup = MethodHandles.privateLookupIn(type, lookup);
+        method.trySetAccessible();
+        MethodHandle methodHandle = beanTypeLookup.unreflect(method);
+        methodHandle.invoke(bean);
+      } catch (Throwable e) {
+        throw new SilverpeasReflectionException("Error while invoking method " +
+            type.getName() + "#" + method.getName() + e);
       }
     }
   }

@@ -24,7 +24,6 @@
 
 package org.silverpeas.kernel.test;
 
-import org.silverpeas.kernel.annotation.Base;
 import org.silverpeas.kernel.annotation.Managed;
 import org.silverpeas.kernel.annotation.Technical;
 import org.silverpeas.kernel.util.SystemWrapper;

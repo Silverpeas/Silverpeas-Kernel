@@ -22,17 +22,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test;
+package org.silverpeas.kernel.exception;
 
-import javax.inject.Inject;
+import org.silverpeas.kernel.SilverpeasRuntimeException;
 
-public class MyBean3 {
+/**
+ * Exception thrown when there are more than one candidate at a request for a single object to a service. This exception
+ * is used by the {@link org.silverpeas.kernel.BeanContainer}.
+ * @author mmoquillon
+ */
+public class MultipleCandidateException extends SilverpeasRuntimeException {
 
-  @Inject
-  private MyBean1 myBean1;
-
-  public MyBean1 getMyBean1() {
-    return myBean1;
+  public MultipleCandidateException(String message) {
+    super(message);
   }
-
 }

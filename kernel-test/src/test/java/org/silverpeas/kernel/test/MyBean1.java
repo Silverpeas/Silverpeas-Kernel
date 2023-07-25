@@ -24,13 +24,24 @@
 
 package org.silverpeas.kernel.test;
 
+import javax.annotation.PostConstruct;
+
 /**
  * A managed bean to use for testing the IoC/IoD mechanism dedicated to the unit tests.
  * @author mmoquillon
  */
 public class MyBean1 implements MyBean {
 
+  public static final String DEFAULT_FOO = "Hey man!";
+
   private String foo;
+
+  @PostConstruct
+  private void initFoo() {
+    if (this.foo == null) {
+      this.foo = DEFAULT_FOO;
+    }
+  }
 
   @Override
   public String getFoo() {

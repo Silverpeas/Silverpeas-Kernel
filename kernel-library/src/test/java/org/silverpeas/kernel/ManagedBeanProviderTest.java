@@ -27,6 +27,9 @@ package org.silverpeas.kernel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.silverpeas.kernel.cache.service.ThreadCacheService;
+import org.silverpeas.kernel.exception.InvalidStateException;
+import org.silverpeas.kernel.exception.MultipleCandidateException;
+import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.util.Mutable;
 
 import java.util.Set;
@@ -67,7 +70,7 @@ class ManagedBeanProviderTest {
   @Test
   void getNonExistingManagedBeanByName() {
     feeder.manageBeanWithName(MyBean1.class, "toto");
-    assertThrows(IllegalStateException.class, () -> provider.getManagedBean("foo"));
+    assertThrows(NotFoundException.class, () -> provider.getManagedBean("foo"));
   }
 
   @Test
@@ -83,7 +86,7 @@ class ManagedBeanProviderTest {
   @Test
   void getNonExistingSingleInstanceByName() {
     feeder.manageBeanWithName(MyBean1.class, "toto");
-    assertThrows(IllegalStateException.class, () -> provider.getSingleInstance("foo"));
+    assertThrows(NotFoundException.class, () -> provider.getSingleInstance("foo"));
   }
 
   @Test
@@ -109,7 +112,7 @@ class ManagedBeanProviderTest {
   @Test
   void getNonExistingManagedBeanByType() {
     feeder.manageBeanForType(MyBean2.class, MyBean.class);
-    assertThrows(IllegalStateException.class, () -> provider.getManagedBean(MyBean1.class));
+    assertThrows(NotFoundException.class, () -> provider.getManagedBean(MyBean1.class));
   }
 
   @Test
@@ -124,7 +127,7 @@ class ManagedBeanProviderTest {
   @Test
   void getNonExistingSingleInstanceByType() {
     feeder.manageBeanForType(MyBean2.class, MyBean.class);
-    assertThrows(IllegalStateException.class, () -> provider.getSingleInstance(MyBean1.class));
+    assertThrows(InvalidStateException.class, () -> provider.getSingleInstance(MyBean.class));
   }
 
   @Test
@@ -142,14 +145,31 @@ class ManagedBeanProviderTest {
     final String name = "foo";
     feeder.manageBeanWithName(MyBean2.class, name);
 
-    assertThrows(IllegalStateException.class, () -> provider.getSingleInstance(name));
+    assertThrows(InvalidStateException.class, () -> provider.getSingleInstance(name));
   }
 
   @Test
   void getSingleInstanceByTypeOfANonSingleton() {
     feeder.manageBeanForType(MyBean2.class, MyBean2.class);
 
-    assertThrows(IllegalStateException.class, () -> provider.getSingleInstance(MyBean2.class));
+    assertThrows(InvalidStateException.class, () -> provider.getSingleInstance(MyBean2.class));
+  }
+
+  @Test
+  void getMoreThanOneBeanByName() {
+    final String name = "foo";
+    feeder.manageBeanWithName(MyBean2.class, name);
+    feeder.manageBeanWithName(MyBean1.class, name);
+
+    assertThrows(MultipleCandidateException.class, () -> provider.getManagedBean(name));
+  }
+
+  @Test
+  void getMoreThanOneBeanWhenAskedOneBeanByType() {
+    feeder.manageBeanForType(MyBean2.class, MyBean.class);
+    feeder.manageBeanForType(MyBean1.class, MyBean.class);
+
+    assertThrows(MultipleCandidateException.class, () -> provider.getManagedBean(MyBean.class));
   }
 
   @Test

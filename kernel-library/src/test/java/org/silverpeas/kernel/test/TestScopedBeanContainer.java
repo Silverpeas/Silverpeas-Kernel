@@ -25,6 +25,8 @@
 package org.silverpeas.kernel.test;
 
 import org.silverpeas.kernel.BeanContainer;
+import org.silverpeas.kernel.exception.MultipleCandidateException;
+import org.silverpeas.kernel.exception.NotFoundException;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -39,28 +41,28 @@ public class TestScopedBeanContainer implements BeanContainer {
   private final Map<String, Set<?>> beans = new ConcurrentHashMap<>();
 
   @Override
-  public <T> Optional<T> getBeanByName(String name) throws IllegalStateException {
+  public <T> Optional<T> getBeanByName(String name) {
     try {
       Set<?> theBeans = getBeans(name);
       if (theBeans.size() > 1) {
-        throw new IllegalStateException("Several available beans: " + name);
+        throw new MultipleCandidateException("Several available beans: " + name);
       }
       return getSingleBean(theBeans);
     } catch (ClassCastException e) {
-      throw new IllegalStateException(e);
+      return Optional.empty();
     }
   }
 
   @Override
-  public <T> Optional<T> getBeanByType(Class<T> type, Annotation... qualifiers) throws IllegalStateException {
+  public <T> Optional<T> getBeanByType(Class<T> type, Annotation... qualifiers) {
     try {
       Set<?> theBeans = getBeans(type.getName());
       if (theBeans.size() > 1) {
-        throw new IllegalStateException("Several available beans: " + type.getName());
+        throw new MultipleCandidateException("Several available beans: " + type.getName());
       }
       return getSingleBean(theBeans);
     } catch (ClassCastException e) {
-      throw new IllegalStateException(e);
+      return Optional.empty();
     }
   }
 
@@ -71,7 +73,7 @@ public class TestScopedBeanContainer implements BeanContainer {
       Set<?> theBeans = getBeans(type.getName());
       return theBeans.stream().map(b -> (T) b).collect(Collectors.toSet());
     } catch (ClassCastException e) {
-      throw new IllegalStateException(e);
+      return Set.of();
     }
   }
 

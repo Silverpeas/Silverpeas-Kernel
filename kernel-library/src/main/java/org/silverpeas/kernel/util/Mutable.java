@@ -267,7 +267,7 @@ public final class Mutable<T> {
    * {@code exceptionSupplier} is null
    * @apiNote A method reference to the exception constructor with an empty
    * argument list can be used as the supplier. For example,
-   * {@code IllegalStateException::new}
+   * {@code InvalidStateException::new}
    */
   public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
     if (value != null) {

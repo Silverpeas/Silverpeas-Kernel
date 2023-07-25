@@ -27,12 +27,17 @@ package org.silverpeas.kernel.test;
 import org.silverpeas.kernel.ManagedBeanProvider;
 import org.silverpeas.kernel.SilverpeasRuntimeException;
 import org.silverpeas.kernel.annotation.NonNull;
+import org.silverpeas.kernel.exception.MultipleCandidateException;
+import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.test.util.Reflections;
+import org.silverpeas.kernel.test.util.SilverpeasReflectionException;
 
 import javax.inject.Inject;
 import javax.inject.Qualifier;
 import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Optional;
@@ -83,8 +88,11 @@ public class DependencyResolver {
    * </ul>
    *
    * @param bean the bean for which the dependencies on others managed bean have to be resolved.
+   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one managed bean
+   * satisfying a dependency when only one is required
+   * @throws org.silverpeas.kernel.test.util.SilverpeasReflectionException if the dependencies cannot be satisfied.
    */
-  public final void resolve(final Object bean) {
+  public final void resolve(final Object bean) throws MultipleCandidateException, SilverpeasReflectionException {
     Reflections.loopInheritance(bean.getClass(), typeToLookup -> {
       Field[] beanFields = typeToLookup.getDeclaredFields();
       Stream.of(beanFields)
@@ -98,22 +106,22 @@ public class DependencyResolver {
     });
   }
 
-  private static void setDependency(Object bean, Field f, Object dependency) {
-    f.trySetAccessible();
-    try {
-      f.set(bean, dependency);
-    } catch (IllegalAccessException e) {
-      throw new SilverpeasRuntimeException(e);
-    }
+  private static void setDependency(Object bean, Field field, Object dependency) {
+    Reflections.setField(bean, field, dependency);
   }
 
   /**
    * Applies a custom dependency resolution mechanism. Does nothing by default.
+   *
    * @param dependency the dependency to resolve. The field shouldn't be valued by the method.
    * @param qualifiers a set of qualifiers the managed bean to look for has to satisfy.
    * @return optionally a bean responding successfully to the expectations. By default, nothing.
+   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one managed bean
+   * satisfying a dependency.
+   * @throws org.silverpeas.kernel.test.util.SilverpeasReflectionException if the dependency cannot be set.
    */
-  protected Optional<Object> resolveCustomDependency(@NonNull Field dependency, @NonNull Annotation... qualifiers) {
+  protected Optional<Object> resolveCustomDependency(@NonNull Field dependency, @NonNull Annotation... qualifiers)
+      throws MultipleCandidateException, SilverpeasReflectionException {
     Objects.requireNonNull(dependency);
     Objects.requireNonNull(qualifiers);
     return Optional.empty();
@@ -122,11 +130,16 @@ public class DependencyResolver {
   /**
    * Applies the default dependency resolution mechanism. It looks for a bean in the IoC container that satisfies the
    * type of the field and the specified qualifiers on the field. If no such a bean is found, then the field is mocked.
+   *
    * @param dependency the dependency to resolve. The field shouldn't be valued by the method.
    * @param qualifiers a set of qualifiers the managed bean to look for has to satisfy.
    * @return either the managed bean that satisfies the expectations or a mock.
+   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one managed bean
+   * satisfying a dependency.
+   * @throws org.silverpeas.kernel.test.util.SilverpeasReflectionException if the dependency cannot be set.
    */
-  protected Object resolveDependency(@NonNull Field dependency, @NonNull Annotation... qualifiers) {
+  protected Object resolveDependency(@NonNull Field dependency, @NonNull Annotation... qualifiers)
+      throws MultipleCandidateException, SilverpeasReflectionException {
     Objects.requireNonNull(dependency);
     Objects.requireNonNull(qualifiers);
     Class<?> dependencyType = dependency.getType();
@@ -138,7 +151,7 @@ public class DependencyResolver {
         bean = beanProvider.getManagedBean(dependencyType, qualifiers);
       }
       return bean;
-    } catch (IllegalStateException e) {
+    } catch (NotFoundException e) {
       return mock(dependencyType);
     }
   }

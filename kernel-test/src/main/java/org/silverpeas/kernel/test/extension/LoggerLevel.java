@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2022 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,17 +22,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test;
+package org.silverpeas.kernel.test.extension;
 
-import javax.inject.Inject;
+import org.silverpeas.kernel.logging.Level;
 
-public class MyBean3 {
+import java.lang.annotation.*;
 
-  @Inject
-  private MyBean1 myBean1;
+/**
+ * Annotation to specify a logger level. This annotation is managed by the {@link LoggerExtension}
+ * JUnit 5 extension. Be cautious: the annotation cannot be used in
+ * {@link org.junit.jupiter.api.BeforeEach} and in @{@link org.junit.jupiter.api.BeforeAll}
+ * annotated methods.
+ * @author mmoquillon
+ */
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface LoggerLevel {
 
-  public MyBean1 getMyBean1() {
-    return myBean1;
-  }
-
+  Level value();
 }

@@ -22,24 +22,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test.extention;
-
-import org.silverpeas.kernel.logging.Level;
-
-import java.lang.annotation.*;
-
 /**
- * Annotation to specify a logger level. This annotation is managed by the {@link LoggerExtension}
- * JUnit 5 extension. Be cautious: the annotation cannot be used in
- * {@link org.junit.jupiter.api.BeforeEach} and in @{@link org.junit.jupiter.api.BeforeAll}
- * annotated methods.
+ * Provides various JUnit 5 extensions to prepare and configure the context of execution of unit
+ * tests. These extensions use the Mockito framework and as such they cannot be used (and shouldn't
+ * be used) in the integration tests.
  * @author mmoquillon
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Inherited
-@Documented
-public @interface LoggerLevel {
-
-  Level value();
-}
+package org.silverpeas.kernel.test.extension;
