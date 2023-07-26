@@ -30,7 +30,8 @@ import java.util.function.Supplier;
 
 /**
  * Common implementation of a {@link SimpleCache} from which a more concrete solution can be extended.
- * @author  Yohann Chastagnier
+ *
+ * @author Yohann Chastagnier
  * @since 25/10/13
  */
 public abstract class AbstractSimpleCache implements SimpleCache {
@@ -49,9 +50,8 @@ public abstract class AbstractSimpleCache implements SimpleCache {
   public <T> T computeIfAbsent(final Object key, final Class<T> classType,
       final Supplier<T> valueSupplier) {
     Objects.requireNonNull(valueSupplier);
-    T value = get(key, classType);
-    if (value == null) {
-      value = valueSupplier.get();
+    T value;
+    if ((value = get(key, classType)) == null && (value = valueSupplier.get()) != null) {
       put(key, value);
     }
     return value;
@@ -66,6 +66,7 @@ public abstract class AbstractSimpleCache implements SimpleCache {
 
   /**
    * Gets the whole content of the cache.
+   *
    * @return a {@link Map} with all the items in the cache, mapped each of them by their key.
    */
   public abstract Map<Object, Object> getAll();

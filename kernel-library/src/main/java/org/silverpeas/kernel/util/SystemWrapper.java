@@ -46,7 +46,7 @@ public interface SystemWrapper {
    * @return the instance of the System Wrapper.
    */
   static SystemWrapper get() {
-    return ManagedBeanProvider.getInstance().getSingleInstance(SystemWrapper.class);
+    return ManagedBeanProvider.getInstance().getManagedBean(SystemWrapper.class);
   }
 
   /**

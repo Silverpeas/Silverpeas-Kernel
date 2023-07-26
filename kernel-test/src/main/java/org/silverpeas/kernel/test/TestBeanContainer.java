@@ -35,7 +35,6 @@ import javax.annotation.PreDestroy;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -245,7 +244,7 @@ public class TestBeanContainer implements BeanContainer {
         return bean;
       } catch (SilverpeasReflectionException | MultipleCandidateException e) {
         throw e;
-      } catch (Throwable e) {
+      } catch (Exception e) {
         throw new SilverpeasReflectionException("A default constructor without any parameters should be available in " +
             type.getName(), e);
       }
@@ -258,7 +257,7 @@ public class TestBeanContainer implements BeanContainer {
       }
     }
 
-    private void invokePostConstruction(final Object bean) {
+    private void invokePostConstruction(final Object bean) throws SilverpeasReflectionException {
       Method[] methods = bean.getClass().getDeclaredMethods();
       for (Method method : methods) {
         if (method.isAnnotationPresent(PostConstruct.class)) {
@@ -268,7 +267,7 @@ public class TestBeanContainer implements BeanContainer {
       }
     }
 
-    private void invokePreDestruction(final Object bean) {
+    private void invokePreDestruction(final Object bean) throws SilverpeasReflectionException {
       Method[] methods = bean.getClass().getDeclaredMethods();
       for (Method method : methods) {
         if (method.isAnnotationPresent(PreDestroy.class)) {

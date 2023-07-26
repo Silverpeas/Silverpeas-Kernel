@@ -97,7 +97,7 @@ public final class Reflections {
    * @throws SilverpeasReflectionException if an error occurs while instantiating the specified class.
    */
   @NonNull
-  public static <T> T instantiate(@NonNull Class<T> clazz) {
+  public static <T> T instantiate(@NonNull Class<T> clazz) throws SilverpeasReflectionException {
     try {
       Objects.requireNonNull(clazz);
       MethodHandles.Lookup beanTypeLookup = MethodHandles.privateLookupIn(clazz, lookup);
@@ -118,7 +118,8 @@ public final class Reflections {
    * @param value the value to set.
    * @throws SilverpeasReflectionException if an error occurs while setting the field of the object with the value.
    */
-  public static void setField(@NonNull Object object, @NonNull Field field, @Nullable Object value) {
+  public static void setField(@NonNull Object object, @NonNull Field field, @Nullable Object value)
+      throws SilverpeasReflectionException {
     try {
       Objects.requireNonNull(object);
       Objects.requireNonNull(field);
@@ -140,7 +141,8 @@ public final class Reflections {
    * @param value the value to set.
    * @throws SilverpeasReflectionException if an error occurs while setting the field of the object with the value.
    */
-  public static void setField(@NonNull Class<?> type, @NonNull Object object, @NonNull Field field, @Nullable Object value) {
+  public static void setField(@NonNull Class<?> type, @NonNull Object object, @NonNull Field field,
+      @Nullable Object value) throws SilverpeasReflectionException {
     try {
       Objects.requireNonNull(type);
       Objects.requireNonNull(object);

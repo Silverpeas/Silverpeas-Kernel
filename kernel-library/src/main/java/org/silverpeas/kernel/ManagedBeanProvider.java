@@ -23,9 +23,10 @@
  */
 package org.silverpeas.kernel;
 
+import org.silverpeas.kernel.annotation.NonNull;
 import org.silverpeas.kernel.cache.service.ThreadCacheService;
-import org.silverpeas.kernel.exception.InvalidStateException;
 import org.silverpeas.kernel.exception.NotFoundException;
+import org.silverpeas.kernel.util.Mutable;
 
 import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
@@ -36,11 +37,10 @@ import java.util.stream.Stream;
 
 
 /**
- * A provider of objects whose the life-cycle is managed by an underlying IoC/IoD container whose the implementation
- * satisfies the {@link BeanContainer} interface. For doing, the class of these objects must be elective for management
- * and registered into the {@link BeanContainer} instance. This provider is just an access point to the objects of these
- * classes in the container. The election and the registration of the classes in the bean container are left to the
- * implementation of the IoC/IoD solution.
+ * A provider of objects whose the life-cycle is managed by an underlying IoC/IoD container that must satisfy the
+ * {@link BeanContainer} interface. This provider is just an access point to the beans for which their class has been
+ * elective for life-cycle management and registered for this. The election and the registration of the classes in the
+ * bean container are left to the implementation of the IoC/IoD solution.
  * <p>
  * Usually, the dependencies between beans managed by the container are resolved during their instantiation and this
  * mechanism is usually done transparently by the IoC/IoD solution itself. Nevertheless, some IoC/IoD solutions resolves
@@ -54,7 +54,8 @@ import java.util.stream.Stream;
  * For managed beans, according to the IoC system used, their dependency resolution should be left to the underlying
  * container because it is less expensive in time than using this provider to access the dependencies. This is why this
  * provider should be used only by unmanaged beans. Anyway, to improve lightly the performance, the thread local cache
- * is used to store single bean of singleton, avoiding then to invoke explicitly the underlying bean container.
+ * is used to store single bean of singleton, avoiding then to invoke explicitly the underlying bean container. It is
+ * when such a single instance isn't found in the cache the container is implied to get it.
  * </p>
  *
  * @author mmoquillon
@@ -93,7 +94,10 @@ public class ManagedBeanProvider {
   }
 
   /**
-   * Gets an instance of the single implementation of the specified type and satisfying the given qualifiers if any.
+   * Gets an instance of the single implementation matching the specified type and satisfying the given qualifiers if
+   * any. The bean is first looked for in the cache of the current thead before asking it to the bean container. If the
+   * implementation is a singleton and it's not yet cached, then the bean is put in the cache of the current thread for
+   * further retrieval.
    *
    * @param type the type of the bean.
    * @param qualifiers zero, one or more qualifiers annotating the bean to look for.
@@ -104,49 +108,27 @@ public class ManagedBeanProvider {
    * given type and qualifiers as there is an ambiguous decision in selecting the bean to return.
    * @see BeanContainer#getBeanByType(Class, Annotation...)
    */
+  @NonNull
   public <T> T getManagedBean(Class<T> type, Annotation... qualifiers) {
-    return beanContainer().getBeanByType(type, qualifiers)
-        .orElseThrow(() -> {
-          String q = qualifiers.length > 0 ? " and qualifiers " +
-              Stream.of(qualifiers).map(a -> a.getClass().getName()).collect(Collectors.joining(", ")) : "";
-          return new NotFoundException("No such bean satisfying type " + type.getName() + q);
-        });
+    Mutable<T> bean = Mutable.empty();
+    T cachedBean = cacheService.getCache().computeIfAbsent(cacheKey(type, qualifiers), type, () -> {
+      bean.set(beanContainer()
+          .getBeanByType(type)
+          .orElseThrow(() -> {
+            String q = qualifiers.length > 0 ? " and qualifiers " +
+                Stream.of(qualifiers).map(a -> a.getClass().getName()).collect(Collectors.joining(", ")) : "";
+            return new NotFoundException("No such bean satisfying type " + type.getName() + q);
+          }));
+      return bean.get().getClass().isAnnotationPresent(Singleton.class) ? bean.get() : null;
+    });
+    return cachedBean == null ? bean.get() : cachedBean;
   }
 
   /**
-   * Gets the single instance of the single implementation of the specified type and satisfying the given qualifiers if
-   * any. The class satisfying the expectation has to be a singleton, otherwise an {@link IllegalStateException} is
-   * thrown.
-   * <p>
-   * By using this method, the caller is knowingly requesting a singleton. This is why it has to be
-   * <em>sure</em> the class is a singleton.
-   *
-   * @param type the type of the bean.
-   * @param qualifiers zero, one or more qualifiers annotating the bean to look for.
-   * @param <T> the type of the bean to return.
-   * @return the singleton bean satisfying the expected type and, if any, the expected qualifiers.
-   * @throws NotFoundException if no bean of the specified type and with the specified qualifiers can be found.
-   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one bean matching the
-   * given type and qualifiers as there is an ambiguous decision in selecting the bean to return.
-   * @throws InvalidStateException if the class satisfying the give type and with the specified qualifiers isn't a
-   * singleton.
-   * @implNote The bean provided by this method is the single instance of the specified class within the current
-   * thread.
-   * @implSpec for singletons, their single bean is cached in the cache of the current thread so that it can be latter
-   * retrieved without having to ask the {@link BeanContainer} for it. This improves the time to fetch a bean.
-   * @see #getManagedBean(Class, Annotation...)
-   */
-  public <T> T getSingleInstance(Class<T> type, Annotation... qualifiers) {
-    final StringBuilder cacheKey = new StringBuilder(CACHE_KEY_PREFIX + type.getName());
-    for (final Annotation qualifier : qualifiers) {
-      cacheKey.append(":").append(qualifier.annotationType().getName());
-    }
-    return cacheService.getCache()
-        .computeIfAbsent(cacheKey.toString(), type, () -> ensureIsSingleBean(getManagedBean(type, qualifiers)));
-  }
-
-  /**
-   * Gets an object of the single type implementation that is qualified by the specified name.
+   * Gets an object of the single type implementation that is qualified with the specified name. The bean is first
+   * looked for in the cache of the current thead before asking it to the bean container. If the implementation is a
+   * singleton and it's not yet cached, then the bean is put in the cache of the current thread for * further
+   * retrieval.
    *
    * @param name the unique name identifying the bean in the container.
    * @param <T> the type of the bean to return.
@@ -156,41 +138,18 @@ public class ManagedBeanProvider {
    * name as the name must be unique for each bean.
    * @see BeanContainer#getBeanByName(String)
    */
-  public <T> T getManagedBean(String name) {
-    //noinspection unchecked
-    return beanContainer()
-        .getBeanByName(name)
-        .map(b -> (T) b)
-        .orElseThrow(() -> new NotFoundException("No such bean named " + name));
-  }
-
-
-  /**
-   * Gets the single instance of a single type implementation that is qualified by the specified name. If the class of
-   * the bean registered under the given name isn't a singleton, an {@link IllegalStateException} is thrown.
-   * <p>
-   * By using this method, the caller is knowingly requesting a singleton. This is why it has to be
-   * <em>sure</em> the class is a singleton.
-   * <p>
-   *
-   * @param name the unique name identifying the bean in the container.
-   * @param <T> the type of the bean to return.
-   * @return the bean matching the specified name.
-   * @throws NotFoundException if no bean can be found with the specified name.
-   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one bean with the given
-   * name as the name must be unique for each bean.
-   * @throws InvalidStateException if the class satisfying the give type and with the specified qualifiers isn't a
-   * singleton.
-   * @implNote The bean provided by this method is the single instance of the class that is qualified by the given name
-   * and within the current thread.
-   * @implSpec for singletons, their single bean is cached in the cache of the current thread so that it can be latter
-   * retrieved without having to ask the {@link BeanContainer} for it. This improves the time to fetch a bean.
-   * @see #getManagedBean(String)
-   */
   @SuppressWarnings("unchecked")
-  public <T> T getSingleInstance(String name) {
-    return (T) cacheService.getCache()
-        .computeIfAbsent(CACHE_KEY_PREFIX + name, Object.class, () -> ensureIsSingleBean(getManagedBean(name)));
+  @NonNull
+  public <T> T getManagedBean(String name) {
+    Mutable<T> bean = Mutable.empty();
+    T cachedBean = (T) cacheService.getCache().computeIfAbsent(CACHE_KEY_PREFIX + name, Object.class, () -> {
+      bean.set(beanContainer()
+          .getBeanByName(name)
+          .map(b -> (T) b)
+          .orElseThrow(() -> new NotFoundException("No such bean named " + name)));
+      return bean.get().getClass().isAnnotationPresent(Singleton.class) ? bean.get() : null;
+    });
+    return cachedBean == null ? bean.get() : cachedBean;
   }
 
   /**
@@ -211,11 +170,11 @@ public class ManagedBeanProvider {
     return currentContainer;
   }
 
-  protected <T> T ensureIsSingleBean(final T bean) {
-    if (!bean.getClass().isAnnotationPresent(Singleton.class)) {
-      throw new InvalidStateException(bean.getClass() + " isn't a singleton");
+  private static <T> String cacheKey(Class<T> type, Annotation[] qualifiers) {
+    final StringBuilder cacheKey = new StringBuilder(CACHE_KEY_PREFIX + type.getName());
+    for (final Annotation qualifier : qualifiers) {
+      cacheKey.append(":").append(qualifier.annotationType().getName());
     }
-    return bean;
+    return cacheKey.toString();
   }
-
 }

@@ -25,7 +25,6 @@
 package org.silverpeas.kernel.test;
 
 import org.silverpeas.kernel.ManagedBeanProvider;
-import org.silverpeas.kernel.SilverpeasRuntimeException;
 import org.silverpeas.kernel.annotation.NonNull;
 import org.silverpeas.kernel.exception.MultipleCandidateException;
 import org.silverpeas.kernel.exception.NotFoundException;
@@ -34,10 +33,7 @@ import org.silverpeas.kernel.test.util.SilverpeasReflectionException;
 
 import javax.inject.Inject;
 import javax.inject.Qualifier;
-import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Optional;
@@ -144,13 +140,7 @@ public class DependencyResolver {
     Objects.requireNonNull(qualifiers);
     Class<?> dependencyType = dependency.getType();
     try {
-      Object bean;
-      if (dependencyType.isAnnotationPresent(Singleton.class)) {
-        bean = beanProvider.getSingleInstance(dependencyType, qualifiers);
-      } else {
-        bean = beanProvider.getManagedBean(dependencyType, qualifiers);
-      }
-      return bean;
+      return beanProvider.getManagedBean(dependencyType, qualifiers);
     } catch (NotFoundException e) {
       return mock(dependencyType);
     }
