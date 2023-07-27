@@ -29,7 +29,8 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
- * Common implementation of a {@link SimpleCache} from which a more concrete solution can be extended.
+ * Common implementation of a {@link SimpleCache} from which a more concrete solution can be
+ * extended.
  *
  * @author Yohann Chastagnier
  * @since 25/10/13

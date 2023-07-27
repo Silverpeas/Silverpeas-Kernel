@@ -26,31 +26,35 @@ package org.silverpeas.kernel.logging;
 import java.util.function.Supplier;
 
 /**
- * The custom logger for Silverpeas. It abstracts the concrete logging mechanism that will be used in runtime and it
- * provides additional capabilities for the specific use in Silverpeas.
+ * The custom logger for Silverpeas. It abstracts the concrete logging mechanism that will be used
+ * in runtime and it provides additional capabilities for the specific use in Silverpeas.
  * <p>
- * This custom logger is an adapter to a concrete underlying logging backend to use to log messages. The logging backend
- * can be the logging subsystem of the used application server or a tiers logging framework. With the adapter it can
- * then be easy to switch from an implementation to the other without impacting the logging use in the code of
- * Silverpeas.
+ * This custom logger is an adapter to a concrete underlying logging backend to use to log messages.
+ * The logging backend can be the logging subsystem of the used application server or a tiers
+ * logging framework. With the adapter it can then be easy to switch from an implementation to the
+ * other without impacting the logging use in the code of Silverpeas.
  * </p>
  * <p>
- * Each logger is identified by a namespace and belongs to an hierarchical tree of loggers rooted to the
- * <code>silverpeas</code> namespace. The namespace of a logger defines the position of the logger in the tree: a
- * logger with as namespace <code>silverpeas.kernel</code> is a child of the root Silverpeas logger. When a logger of a
- * given namespace isn't found, then it is the configuration of the nearest defined parent logger that is used (logging
- * level and handler). In Silverpeas, the handlers (aka the snippet of codes that handles the messages into logs) are
- * predefined by configuration and cannot be modified programmatically.
+ * Each logger is identified by a namespace and belongs to an hierarchical tree of loggers rooted to
+ * the
+ * <code>silverpeas</code> namespace. The namespace of a logger defines the position of the logger
+ * in the tree: a
+ * logger with as namespace <code>silverpeas.kernel</code> is a child of the root Silverpeas logger.
+ * When a logger of a given namespace isn't found, then it is the configuration of the nearest
+ * defined parent logger that is used (logging level and handler). In Silverpeas, the handlers (aka
+ * the snippet of codes that handles the messages into logs) are predefined by configuration and
+ * cannot be modified programmatically.
  * </p>
  * <p>
- * The convention mapping between the namespace of a logger and the package name of an object that logs messages is that
- * all packages rooted to the package <code>org.silverpeas</code> are mapped, each of them, to a namespace of identical
- * name rooted to the Silverpeas root namespace <code>silverpeas</code>. For others packages, the namespace is the
- * package fully qualified name.
+ * The convention mapping between the namespace of a logger and the package name of an object that
+ * logs messages is that all packages rooted to the package <code>org.silverpeas</code> are mapped,
+ * each of them, to a namespace of identical name rooted to the Silverpeas root namespace
+ * <code>silverpeas</code>. For others packages, the namespace is the package fully qualified name.
  * </p>
  * <p>
- * An implementation of this interface must be a wrapper of a concrete logging mechanism and instances of the
- * implementation must be manufactured by the {@link org.silverpeas.kernel.logging.SilverLoggerFactory} factory.
+ * An implementation of this interface must be a wrapper of a concrete logging mechanism and
+ * instances of the implementation must be manufactured by the
+ * {@link org.silverpeas.kernel.logging.SilverLoggerFactory} factory.
  * </p>
  *
  * @author mmoquillon
@@ -58,10 +62,11 @@ import java.util.function.Supplier;
 public interface SilverLogger {
 
   /**
-   * Gets the logger that is defined for the specified logging namespace. The logger getting is delegated to a
-   * {@link SilverLoggerProvider} instance.
+   * Gets the logger that is defined for the specified logging namespace. The logger getting is
+   * delegated to a {@link SilverLoggerProvider} instance.
    *
-   * @param module a logging namespace. It is the name or a category under which the messages will be log.
+   * @param module a logging namespace. It is the name or a category under which the messages will
+   * be log.
    * @return a logger instance provided by a {@link SilverLoggerProvider} instance.
    * @see SilverLoggerProvider#getLogger(String)
    */
@@ -70,11 +75,12 @@ public interface SilverLogger {
   }
 
   /**
-   * Gets a logger for the specified object. The logger getting is delegated to a {@link SilverLoggerProvider}
-   * instance.
+   * Gets a logger for the specified object. The logger getting is delegated to a
+   * {@link SilverLoggerProvider} instance.
    *
-   * @param object the object from which the logging namespace is determined. The logging namespace is found from the
-   * package name of the object. In Silverpeas, each logger namespace matches a package name, starting from the *
+   * @param object the object from which the logging namespace is determined. The logging namespace
+   * is found from the package name of the object. In Silverpeas, each logger namespace matches a
+   * package name, starting from the *
    * <code>silverpeas</code> subpackage: for a package
    * <code>org.silverpeas.core.io</code>, there is a logger with the namespace
    * <code>silverpeas.core.io</code>.
@@ -93,25 +99,26 @@ public interface SilverLogger {
   String getNamespace();
 
   /**
-   * Gets the log Level of this Logger. If no level was explicitly set for his logger, its effective level is then
-   * inherited from its parent.
+   * Gets the log Level of this Logger. If no level was explicitly set for his logger, its effective
+   * level is then inherited from its parent.
    *
    * @return the level of this logger.
    */
   Level getLevel();
 
   /**
-   * Sets the log level specifying which message levels will be logged by this logger. Message levels lower than this
-   * value will be discarded. If the new level is null, it means that this node should inherit its level from its
-   * nearest ancestor with a specific (non-null) level value.
+   * Sets the log level specifying which message levels will be logged by this logger. Message
+   * levels lower than this value will be discarded. If the new level is null, it means that this
+   * node should inherit its level from its nearest ancestor with a specific (non-null) level
+   * value.
    *
    * @param level the new value for the log level (may be null).
    */
   void setLevel(Level level);
 
   /**
-   * Checks if a message of the given level would actually be logged by this logger. This check is based on the Loggers
-   * effective level, which may be inherited from its parent.
+   * Checks if a message of the given level would actually be logged by this logger. This check is
+   * based on the Loggers effective level, which may be inherited from its parent.
    *
    * @param level a logging level.
    * @return true if a message of the given level would actually be logged. False otherwise.
@@ -119,9 +126,10 @@ public interface SilverLogger {
   boolean isLoggable(Level level);
 
   /**
-   * Logs a message at the specified level, with the specified parameters if any and with a Throwable object if any. If
-   * the logger is currently enabled for the given message level then a corresponding logging record is created and
-   * forwarded to all the registered output handlers objects.
+   * Logs a message at the specified level, with the specified parameters if any and with a
+   * Throwable object if any. If the logger is currently enabled for the given message level then a
+   * corresponding logging record is created and forwarded to all the registered output handlers
+   * objects.
    *
    * @param level the level of the message to log.
    * @param message the message to log.
@@ -220,12 +228,14 @@ public interface SilverLogger {
   }
 
   /**
-   * Logs an debugging message with the specified parameters. The message is computed by a function that will be invoked
-   * only if the actual logger level is higher or equal than the message level.
+   * Logs an debugging message with the specified parameters. The message is computed by a function
+   * that will be invoked only if the actual logger level is higher or equal than the message
+   * level.
    * <p>
-   * Usually, debugging message are computed by executing codes that shouldn't be ran in a nominal execution context. In
-   * order to avoid this code to be executed when the logger level is lower than the debug level, it can be written
-   * within a function whose the invocation is left to the logger responsibility.
+   * Usually, debugging message are computed by executing codes that shouldn't be ran in a nominal
+   * execution context. In order to avoid this code to be executed when the logger level is lower
+   * than the debug level, it can be written within a function whose the invocation is left to the
+   * logger responsibility.
    *
    * @param messageSupplier a function that will computed the message to log.
    */
@@ -236,13 +246,14 @@ public interface SilverLogger {
   }
 
   /**
-   * Logs silently the specified error. The message is actually wiped out. This method is mainly dedicated to explicitly
-   * indicate the error is expected in some well-defined circumstances; it is a computation branch in the nominal
-   * execution flow.
+   * Logs silently the specified error. The message is actually wiped out. This method is mainly
+   * dedicated to explicitly indicate the error is expected in some well-defined circumstances; it
+   * is a computation branch in the nominal execution flow.
    * <p>
-   * Be caution by using this method; it is more efficient to use the if-else condition than the try-catch instruction
-   * to perform a default treatment on error cases. This method is to be used when a method marked as throwing an
-   * exception is invoked and for which the exception is, in the context of the invocation, can be expected.
+   * Be caution by using this method; it is more efficient to use the if-else condition than the
+   * try-catch instruction to perform a default treatment on error cases. This method is to be used
+   * when a method marked as throwing an exception is invoked and for which the exception is, in the
+   * context of the invocation, can be expected.
    * </p>
    *
    * @param error the error to wipe out.

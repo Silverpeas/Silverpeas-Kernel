@@ -34,8 +34,8 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Simple implementation of the {@link SystemWrapper} to be used in the unit tests. It wraps {@link System} by allowing
- * to set additional both system properties and environment variables.
+ * Simple implementation of the {@link SystemWrapper} to be used in the unit tests. It wraps
+ * {@link System} by allowing to set additional both system properties and environment variables.
  *
  * @author mmoquillon
  */

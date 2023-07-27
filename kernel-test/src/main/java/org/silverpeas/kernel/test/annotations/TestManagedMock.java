@@ -27,21 +27,24 @@ package org.silverpeas.kernel.test.annotations;
 import java.lang.annotation.*;
 
 /**
- * This annotation is used to indicate that a field or a parameter of a test (method) in a unit test class has to be
- * mocked and the resulting mock put into the IoC container used in the unit tests and this before any execution of any
- * unit tests.
+ * This annotation is used to indicate that a field or a parameter of a test (method) in a unit test
+ * class has to be mocked and the resulting mock put into the IoC container used in the unit tests
+ * and this before any execution of any unit tests.
  * <p>
- * If the test class declares several annotated fields having a common type among their ancestor, then the type of the
- * fields will be registered into the IoC container for that type and their values could be get by using the
- * {@link org.silverpeas.kernel.test.TestBeanContainer#getAllBeansByType(Class, Annotation...)} method. In that case,
- * the call of {@link org.silverpeas.kernel.test.TestBeanContainer#getBeanByType(Class, Annotation...)} method with that
- * type as parameter will throw an exception.
+ * If the test class declares several annotated fields having a common type among their ancestor,
+ * then the type of the fields will be registered into the IoC container for that type and their
+ * values could be get by using the
+ * {@link org.silverpeas.kernel.test.TestBeanContainer#getAllBeansByType(Class, Annotation...)}
+ * method. In that case, the call of
+ * {@link org.silverpeas.kernel.test.TestBeanContainer#getBeanByType(Class, Annotation...)} method
+ * with that type as parameter will throw an exception.
  * </p>
  * <p>
- * If the annotation is applied to a parameter, then a bean of the parameter type is first looking for in the IoC
- * container used in the tests. If no such bean is found, then the type is mocked, the mock is then put into the bean
- * container and finally it is passed as parameter value. By using this annotation with the parameters, you can get any
- * previously mocked bean to, for example, specify behaviours for the current unit test.
+ * If the annotation is applied to a parameter, then a bean of the parameter type is first looking
+ * for in the IoC container used in the tests. If no such bean is found, then the type is mocked,
+ * the mock is then put into the bean container and finally it is passed as parameter value. By
+ * using this annotation with the parameters, you can get any previously mocked bean to, for
+ * example, specify behaviours for the current unit test.
  * </p>
  *
  * @author mmoquillon
@@ -52,9 +55,10 @@ import java.lang.annotation.*;
 public @interface TestManagedMock {
 
   /**
-   * Is all of the methods of the mock should be stubbed? By default, a call to method of such an object is stubbed
-   * unless a behaviour was previously set to that method. To reverse this default behaviour, that is to say to allow a
-   * call to the methods invokes the <i>real</i> implementation of the called method, just set this property to false.
+   * Is all of the methods of the mock should be stubbed? By default, a call to method of such an
+   * object is stubbed unless a behaviour was previously set to that method. To reverse this default
+   * behaviour, that is to say to allow a call to the methods invokes the <i>real</i> implementation
+   * of the called method, just set this property to false.
    */
   boolean stubbed() default true;
 }

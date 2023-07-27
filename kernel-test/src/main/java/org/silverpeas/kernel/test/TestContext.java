@@ -31,16 +31,19 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 /**
- * Context of a unit test. Used to access the information of the context of such a test. This class can be extended to
- * add other information required by unit tests for their execution.
+ * Context of a unit test. Used to access the information of the context of such a test. This class
+ * can be extended to add other information required by unit tests for their execution.
+ *
  * @author mmoquillon
  */
+@SuppressWarnings("unused")
 public class TestContext {
 
   private Properties mavenProperties;
 
   /**
    * Gets the properties of the project with which the unit test is configured.
+   *
    * @return the Maven properties
    */
   public Properties getMavenProperties() {
@@ -61,7 +64,8 @@ public class TestContext {
   }
 
   /**
-   * Gets the path of the directory in which are located the resources available to the unit test during its execution.
+   * Gets the path of the directory in which are located the resources available to the unit test
+   * during its execution.
    *
    * @return the path of the test resources root directory.
    */

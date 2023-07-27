@@ -34,18 +34,19 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 
 /**
- * Implementation of the {@link org.silverpeas.kernel.logging.SilverLoggerFactory} interface to provide a logger
- * wrapping the default Java logger.
+ * Implementation of the {@link org.silverpeas.kernel.logging.SilverLoggerFactory} interface to
+ * provide a logger wrapping the default Java logger.
  * </p>
- * It manages a cache of {@link org.silverpeas.kernel.logging.sys.SysLogger} instances that were already previously
- * asked. If a logger isn't in the cache, then it manufactures it, initializes it from its logging configuration, and
- * puts it into the cache.
+ * It manages a cache of {@link org.silverpeas.kernel.logging.sys.SysLogger} instances that were
+ * already previously asked. If a logger isn't in the cache, then it manufactures it, initializes it
+ * from its logging configuration, and puts it into the cache.
  *
  * @author mmoquillon
  */
 public class SysLoggerFactory implements SilverLoggerFactory {
 
-  private final Map<SilverLoggerKey, SilverLogger> loggers = Collections.synchronizedMap(new WeakHashMap<>());
+  private final Map<SilverLoggerKey, SilverLogger> loggers =
+      Collections.synchronizedMap(new WeakHashMap<>());
 
   @Override
   public SilverLogger getLogger(final String namespace, LoggerConfiguration configuration) {

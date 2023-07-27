@@ -42,8 +42,7 @@ public class TestScopedResourcesProvider implements SilverpeasResourcesProvider 
 
   @Override
   public Path getLoggersRootPath() {
-    Path resourcesDirPath = context.getPathOfTestResources();
-    return resourcesDirPath.resolve(Path.of("org", "silverpeas", "test", "logging"));
+    return context.getLoggerRootHomePath();
   }
 
   @Override

@@ -50,13 +50,14 @@ public final class Reflections {
   }
 
   /**
-   * Browses the inheritance graph of the specified type up to his root parent and applies for each parent type the
-   * specified type consumer.
+   * Browses the inheritance graph of the specified type up to his root parent and applies for each
+   * parent type the specified type consumer.
    *
    * @param fromType the type from which the inheritance graph is browsed
    * @param consumer a function to apply to each type in the inheritance graph
    */
-  public static void loopInheritance(@NonNull final Class<?> fromType, @NonNull final TypeConsumer consumer) {
+  public static void loopInheritance(@NonNull final Class<?> fromType,
+      @NonNull final TypeConsumer consumer) {
     Objects.requireNonNull(fromType);
     Objects.requireNonNull(consumer);
     try {
@@ -71,7 +72,8 @@ public final class Reflections {
   }
 
   /**
-   * Gets all the annotations declared on the specified element and that satisfies the given annotation type.
+   * Gets all the annotations declared on the specified element and that satisfies the given
+   * annotation type.
    *
    * @param element the annotated element.
    * @param annotationType the type of annotation the annotations to return have to satisfy.
@@ -88,13 +90,14 @@ public final class Reflections {
   }
 
   /**
-   * Constructs an instance of the specified concrete class by using its default non-arguments constructor. The
-   * constructor can be private, package-private, protected or public.
+   * Constructs an instance of the specified concrete class by using its default non-arguments
+   * constructor. The constructor can be private, package-private, protected or public.
    *
    * @param clazz the class to instantiate.
    * @param <T> the type of the object to construct.
    * @return the new instance of the given class.
-   * @throws SilverpeasReflectionException if an error occurs while instantiating the specified class.
+   * @throws SilverpeasReflectionException if an error occurs while instantiating the specified
+   * class.
    */
   @NonNull
   public static <T> T instantiate(@NonNull Class<T> clazz) throws SilverpeasReflectionException {
@@ -116,7 +119,8 @@ public final class Reflections {
    * @param object the object having the field to set with the given value.
    * @param field the field of the object to set with the given value.
    * @param value the value to set.
-   * @throws SilverpeasReflectionException if an error occurs while setting the field of the object with the value.
+   * @throws SilverpeasReflectionException if an error occurs while setting the field of the object
+   * with the value.
    */
   public static void setField(@NonNull Object object, @NonNull Field field, @Nullable Object value)
       throws SilverpeasReflectionException {
@@ -133,13 +137,15 @@ public final class Reflections {
   }
 
   /**
-   * Sets the specified value to the given field of the specified object inherited from the given type of the object.
+   * Sets the specified value to the given field of the specified object inherited from the given
+   * type of the object.
    *
    * @param type a type the object satisfies and that is extended by its class.
    * @param object the object having the field to set with the given value.
    * @param field the field of the object to set with the given value.
    * @param value the value to set.
-   * @throws SilverpeasReflectionException if an error occurs while setting the field of the object with the value.
+   * @throws SilverpeasReflectionException if an error occurs while setting the field of the object
+   * with the value.
    */
   public static void setField(@NonNull Class<?> type, @NonNull Object object, @NonNull Field field,
       @Nullable Object value) throws SilverpeasReflectionException {

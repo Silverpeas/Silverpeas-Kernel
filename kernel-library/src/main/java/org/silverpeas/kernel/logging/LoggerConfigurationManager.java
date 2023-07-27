@@ -38,34 +38,39 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * There is a single global LoggerConfigurationManager object that is used to manage a set of configuration about the
- * different Loggers available in Silverpeas. This single instance can only be got from the {@link SilverLoggerProvider}
- * object.
+ * There is a single global LoggerConfigurationManager object that is used to manage a set of
+ * configuration about the different Loggers available in Silverpeas. This single instance can only
+ * be got from the {@link SilverLoggerProvider} object.
  * <p>
- * Each logger in Silverpeas is usually mapped to a given Silverpeas module. A Silverpeas module is a functional
- * component in Silverpeas. The component can provide a service to others components or implement a business service for
- * the end user. By defining a mapping between a module and a logger, when some objects write some messages into a log,
- * only the name of the module in which these objects belong is required to figure out what logger to use; it is hence
- * no necessary to remind the schema of the loggers namespace in use in Silverpeas. Each mapping is defined in a logging
- * configuration file (a Java properties file) with optionally, as property, the logging level to use for the mapped
- * logger.
+ * Each logger in Silverpeas is usually mapped to a given Silverpeas module. A Silverpeas module is
+ * a functional component in Silverpeas. The component can provide a service to others components or
+ * implement a business service for the end user. By defining a mapping between a module and a
+ * logger, when some objects write some messages into a log, only the name of the module in which
+ * these objects belong is required to figure out what logger to use; it is hence no necessary to
+ * remind the schema of the loggers namespace in use in Silverpeas. Each mapping is defined in a
+ * logging configuration file (a Java properties file) with optionally, as property, the logging
+ * level to use for the mapped logger.
  * <p>
- * A logging configuration for a Silverpeas module is stored into a properties file that must be located in the loggers
- * root directory indicated by {@link SilverpeasResourcesProvider#getLoggersRootPath()}. The following properties are
- * expected into such a file:
+ * A logging configuration for a Silverpeas module is stored into a properties file that must be
+ * located in the loggers root directory indicated by
+ * {@link SilverpeasResourcesProvider#getLoggersRootPath()}. The following properties are expected
+ * into such a file:
  * </p>
  * <ul>
- *   <li>namespace: the hierarchical path of the logger in which each node is separated by a dot</li>
- *   <li>level: optional property indicating the level of traces of the logger. If not set, the level is figuring out by
+ *   <li>namespace: the hierarchical path of the logger in which each node is separated by a
+ *   dot</li>
+ *   <li>level: optional property indicating the level of traces of the logger. If not set, the
+ *   level is figuring out by
  *   coming upward to the nearest parent logger for which a level is defined.</li>
  * </ul>
  *
  * @author mmoquillon
- * @apiNote It isn't possible to instantiate explicitly this class. To get a {@link LoggerConfigurationManager}
- * instance, you should ask to the {@link SilverLoggerProvider} single instance.
- * @implNote The loading of the loggers configuration isn't done at instantiation; it has to be invoked explicitly. The
- * instantiation of a {@link LoggerConfigurationManager} is performed by the {@link SilverLoggerProvider} single
- * instance.
+ * @apiNote It isn't possible to instantiate explicitly this class. To get a
+ * {@link LoggerConfigurationManager} instance, you should ask to the {@link SilverLoggerProvider}
+ * single instance.
+ * @implNote The loading of the loggers configuration isn't done at instantiation; it has to be
+ * invoked explicitly. The instantiation of a {@link LoggerConfigurationManager} is performed by the
+ * {@link SilverLoggerProvider} single instance.
  */
 public class LoggerConfigurationManager {
 
@@ -121,9 +126,11 @@ public class LoggerConfigurationManager {
   /**
    * Saves the configuration of the logger referred by the specified configuration instance.
    * <p>
-   * If no configuration exists for the logger referred by the configuration object, then nothing is done.
+   * If no configuration exists for the logger referred by the configuration object, then nothing is
+   * done.
    *
-   * @param configuration the new configuration of the logger defined for the specified Silverpeas module.
+   * @param configuration the new configuration of the logger defined for the specified Silverpeas
+   * module.
    */
   public void saveLoggerConfiguration(LoggerConfiguration configuration) {
     Map<String, LoggerConfiguration> loggerConfigurations = getLoggerConfigurations();
@@ -157,8 +164,8 @@ public class LoggerConfigurationManager {
   }
 
   /**
-   * Gets the available configuration of all the Silverpeas loggers. If a logger has no configuration file, then it
-   * isn't taken into account.
+   * Gets the available configuration of all the Silverpeas loggers. If a logger has no
+   * configuration file, then it isn't taken into account.
    *
    * @return a set of logger configurations sorted by logger namespace.
    */

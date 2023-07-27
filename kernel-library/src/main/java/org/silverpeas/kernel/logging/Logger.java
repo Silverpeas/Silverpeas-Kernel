@@ -32,15 +32,18 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * This annotation is for specifying the logger to use for a given package or class. It overrides the logger mapped to
- * to the package.
+ * This annotation is for specifying the logger to use for a given package or class. It overrides
+ * the logger mapped to to the package.
  * <p>
- * By default, the logger to use is identified by the package name to which the object that logs messages belongs. The
- * convention mapping between the namespace and a package name is that all packages rooted to the package
- * <code>org.silverpeas</code> are mapped, each of them, to a namespace of identical name rooted to the Silverpeas root
- * namespace <code>silverpeas</code>. For others packages, the namespace is the package fully qualified name. Using this
- * annotation, this rule is bypassed, but not the convention, and the namespace specified in the annotation's value is
- * then used to get the logger to use for logging messages.
+ * By default, the logger to use is identified by the package name to which the object that logs
+ * messages belongs. The convention mapping between the namespace and a package name is that all
+ * packages rooted to the package
+ * <code>org.silverpeas</code> are mapped, each of them, to a namespace of identical name rooted to
+ * the Silverpeas root
+ * namespace <code>silverpeas</code>. For others packages, the namespace is the package fully
+ * qualified name. Using this annotation, this rule is bypassed, but not the convention, and the
+ * namespace specified in the annotation's value is then used to get the logger to use for logging
+ * messages.
  *
  * @author mmoquillon
  */

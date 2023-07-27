@@ -27,9 +27,9 @@ package org.silverpeas.kernel.exception;
 import org.silverpeas.kernel.SilverpeasRuntimeException;
 
 /**
- * Exception thrown when an expected object hasn't been found in a container or a repository. This exception is used by
- * the {@link org.silverpeas.kernel.ManagedBeanProvider} when no candidate is found for a given name or satisfying a
- * give type and qualifiers.
+ * Exception thrown when an expected object hasn't been found in a container or a repository. This
+ * exception is used by the {@link org.silverpeas.kernel.ManagedBeanProvider} when no candidate is
+ * found for a given name or satisfying a give type and qualifiers.
  *
  * @author mmoquillon
  */

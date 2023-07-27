@@ -28,8 +28,8 @@ import java.lang.annotation.*;
 
 /**
  * Annotation used to declare a property to set among the system properties within the
- * {@link org.silverpeas.kernel.util.SystemWrapper}. By using this annotation, the property will be available to all
- * managed beans and mocks declared in a test. This annotation is repeatable.
+ * {@link org.silverpeas.kernel.util.SystemWrapper}. By using this annotation, the property will be
+ * available to all managed beans and mocks declared in a test. This annotation is repeatable.
  *
  * @author mmoquillon
  */

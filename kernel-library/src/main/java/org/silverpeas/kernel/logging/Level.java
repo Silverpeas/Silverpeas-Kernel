@@ -24,34 +24,37 @@
 package org.silverpeas.kernel.logging;
 
 /**
- * The different logging levels taken in charge by the Silverpeas logger. Such levels define in what a message is
- * important: the higher the level is, the more important the message is. The loggers have also a logging level from
- * which they accept to write out the messages: all messages with a level greater or equal than its own level will be
- * taken in charge; the loggers level define the lower level of messages they accept to log.
+ * The different logging levels taken in charge by the Silverpeas logger. Such levels define in what
+ * a message is important: the higher the level is, the more important the message is. The loggers
+ * have also a logging level from which they accept to write out the messages: all messages with a
+ * level greater or equal than its own level will be taken in charge; the loggers level define the
+ * lower level of messages they accept to log.
  * <p>
- * Because each logging solution in the Java ecosystem defines their own logging level, it is required to abstract them
- * in order to be agnostic to any logging mechanisms.
+ * Because each logging solution in the Java ecosystem defines their own logging level, it is
+ * required to abstract them in order to be agnostic to any logging mechanisms.
  * </p>
  * <p>
- * This Level enumeration defines a set of standard logging levels that can be used to control logging output. The
- * logging Level objects are ordered and are specified by ordered integers. Enabling logging at a given level also
- * enables logging at all higher levels.
+ * This Level enumeration defines a set of standard logging levels that can be used to control
+ * logging output. The logging Level objects are ordered and are specified by ordered integers.
+ * Enabling logging at a given level also enables logging at all higher levels.
  *
  * @author mmoquillon
  */
 public enum Level {
   /**
-   * The lower logging level: this level includes all the below levels; whatever their level, the messages will be
-   * written into the logs.
+   * The lower logging level: this level includes all the below levels; whatever their level, the
+   * messages will be written into the logs.
    */
   DEBUG(500),
 
   /**
-   * The INFO level: only messages with the tracing level of INFO, WARNING and ERROR will be written into the logs.
+   * The INFO level: only messages with the tracing level of INFO, WARNING and ERROR will be written
+   * into the logs.
    */
   INFO(700),
   /**
-   * The WARNING level: only messages with the tracing level of WARNING and ERROR will be written into the logs.
+   * The WARNING level: only messages with the tracing level of WARNING and ERROR will be written
+   * into the logs.
    */
   WARNING(800),
   /**
@@ -66,7 +69,8 @@ public enum Level {
   }
 
   /**
-   * Gets the level value of this logging level. The higher the value is, the more important the level is.
+   * Gets the level value of this logging level. The higher the value is, the more important the
+   * level is.
    *
    * @return an integer indicating the importance of the level.
    */

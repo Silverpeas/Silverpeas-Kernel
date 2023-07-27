@@ -56,4 +56,8 @@ public final class TestContext {
     String pathProperty = testProperties.getProperty("test.resources.directory", "");
     return Path.of(pathProperty);
   }
+
+  public Path getLoggerRootHomePath() {
+    return getPathOfTestResources().resolve(Path.of("org", "silverpeas", "test", "logging"));
+  }
 }

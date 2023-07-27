@@ -41,11 +41,12 @@ import static org.apache.commons.lang3.reflect.FieldUtils.writeDeclaredField;
 import static org.silverpeas.kernel.util.StringUtil.isDefined;
 
 /**
- * Provides easy stubbing on the {@link SettingBundle} in unit tests. This class is to declare as a field of the unit
- * test class a {@link SettingBundle} that will be used by the tests and with which some settings can be preconfigured
- * or modified without having to use a set of physical properties files (a {@link SettingBundle} is mapped to a
- * properties file). By annotating the field with the {@link org.junit.jupiter.api.extension.RegisterExtension}
- * annotation, the required resources initialization is performed before the execution of a unit test and the resource
+ * Provides easy stubbing on the {@link SettingBundle} in unit tests. This class is to declare as a
+ * field of the unit test class a {@link SettingBundle} that will be used by the tests and with
+ * which some settings can be preconfigured or modified without having to use a set of physical
+ * properties files (a {@link SettingBundle} is mapped to a properties file). By annotating the
+ * field with the {@link org.junit.jupiter.api.extension.RegisterExtension} annotation, the required
+ * resources initialization is performed before the execution of a unit test and the resource
  * cleanup is applied once the unit test resumed.
  *
  * @author silveryocha
@@ -70,13 +71,13 @@ public class SettingBundleStub implements BeforeEachCallback, AfterEachCallback 
   }
 
   /**
-   * Initializing the setting bundled by this way means that the setting could have already been accessed by another
-   * class or instance and the setting bundle instance is registered into a static attribute or an attribute that will
-   * be shared between all tests.
+   * Initializing the setting bundled by this way means that the setting could have already been
+   * accessed by another class or instance and the setting bundle instance is registered into a
+   * static attribute or an attribute that will be shared between all tests.
    * <p>
-   * It is not mandatory to the caller to fill all the keys if a default property file has been registered into context.
-   * The given keys just overrides the default one.<br/> If a null value is returned by the stub for a key, then it is
-   * looking for the key into the default property file.
+   * It is not mandatory to the caller to fill all the keys if a default property file has been
+   * registered into context. The given keys just overrides the default one.<br/> If a null value is
+   * returned by the stub for a key, then it is looking for the key into the default property file.
    * </p>
    *
    * @param settingBundle the setting bundle to stub.
@@ -87,14 +88,15 @@ public class SettingBundleStub implements BeforeEachCallback, AfterEachCallback 
   }
 
   /**
-   * Initializing the setting bundle by this way means that unit or integration test is looking for bundle registry at
-   * each test.
+   * Initializing the setting bundle by this way means that unit or integration test is looking for
+   * bundle registry at each test.
    * <p>
-   * In other words, the setting bundle MUST not be a static attribute (or an attribute) that will be shared between
-   * each test.
+   * In other words, the setting bundle MUST not be a static attribute (or an attribute) that will
+   * be shared between each test.
    * </p>
    * <p>
-   * The caller MUST register all the needed keys because there is no fallback onto a default property file.
+   * The caller MUST register all the needed keys because there is no fallback onto a default
+   * property file.
    * </p>
    *
    * @param bundleName the bundle name to stub.

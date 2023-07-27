@@ -22,8 +22,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Default implementation of the Silverpeas Logging API by using the Java logging system as backend. The default
- * implementation is loaded only if there is no candidate through Java SPI (Service Provider Interface).
+ * Default implementation of the Silverpeas Logging API by using the Java logging system as backend.
+ * The default implementation is loaded only if there is no candidate through Java SPI (Service
+ * Provider Interface).
  *
  * @author mmoquillon
  */

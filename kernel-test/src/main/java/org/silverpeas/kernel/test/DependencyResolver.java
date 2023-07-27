@@ -43,11 +43,12 @@ import java.util.stream.Stream;
 import static org.mockito.Mockito.mock;
 
 /**
- * A resolver of dependencies on managed beans in a given object itself managed by the underlying IoC container. This
- * class can be extended to provide a custom dependency resolution for specific IoD system like Spring DI or CDI. By
- * default, it provides a simple resolution mechanism in which when a dependency isn't found in the
- * {@link org.silverpeas.kernel.BeanContainer} then it is mocked. The new implementation will be loaded by the Java SPI
- * when a dependency resolver will be demanded.
+ * A resolver of dependencies on managed beans in a given object itself managed by the underlying
+ * IoC container. This class can be extended to provide a custom dependency resolution for specific
+ * IoD system like Spring DI or CDI. By default, it provides a simple resolution mechanism in which
+ * when a dependency isn't found in the {@link org.silverpeas.kernel.BeanContainer} then it is
+ * mocked. The new implementation will be loaded by the Java SPI when a dependency resolver will be
+ * demanded.
  *
  * @author mmoquillon
  */
@@ -56,8 +57,8 @@ public class DependencyResolver {
   private static DependencyResolver instance;
 
   /**
-   * Gets an instance of a dependency resolver. If at least one custom dependency resolver is found by the Java SPI, the
-   * first one will be got and returned.
+   * Gets an instance of a dependency resolver. If at least one custom dependency resolver is found
+   * by the Java SPI, the first one will be got and returned.
    *
    * @return a {@link DependencyResolver} object.
    */
@@ -73,22 +74,25 @@ public class DependencyResolver {
   private final ManagedBeanProvider beanProvider = ManagedBeanProvider.getInstance();
 
   /**
-   * Resolves the dependencies on others managed bean of the specified object. The dependencies on others managed beans
-   * are figured out by the annotation {@link Inject} applied on the fields of the bean. The resolution is performed as
-   * follow: for each field annotated with {@link Inject}:
+   * Resolves the dependencies on others managed bean of the specified object. The dependencies on
+   * others managed beans are figured out by the annotation {@link Inject} applied on the fields of
+   * the bean. The resolution is performed as follow: for each field annotated with {@link Inject}:
    * <ul>
-   *   <li>invoke the {@link DependencyResolver#resolveCustomDependency(Field, Annotation...)} method for custom
+   *   <li>invoke the {@link DependencyResolver#resolveCustomDependency(Field, Annotation...)}
+   *   method for custom
    *   dependency resolution.</li>
    *   <li>if no bean is found by the custom dependency resolver, then invoke the
    *   {@link DependencyResolver#resolveDependency(Field, Annotation...)} default method.</li>
    * </ul>
    *
    * @param bean the bean for which the dependencies on others managed bean have to be resolved.
-   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one managed bean
-   * satisfying a dependency when only one is required
-   * @throws org.silverpeas.kernel.test.util.SilverpeasReflectionException if the dependencies cannot be satisfied.
+   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one
+   * managed bean satisfying a dependency when only one is required
+   * @throws org.silverpeas.kernel.test.util.SilverpeasReflectionException if the dependencies
+   * cannot be satisfied.
    */
-  public final void resolve(final Object bean) throws MultipleCandidateException, SilverpeasReflectionException {
+  public final void resolve(final Object bean) throws MultipleCandidateException,
+      SilverpeasReflectionException {
     Reflections.loopInheritance(bean.getClass(), typeToLookup -> {
       Field[] beanFields = typeToLookup.getDeclaredFields();
       Stream.of(beanFields)
@@ -112,11 +116,13 @@ public class DependencyResolver {
    * @param dependency the dependency to resolve. The field shouldn't be valued by the method.
    * @param qualifiers a set of qualifiers the managed bean to look for has to satisfy.
    * @return optionally a bean responding successfully to the expectations. By default, nothing.
-   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one managed bean
-   * satisfying a dependency.
-   * @throws org.silverpeas.kernel.test.util.SilverpeasReflectionException if the dependency cannot be set.
+   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one
+   * managed bean satisfying a dependency.
+   * @throws org.silverpeas.kernel.test.util.SilverpeasReflectionException if the dependency cannot
+   * be set.
    */
-  protected Optional<Object> resolveCustomDependency(@NonNull Field dependency, @NonNull Annotation... qualifiers)
+  protected Optional<Object> resolveCustomDependency(@NonNull Field dependency,
+      @NonNull Annotation... qualifiers)
       throws MultipleCandidateException, SilverpeasReflectionException {
     Objects.requireNonNull(dependency);
     Objects.requireNonNull(qualifiers);
@@ -124,15 +130,17 @@ public class DependencyResolver {
   }
 
   /**
-   * Applies the default dependency resolution mechanism. It looks for a bean in the IoC container that satisfies the
-   * type of the field and the specified qualifiers on the field. If no such a bean is found, then the field is mocked.
+   * Applies the default dependency resolution mechanism. It looks for a bean in the IoC container
+   * that satisfies the type of the field and the specified qualifiers on the field. If no such a
+   * bean is found, then the field is mocked.
    *
    * @param dependency the dependency to resolve. The field shouldn't be valued by the method.
    * @param qualifiers a set of qualifiers the managed bean to look for has to satisfy.
    * @return either the managed bean that satisfies the expectations or a mock.
-   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one managed bean
-   * satisfying a dependency.
-   * @throws org.silverpeas.kernel.test.util.SilverpeasReflectionException if the dependency cannot be set.
+   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one
+   * managed bean satisfying a dependency.
+   * @throws org.silverpeas.kernel.test.util.SilverpeasReflectionException if the dependency cannot
+   * be set.
    */
   protected Object resolveDependency(@NonNull Field dependency, @NonNull Annotation... qualifiers)
       throws MultipleCandidateException, SilverpeasReflectionException {

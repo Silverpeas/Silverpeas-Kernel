@@ -29,16 +29,18 @@ import org.silverpeas.kernel.test.extension.SilverTestEnv;
 import java.lang.annotation.*;
 
 /**
- * Annotation to indicate that a field in a unit test class is the bean to test and this bean is managed by the IoC
- * container used by the unit tests. This annotation is taken in charge by the {@link SilverTestEnv} extension. When
- * such an annotation is discovered by the extension, the type of the field is automatically registered as to be managed
- * by the IoC container and the field is valued with the resulting managed bean. For doing, the bean type must have a
- * default constructor. Once instantiated, the dependencies on others managed beans will be resolved and if the bean has
+ * Annotation to indicate that a field in a unit test class is the bean to test and this bean is
+ * managed by the IoC container used by the unit tests. This annotation is taken in charge by the
+ * {@link SilverTestEnv} extension. When such an annotation is discovered by the extension, the type
+ * of the field is automatically registered as to be managed by the IoC container and the field is
+ * valued with the resulting managed bean. For doing, the bean type must have a default constructor.
+ * Once instantiated, the dependencies on others managed beans will be resolved and if the bean has
  * a {@link javax.annotation.PostConstruct} annotated method, then this method will be invoked.
  * <p>
- * The field annotated with this annotation can be explicitly instantiated, in this case the instance will be put
- * directly into the IoC container. The dependencies of the instance on others managed bean will be then resolved and
- * the {@link javax.annotation.PostConstruct} annotated method, if any, will be invoked.
+ * The field annotated with this annotation can be explicitly instantiated, in this case the
+ * instance will be put directly into the IoC container. The dependencies of the instance on others
+ * managed bean will be then resolved and the {@link javax.annotation.PostConstruct} annotated
+ * method, if any, will be invoked.
  * </p>
  *
  * @author mmoquillon

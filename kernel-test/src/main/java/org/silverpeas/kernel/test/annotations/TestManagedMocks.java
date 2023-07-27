@@ -27,8 +27,9 @@ package org.silverpeas.kernel.test.annotations;
 import java.lang.annotation.*;
 
 /**
- * Annotation used to declare a set of classes to mock. The resulting mock will be put into the IoC container in order
- * to satisfy the dependencies of the managed beans used in the unit tests.
+ * Annotation used to declare a set of classes to mock. The resulting mock will be put into the IoC
+ * container in order to satisfy the dependencies of the managed beans used in the unit tests.
+ *
  * @author mmoquillon
  */
 @Target({ElementType.TYPE})

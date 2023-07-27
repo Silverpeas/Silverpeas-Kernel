@@ -27,8 +27,9 @@ package org.silverpeas.kernel.exception;
 import org.silverpeas.kernel.SilverpeasRuntimeException;
 
 /**
- * Exception thrown when there are more than one candidate at a request for a single object to a service. This exception
- * is used by the {@link org.silverpeas.kernel.BeanContainer}.
+ * Exception thrown when there are more than one candidate at a request for a single object to a
+ * service. This exception is used by the {@link org.silverpeas.kernel.BeanContainer}.
+ *
  * @author mmoquillon
  */
 public class MultipleCandidateException extends SilverpeasRuntimeException {

@@ -30,7 +30,8 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Annotation to indicate a base of something.
+ * Annotation to indicate a class is the base of a hierarchy of a given functionality. All the
+ * classes inherited from the base class adds specific behaviours to the base one.
  * @author Yohann Chastagnier
  */
 @Qualifier

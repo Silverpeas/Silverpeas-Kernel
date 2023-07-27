@@ -30,6 +30,7 @@ import org.silverpeas.kernel.ManagedBeanProvider;
 import org.silverpeas.kernel.SilverpeasRuntimeException;
 import org.silverpeas.kernel.TestManagedBeanFeeder;
 import org.silverpeas.kernel.annotation.NonNull;
+import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.test.TestSystemWrapper;
 import org.silverpeas.kernel.test.annotations.*;
 import org.silverpeas.kernel.test.extension.SilverTestEnvContext.TestExecutionContext;
@@ -43,7 +44,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.mock;
@@ -51,24 +54,27 @@ import static org.mockito.Mockito.spy;
 
 /**
  * Prepares the environment specific to Silverpeas to run unit tests.
- * <p>Firstly, it bootstraps the container of beans to use for IoC/IoD and preloads it with some managed beans usually
+ * <p>Firstly, it bootstraps the container of beans to use for IoC/IoD and preloads it with some
+ * managed beans usually
  * required by the unit tests.</p>
  * <p>
- * Secondly it scans for fields and parameters annotated with {@link TestManagedBean} and {@link TestManagedMock} to
- * register them automatically into the bean container used in tests. If the class of a {@link TestManagedBean}
- * annotated field is qualified by a {@link Qualifier} annotated annotation, then it is registered under that qualifier
- * also. For any parameter annotated with {@link TestManagedMock}, it is first resolved by looking for an already
- * registered mock in the bean container (otherwise it is mocked and registered as for fields). Any methods annotated
- * with {@link TestManagedBean} are resolved in last.
+ * Secondly it scans for fields and parameters annotated with {@link TestManagedBean} and
+ * {@link TestManagedMock} to register them automatically into the bean container used in tests. If
+ * the class of a {@link TestManagedBean} annotated field is qualified by a {@link Qualifier}
+ * annotated annotation, then it is registered under that qualifier also. For any parameter
+ * annotated with {@link TestManagedMock}, it is first resolved by looking for an already registered
+ * mock in the bean container (otherwise it is mocked and registered as for fields). Any methods
+ * annotated with {@link TestManagedBean} are resolved in last.
  * </p>
  * <p>
- * Thirdly it scans for fields annotated with {@link TestedBean} to scan it for injection point in order to resolve
- * those dependencies either by settings them with a bean already registered into the bean container or by mocking it.
+ * Thirdly it scans for fields annotated with {@link TestedBean} to scan it for injection point in
+ * order to resolve those dependencies either by settings them with a bean already registered into
+ * the bean container or by mocking it.
  * </p>
  * <p>
- * The ordering of the declaration of the different such annotated fields in the test class is very important as they
- * are treated sequentially in their declaration ordering. So, any bean that is required by others beans has to be
- * declared before those others beans.
+ * The ordering of the declaration of the different such annotated fields in the test class is very
+ * important as they are treated sequentially in their declaration ordering. So, any bean that is
+ * required by others beans has to be declared before those others beans.
  * </p>
  *
  * @author mmoquillon
@@ -83,27 +89,39 @@ public class SilverTestEnv
   private SilverTestEnvContext context;
 
   /**
-   * Loads into the IoC container dedicated to the unit test all the classes or beans that are annotated with one of the
-   * following annotations:
+   * Loads into the IoC container dedicated to the unit test all the classes or beans that are
+   * annotated with one of the following annotations:
    * <ul>
-   * <li>{@link TestManagedBeans}: the specified classes of objects are registered into the IoC container</li>
-   * <li>{@link TestManagedMock}: the annotated field of the test instance is set with a mock that has been
-   * registered into the IoC container in order to resolve the dependency on it of managed beans used by the tested
+   * <li>{@link TestManagedBeans}: the specified classes of objects are registered into the IoC
+   * container</li>
+   * <li>{@link TestManagedMock}: the annotated field of the test instance is set with a mock
+   * that has been
+   * registered into the IoC container in order to resolve the dependency on it of managed beans
+   * used by the tested
    * class</li>
-   * <li>{@link TestManagedBean}: the annotated field of the test instance is set with a bean that was automatically
-   * put into the IoC container. If yet explicitly instantiated, the bean is put directly into the container and its
+   * <li>{@link TestManagedBean}: the annotated field of the test instance is set with a bean
+   * that was automatically
+   * put into the IoC container. If yet explicitly instantiated, the bean is put directly into
+   * the container and its
    * dependencies are resolved.</li>
-   * <li>{@link TestedBean}: the annotated field represents an instance of the class covered by the current test
-   * class. The field is set with a bean that was automatically put into the IoC container. If yet explicitly
-   * instantiated, the bean is put directly into the container and its dependencies are resolved.</li>
+   * <li>{@link TestedBean}: the annotated field represents an instance of the class covered by
+   * the current test
+   * class. The field is set with a bean that was automatically put into the IoC container. If
+   * yet explicitly
+   * instantiated, the bean is put directly into the container and its dependencies are resolved
+   * .</li>
    * </ul>
    * <p>
-   * All the beans taken in charge by the IoC container will have their own dependencies resolved and their method
-   * annotated with {@link PostConstruct} invoked. This is why the order of declarations of the annotated fields is
-   * very important in the case an annotated field has a dependency on a bean referred by another field.
+   * All the beans taken in charge by the IoC container will have their own dependencies resolved
+   * and their method
+   * annotated with {@link PostConstruct} invoked. This is why the order of declarations of the
+   * annotated fields is
+   * very important in the case an annotated field has a dependency on a bean referred by another
+   * field.
    * </p>
    * <strong>Be caution:</strong> any {@link TestedBean} annotated fields should be declared
-   * lastly for their dependencies to have a change to be set with any previous declared {@link TestManagedMock} and
+   * lastly for their dependencies to have a change to be set with any previous declared
+   * {@link TestManagedMock} and
    * {@link TestManagedBean} annotated field values.
    * </p>
    *
@@ -163,7 +181,8 @@ public class SilverTestEnv
       try {
         Constructor<? extends SilverTestEnvContext> constructor = contextClass.getConstructor();
         context = constructor.newInstance();
-      } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+      } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
+               InvocationTargetException e) {
         throw new SilverpeasRuntimeException(e);
       }
     }
@@ -189,7 +208,8 @@ public class SilverTestEnv
    *
    * @param parameterContext the context of the parameter.
    * @param extensionContext the context of the extension.
-   * @return true if the parameter is either annotated with @{@link TestManagedBean} or with {@link TestManagedMock}
+   * @return true if the parameter is either annotated with @{@link TestManagedBean} or with
+   * {@link TestManagedMock}
    */
   @Override
   public boolean supportsParameter(final ParameterContext parameterContext,
@@ -199,9 +219,13 @@ public class SilverTestEnv
   }
 
   /**
-   * Resolves the parameter referred by the parameter context by valuing it according to its annotation: if annotated
-   * with {@link TestManagedBean}, the parameter will be instantiated with its default constructor; if annotated with
-   * {@link TestManagedMock}, the parameter will be mocked.
+   * Resolves the parameter referred by the parameter context by valuing it according to its
+   * annotation: if annotated with one of the following annotations {@link TestManagedBean} and
+   * {@link TestManagedMock},the parameter type will be looked for in the bean container for value
+   * injection. If no such a bean exist in the container, then, according to the annotation, the
+   * value will be either instantiated with its default constructor (for {@link TestManagedBean}) or
+   * mocked (for {@link TestManagedMock}) before being put in the bean container and injected as a
+   * parameter value.
    *
    * @param parameterContext the context of the parameter.
    * @param extensionContext the context of the extension.
@@ -213,19 +237,15 @@ public class SilverTestEnv
     Object bean;
     final Parameter parameter = parameterContext.getParameter();
     if (parameterContext.isAnnotated(TestManagedMock.class)) {
-      bean = beanProvider.getManagedBean(parameter.getType());
-      if (bean == null) {
+      bean = computeManagedBeanIfAbsent(parameter.getType(), () -> {
         TestManagedMock annotation = parameterContext.findAnnotation(TestManagedMock.class)
-            .orElseThrow(() -> new SilverpeasRuntimeException("No TestManagedMock annotation found!"));
-        bean = annotation.stubbed() ? mock(parameter.getType()) : spy(parameter.getType());
-        registerInBeanContainer(bean);
-      }
+            .orElseThrow(() -> new SilverpeasRuntimeException("No TestManagedMock annotation " +
+                "found!"));
+        return annotation.stubbed() ? mock(parameter.getType()) : spy(parameter.getType());
+      });
     } else if (parameterContext.isAnnotated(TestManagedBean.class)) {
-      bean = beanProvider.getManagedBean(parameter.getType());
-      if (bean == null) {
-        registerInBeanContainer(parameter.getType());
-        bean = beanProvider.getManagedBean(parameter.getType());
-      }
+      bean = computeManagedBeanIfAbsent(parameter.getType(), () ->
+          Reflections.instantiate(parameter.getType()));
     } else {
       bean = null;
     }
@@ -239,32 +259,37 @@ public class SilverTestEnv
    */
   @Override
   public void beforeEach(@NonNull final ExtensionContext ctx) {
-    TestExecutionContext exeCtx = new TestExecutionContext(ctx.getRequiredTestClass(), ctx.getRequiredTestInstance(),
+    TestExecutionContext exeCtx = new TestExecutionContext(ctx.getRequiredTestClass(),
+        ctx.getRequiredTestInstance(),
         ctx.getRequiredTestMethod());
     context.beforeTest(exeCtx);
   }
 
   /**
-   * Invokes {@link SilverTestEnvContext#afterTest(TestExecutionContext)} and then clear the IoC container.
+   * Invokes {@link SilverTestEnvContext#afterTest(TestExecutionContext)} and then clear the IoC
+   * container.
    *
    * @param ctx the current extension context
    */
   @Override
   public void afterEach(@NonNull final ExtensionContext ctx) {
-    TestExecutionContext exeCtx = new TestExecutionContext(ctx.getRequiredTestClass(), ctx.getRequiredTestInstance(),
+    TestExecutionContext exeCtx = new TestExecutionContext(ctx.getRequiredTestClass(),
+        ctx.getRequiredTestInstance(),
         ctx.getRequiredTestMethod());
     context.afterTest(exeCtx);
     beanFeeder.removeAllManagedBeans();
   }
 
-  private void processTestManagedBeanAnnotation(final Class<?> type, final Field field, final Object testInstance)
+  private void processTestManagedBeanAnnotation(final Class<?> type, final Field field,
+      final Object testInstance)
       throws ReflectiveOperationException {
     if (field.isAnnotationPresent(TestManagedBean.class)) {
       setupTestInstanceField(type, field, testInstance);
     }
   }
 
-  private void processMockedBeanAnnotation(final Class<?> type, final Field field, final Object testInstance) {
+  private void processMockedBeanAnnotation(final Class<?> type, final Field field,
+      final Object testInstance) {
     if (field.isAnnotationPresent(TestManagedMock.class)) {
       TestManagedMock annotation = field.getAnnotation(TestManagedMock.class);
       Object bean = annotation.stubbed() ? mock(field.getType()) : spy(field.getType());
@@ -274,14 +299,16 @@ public class SilverTestEnv
     }
   }
 
-  private void processTestedBeanAnnotation(final Class<?> type, final Field field, final Object testInstance)
+  private void processTestedBeanAnnotation(final Class<?> type, final Field field,
+      final Object testInstance)
       throws ReflectiveOperationException {
     if (field.isAnnotationPresent(TestedBean.class)) {
       setupTestInstanceField(type, field, testInstance);
     }
   }
 
-  private void setupTestInstanceField(final Class<?> type, final Field field, final Object testInstance)
+  private void setupTestInstanceField(final Class<?> type, final Field field,
+      final Object testInstance)
       throws ReflectiveOperationException {
     field.trySetAccessible();
     Object bean = field.get(testInstance);
@@ -298,10 +325,11 @@ public class SilverTestEnv
   }
 
   /**
-   * Registers in the {@link org.silverpeas.kernel.BeanContainer} the specified class for his instances to be managed by
-   * it. By registering a class instead of directly a bean, the life-cycle of the beans of the class will be taken in
-   * charge by the container, meaning their instantiation will be done on demand (the singleton pattern is taken in
-   * charge with the {@link javax.inject.Singleton} annotation).
+   * Registers in the {@link org.silverpeas.kernel.BeanContainer} the specified class for his
+   * instances to be managed by it. By registering a class instead of directly a bean, the
+   * life-cycle of the beans of the class will be taken in charge by the container, meaning their
+   * instantiation will be done on demand (the singleton pattern is taken in charge with the
+   * {@link javax.inject.Singleton} annotation).
    *
    * @param beanType the class of the beans to manage.
    * @param <T> the concrete type of the bean.
@@ -316,9 +344,10 @@ public class SilverTestEnv
   }
 
   /**
-   * Registers in the {@link org.silverpeas.kernel.BeanContainer} the specified bean so that it can be retrieved later
-   * by the unit tests. In this case, no specific life-cycle management is performed by the container. It is a shortcut
-   * for the beans to be directly accessible through the IoD mechanism during the execution of a unit test.
+   * Registers in the {@link org.silverpeas.kernel.BeanContainer} the specified bean so that it can
+   * be retrieved later by the unit tests. In this case, no specific life-cycle management is
+   * performed by the container. It is a shortcut for the beans to be directly accessible through
+   * the IoD mechanism during the execution of a unit test.
    *
    * @param bean the bean to register.
    * @param <T> the concrete type of the bean.
@@ -372,6 +401,17 @@ public class SilverTestEnv
               throw new SilverpeasRuntimeException(e);
             }
           }));
+    }
+  }
+
+  private Object computeManagedBeanIfAbsent(Class<?> elementType, Supplier<Object> beanSupplier) {
+    try {
+      return beanProvider.getManagedBean(elementType);
+    } catch (NotFoundException e) {
+      Object bean = beanSupplier.get();
+      Objects.requireNonNull(bean);
+      registerInBeanContainer(bean);
+      return bean;
     }
   }
 

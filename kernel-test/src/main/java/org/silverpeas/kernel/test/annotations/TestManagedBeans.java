@@ -27,8 +27,10 @@ package org.silverpeas.kernel.test.annotations;
 import java.lang.annotation.*;
 
 /**
- * Annotation used to declare a set of classes to be managed by the IoC container used in the unit tests so that the
- * dependencies of others managed beans and that are required by the unit tests could be resolved.
+ * Annotation used to declare a set of classes to be managed by the IoC container used in the unit
+ * tests so that the dependencies of others managed beans and that are required by the unit tests
+ * could be resolved.
+ *
  * @author mmoquillon
  */
 @Target({ElementType.TYPE})

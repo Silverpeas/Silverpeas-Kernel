@@ -31,8 +31,8 @@ import java.util.Properties;
 /**
  * This wrapper aims to allow to load additional and custom system properties without passing them
  * explicitly and directly to the JVM. For doing it wraps the {@link System} class; hence its name.
- * The way those custom system properties are loaded is at the discretion of the implementor.
- * In opposite to the {@link System} class in which all the methods are static, this class has to be a
+ * The way those custom system properties are loaded is at the discretion of the implementor. In
+ * opposite to the {@link System} class in which all the methods are static, this class has to be a
  * singleton managed by the underlying IoC container.
  *
  * @author Yohann Chastagnier
@@ -86,7 +86,7 @@ public interface SystemWrapper {
    * Sets a new system property. If the property isn't valued, id est has a null or an empty value,
    * then it is not set. Only non-null and not empty property can be set.
    *
-   * @param key   the key of the property.
+   * @param key the key of the property.
    * @param value a non-null and non-empty value of the property.
    * @return the previous value of the system property, or <code>null</code> if it did not have one
    * or if the property to set isn't valid.

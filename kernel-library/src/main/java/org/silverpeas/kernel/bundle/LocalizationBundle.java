@@ -31,19 +31,21 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 /**
- * A resource bundle that contains the l10n resources defined under a fully qualified name in Silverpeas. These
- * resources can be messages, icons, and so one.
+ * A resource bundle that contains the l10n resources defined under a fully qualified name in
+ * Silverpeas. These resources can be messages, icons, and so one.
  * <p>
- * It decorates {@link java.util.ResourceBundle} to suit the peculiar use of the resource bundles in Silverpeas. It
- * wraps in a transparent way both the Silverpeas general resource bundle and any another peculiar resource bundle. The
- * loading of the resources bundles in Silverpeas is managed by {@link org.silverpeas.kernel.bundle.ResourceLocator}
- * itself. If no bundle exists with the given fully qualified name (the bundle base name) or if a given key isn't
- * defined in the bundle, then a {@link MissingResourceException} exception is thrown as defined in the
+ * It decorates {@link java.util.ResourceBundle} to suit the peculiar use of the resource bundles in
+ * Silverpeas. It wraps in a transparent way both the Silverpeas general resource bundle and any
+ * another peculiar resource bundle. The loading of the resources bundles in Silverpeas is managed
+ * by {@link org.silverpeas.kernel.bundle.ResourceLocator} itself. If no bundle exists with the
+ * given fully qualified name (the bundle base name) or if a given key isn't defined in the bundle,
+ * then a {@link MissingResourceException} exception is thrown as defined in the
  * {@link ResourceBundle} contract.
  * <p>
- * To handle the general localized resources and those from the given bundle name it uses an instance of
- * {@link java.util.ResourceBundle} for each of them. So, it profits then of the bundle content access policy
- * implemented by this class: the content is cached in memory with an expiration trigger.
+ * To handle the general localized resources and those from the given bundle name it uses an
+ * instance of {@link java.util.ResourceBundle} for each of them. So, it profits then of the bundle
+ * content access policy implemented by this class: the content is cached in memory with an
+ * expiration trigger.
  *
  * @apiNote A general resource bundle is expected at {@link LocalizationBundle#GENERAL_BUNDLE_NAME}
  * @see ResourceBundle
@@ -51,8 +53,9 @@ import java.util.function.BiFunction;
 public class LocalizationBundle extends ResourceBundle implements SilverpeasBundle {
 
   /**
-   * The Silverpeas l10n bundle for general translations. It is both the default and base bundle that is always loaded
-   * along any other specific bundles. This Bundle has to be provided and available for Silverpeas.
+   * The Silverpeas l10n bundle for general translations. It is both the default and base bundle
+   * that is always loaded along any other specific bundles. This Bundle has to be provided and
+   * available for Silverpeas.
    */
   public static final String GENERAL_BUNDLE_NAME = "org.silverpeas.multilang.generalMultilang";
 
@@ -75,7 +78,7 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
   private final boolean mandatory;
 
   protected LocalizationBundle(String name, Locale locale,
-                               BiFunction<String, Locale, ResourceBundle> loader, boolean mandatory) {
+      BiFunction<String, Locale, ResourceBundle> loader, boolean mandatory) {
     this.name = name;
     this.locale = locale;
     this.loader = loader;
@@ -100,7 +103,8 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
   }
 
   /**
-   * Returns a <code>Set</code> of the specific keys contained in this <code>ResourceBundle</code>. The
+   * Returns a <code>Set</code> of the specific keys contained in this <code>ResourceBundle</code>.
+   * The
    * <code>keys</code> from the general resource bundle aren't taken into account.
    *
    * @return a <code>Set</code> of specific keys contained in this <code>ResourceBundle</code>.
@@ -111,12 +115,13 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
   }
 
   /**
-   * Determines whether the given <code>key</code> is contained in this <code>ResourceBundle</code> or its parent
-   * bundles.
+   * Determines whether the given <code>key</code> is contained in this <code>ResourceBundle</code>
+   * or its parent bundles.
    *
    * @param key the resource <code>key</code>
    * @return <code>true</code> if the given <code>key</code> is
-   * contained in this <code>ResourceBundle</code> or its parent bundles; <code>false</code> otherwise.
+   * contained in this <code>ResourceBundle</code> or its parent bundles; <code>false</code>
+   * otherwise.
    * @throws NullPointerException if <code>key</code> is <code>null</code>
    * @since 1.6
    */
@@ -144,8 +149,9 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
   }
 
   /**
-   * Returns the actual locale of this resource bundle. This method can be used to determine whether the resource bundle
-   * returned really corresponds to the requested locale or is a fallback to the default locale.
+   * Returns the actual locale of this resource bundle. This method can be used to determine whether
+   * the resource bundle returned really corresponds to the requested locale or is a fallback to the
+   * default locale.
    *
    * @return the locale of this resource bundle
    */
@@ -160,7 +166,8 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
   }
 
   /**
-   * Gets the specific keys of this bundle. The keys from the general resource bundle aren't taken into account.
+   * Gets the specific keys of this bundle. The keys from the general resource bundle aren't taken
+   * into account.
    *
    * @return an enumaration with the specific keys of this bundle.
    */
@@ -169,7 +176,8 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
   }
 
   /**
-   * Changes the locale of this localization bundle. The bundle content will be loaded for the specified locale.
+   * Changes the locale of this localization bundle. The bundle content will be loaded for the
+   * specified locale.
    *
    * @param locale the new locale.
    */
@@ -178,7 +186,8 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
   }
 
   /**
-   * Changes the locale of this localization bundle. The bundle content will be loaded for the specified locale.
+   * Changes the locale of this localization bundle. The bundle content will be loaded for the
+   * specified locale.
    *
    * @param locale the new locale.
    */

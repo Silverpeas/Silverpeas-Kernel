@@ -32,8 +32,8 @@ import java.util.List;
 
 /**
  * Context of the Silverpeas testing environment enabled by the
- * {@link org.silverpeas.kernel.test.extension.EnableSilverTestEnv} Junit extension. Such context is a way to customize
- * the environment.
+ * {@link org.silverpeas.kernel.test.extension.EnableSilverTestEnv} Junit extension. Such context is
+ * a way to customize the environment.
  *
  * @author mmoquillon
  */
@@ -77,20 +77,23 @@ public abstract class SilverTestEnvContext {
   };
 
   /**
-   * Initializes the test environment context. This method is usually invoked by the Silverpeas unit test environment
-   * that was enabled with the @{@link org.silverpeas.kernel.test.extension.EnableSilverTestEnv} annotation once this
-   * one is bootstrapped and initialized.
+   * Initializes the test environment context. This method is usually invoked by the Silverpeas unit
+   * test environment that was enabled with the
+   * @{@link org.silverpeas.kernel.test.extension.EnableSilverTestEnv} annotation once this one is
+   * bootstrapped and initialized.
    */
   public abstract void init();
 
   /**
    * Execute some actions to perform before the execution of a unit test.
+   *
    * @param context the execution context of the current test.
    */
   public abstract void beforeTest(final TestExecutionContext context);
 
   /**
    * Execute some actions to perform once the execution of a unit test has been completed.
+   *
    * @param context the execution context of the current test.
    */
   public abstract void afterTest(final TestExecutionContext context);
@@ -103,9 +106,10 @@ public abstract class SilverTestEnvContext {
   public abstract List<Object> getMocksToManage();
 
   /**
-   * Gets the classes of the beans to preload into the IoC/IoD subsystem used in the tests. Theses beans will be managed
-   * by the IoC/IoD subsystem, meaning their {@link javax.annotation.PostConstruct} annotated methods will be invoked
-   * and their dependencies satisfied (by mock unless there is a bean available in the
+   * Gets the classes of the beans to preload into the IoC/IoD subsystem used in the tests. Theses
+   * beans will be managed by the IoC/IoD subsystem, meaning their
+   * {@link javax.annotation.PostConstruct} annotated methods will be invoked and their dependencies
+   * satisfied (by mock unless there is a bean available in the
    * {@link org.silverpeas.kernel.BeanContainer} and satisfying the dependency).
    *
    * @return a non-null list of classes of beans to manage for the unit tests.
@@ -120,6 +124,7 @@ public abstract class SilverTestEnvContext {
 
   /**
    * Execution context of a given test.
+   *
    * @author mmoquillon
    */
   public static class TestExecutionContext {
@@ -135,6 +140,7 @@ public abstract class SilverTestEnvContext {
 
     /**
      * Gets the instance of the test.
+     *
      * @return an object of a unit test class.
      */
     public Object getInstance() {
@@ -143,6 +149,7 @@ public abstract class SilverTestEnvContext {
 
     /**
      * Gets the type of the unit test class.
+     *
      * @return the unit test class.
      */
     public Class<?> getType() {
@@ -151,6 +158,7 @@ public abstract class SilverTestEnvContext {
 
     /**
      * Gets the unit test targeted for execution.
+     *
      * @return the method representing the unit test.
      */
     public Method getTest() {

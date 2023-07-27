@@ -27,6 +27,6 @@
  * datasource (database, filesystem, ...) or to recreate them. According to the implementation a
  * cache can also be shared between several runtimes allowing consequently load-balancing. In a
  * cache, an object is stored as a key-value pair in which the key is used to identify and hence to
- * refer the stored object and the value is the object itself.
+ * refer the stored object, and the value is the object itself.
  */
 package org.silverpeas.kernel.cache;

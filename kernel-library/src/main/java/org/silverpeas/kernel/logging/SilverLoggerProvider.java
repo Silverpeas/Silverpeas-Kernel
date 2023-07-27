@@ -24,18 +24,19 @@
 package org.silverpeas.kernel.logging;
 
 /**
- * A provider of a {@link SilverLogger}. It is a singleton and its single instance is lazily created. It is used by the
- * {@link SilverLogger} class to get a {@link SilverLogger} instance matching a given logging namespace.
+ * A provider of a {@link SilverLogger}. It is a singleton and its single instance is lazily
+ * created. It is used by the {@link SilverLogger} class to get a {@link SilverLogger} instance
+ * matching a given logging namespace.
  *
  * @author mmoquillon
- * @implNote the single instance of {@link SilverLoggerProvider} is lazily spawn: it is created at the first invocation
- * of the {@link SilverLoggerProvider#getInstance()} static method.
+ * @implNote the single instance of {@link SilverLoggerProvider} is lazily spawn: it is created at
+ * the first invocation of the {@link SilverLoggerProvider#getInstance()} static method.
  */
 public class SilverLoggerProvider {
 
   /**
-   * The namespace of the root logger in Silverpeas. This namespace is predefined and each logger taken in charge by the
-   * Logging Engine should be a descendant of its logger.
+   * The namespace of the root logger in Silverpeas. This namespace is predefined and each logger
+   * taken in charge by the Logging Engine should be a descendant of its logger.
    */
   public static final String ROOT_NAMESPACE = "silverpeas";
 
@@ -64,17 +65,19 @@ public class SilverLoggerProvider {
   /**
    * Gets the logger that is defined for the specified logging namespace.
    * <p>
-   * A logging namespace is the name or a category under which the messages will be log. The messages will be logged
-   * only if the logging level satisfies the logger's level. If no level is set for the logger, then the level from its
-   * nearest ancestor with a specific (non-null) level value is taken into account.
+   * A logging namespace is the name or a category under which the messages will be log. The
+   * messages will be logged only if the logging level satisfies the logger's level. If no level is
+   * set for the logger, then the level from its nearest ancestor with a specific (non-null) level
+   * value is taken into account.
    * </p>
    * The logger instance is obtained from the logging namespace by using the
-   * {@link org.silverpeas.kernel.logging.SilverLoggerFactory} factory. The factory has also the responsibility of the
-   * initialization mechanism of the logger from its logging configuration parameters before returning it.
+   * {@link org.silverpeas.kernel.logging.SilverLoggerFactory} factory. The factory has also the
+   * responsibility of the initialization mechanism of the logger from its logging configuration
+   * parameters before returning it.
    *
    * @param module a logging namespace.
-   * @return a logger instance identified by the given logging namespace, manufactured by a {@link SilverLoggerFactory}
-   * instance.
+   * @return a logger instance identified by the given logging namespace, manufactured by a
+   * {@link SilverLoggerFactory} instance.
    */
   public SilverLogger getLogger(final String module) {
     LoggerConfigurationManager.LoggerConfiguration configuration =
@@ -83,7 +86,8 @@ public class SilverLoggerProvider {
   }
 
   /**
-   * Gets a logger for the specified object. The logger is found from the package name of the specified object.
+   * Gets a logger for the specified object. The logger is found from the package name of the
+   * specified object.
    * <p>
    * In Silverpeas, each logger namespace matches a package name, starting from the
    * <code>silverpeas</code> subpackage: for a package <code>org.silverpeas.core.io</code>, there
@@ -91,8 +95,8 @@ public class SilverLoggerProvider {
    * </p>
    *
    * @param object the object from which the logger namespace will be determined.
-   * @return a logger instance identified by the logging namespace that was determined from the given object,
-   * manufactured by a {@link SilverLoggerFactory} instance.
+   * @return a logger instance identified by the logging namespace that was determined from the
+   * given object, manufactured by a {@link SilverLoggerFactory} instance.
    * @see SilverLoggerProvider#getLogger(String)
    */
   public SilverLogger getLogger(Object object) {
@@ -112,11 +116,12 @@ public class SilverLoggerProvider {
   }
 
   /**
-   * Gets the {@link LoggerConfigurationManager} instance used by this provider to manage the configuration of the
-   * Silverpeas loggers. By using the {@link LoggerConfigurationManager} object, you can modify programmatically the
-   * configuration of a logger.
+   * Gets the {@link LoggerConfigurationManager} instance used by this provider to manage the
+   * configuration of the Silverpeas loggers. By using the {@link LoggerConfigurationManager}
+   * object, you can modify programmatically the configuration of a logger.
    *
-   * @return the {@link LoggerConfigurationManager} instance backed by this Silverpeas loggers provider.
+   * @return the {@link LoggerConfigurationManager} instance backed by this Silverpeas loggers
+   * provider.
    */
   public LoggerConfigurationManager getConfigurationManager() {
     return configurationManager;

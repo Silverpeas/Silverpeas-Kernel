@@ -36,9 +36,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
- * Test the expected {@link SilverpeasResourcesProvider} implementation is well loaded by SPI and
- * only a single instance is returned. The properties for the unit tests should be defined from
- * the maven.properties resource file in the classpath of the tests.
+ * Test the expected {@link SilverpeasResourcesProvider} implementation is well loaded by SPI and only a single instance
+ * is returned. The properties for the unit tests should be defined from the maven.properties resource file in the
+ * classpath of the tests.
+ *
  * @author mmoquillon
  */
 class SilverpeasResourcesProviderTest {
@@ -71,7 +72,15 @@ class SilverpeasResourcesProviderTest {
   }
 
   @Test
+  @DisplayName("For the unit tests, the root path of the loggers definitions are located in a given subdirectory of " +
+      "the Maven test target directory")
   void getLoggersRootPath() {
+    TestContext context = new TestContext();
+    TestScopedResourcesProvider provider =
+        (TestScopedResourcesProvider) SilverpeasResourcesProvider.getInstance();
+    Path rootPath = provider.getLoggersRootPath();
+    assertThat(rootPath, notNullValue());
+    assertThat(rootPath.toString(), startsWith(context.getMavenProperties().getProperty("test.resources.directory")));
   }
 
   @Test

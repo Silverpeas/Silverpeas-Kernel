@@ -22,22 +22,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * The technical foundation of all of the Silverpeas projects. It provides all the technical bricks upon which a more
- * functional foundation or solution can be built for Silverpeas. All the interfaces and abstract classes have to be
- * implemented by choosing the more appropriate software solution and the implementations should be available through
- * the Java Service Provider Interface (SPI). Utility classes are also provided for common tasks or needs.
+ * The technical foundation of all of the Silverpeas projects. It provides all the technical bricks
+ * upon which a more functional foundation or solution can be built for Silverpeas. All the
+ * interfaces and abstract classes have to be implemented by choosing the more appropriate software
+ * solution and the implementations should be available through the Java Service Provider Interface
+ * (SPI). Utility classes are also provided for common tasks or needs.
  * <p>
- * The base key of Silverpeas Kernel is its API abstracting an IoC (Inversion of Control) by IoD (Injection of
- * Dependencies) solution. The idea here is to grant the control flow to frameworks which then delegate functional
- * details to the implementations of some of theirs APIs. These implementations are custom codes provided by the
- * Silverpeas projects. The IoC mechanism allows then the Silverpeas projects to expose their own business or functional
- * interfaces to others projects, to propose one or more implementations of them, and to get transparently an instance
- * of an implementation of a given interface. All the details are taken in charge under the hood by the IoC/IoD
- * solution. Because the code of Silverpeas Kernel must be agnostic to all technical implementation choices, and because
- * there are several and incompatible solutions of an IoC by IoD mechanism, the API is built only upon the JSR-330 and
- * provides a simple way to get programmatically an object satisfying a given type and some qualifiers. The IoC/IoD
- * solution has to be provided through the Java SPI by implementing the {@link org.silverpeas.kernel.BeanContainer}
- * interface.
+ * The base key of Silverpeas Kernel is its API abstracting an IoC (Inversion of Control) by IoD
+ * (Injection of Dependencies) solution. The idea here is to grant the control flow to frameworks
+ * which then delegate functional details to the implementations of some of theirs APIs. These
+ * implementations are custom codes provided by the Silverpeas projects. The IoC mechanism allows
+ * then the Silverpeas projects to expose their own business or functional interfaces to others
+ * projects, to propose one or more implementations of them, and to get transparently an instance of
+ * an implementation of a given interface. All the details are taken in charge under the hood by the
+ * IoC/IoD solution. Because the code of Silverpeas Kernel must be agnostic to all technical
+ * implementation choices, and because there are several and incompatible solutions of an IoC by IoD
+ * mechanism, the API is built only upon the JSR-330 and provides a simple way to get
+ * programmatically an object satisfying a given type and some qualifiers. The IoC/IoD solution has
+ * to be provided through the Java SPI by implementing the
+ * {@link org.silverpeas.kernel.BeanContainer} interface.
  * </p>
  *
  * @author mmoquillon

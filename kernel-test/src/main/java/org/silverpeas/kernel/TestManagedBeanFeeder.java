@@ -33,9 +33,9 @@ import java.util.Objects;
 
 /**
  * A feeder of beans to manage in the underlying IoC subsystem. The subsystem is implemented here by
- * {@link TestBeanContainer}. This feeder is to be used by the unit tests to register the beans required by them for the
- * test passes successfully. For more information about are managed the beans in the IoC container used in the unit
- * tests, please see {@link TestBeanContainer}
+ * {@link TestBeanContainer}. This feeder is to be used by the unit tests to register the beans
+ * required by them for the test passes successfully. For more information about are managed the
+ * beans in the IoC container used in the unit tests, please see {@link TestBeanContainer}
  *
  * @see TestBeanContainer
  */
@@ -57,10 +57,12 @@ public final class TestManagedBeanFeeder {
   }
 
   /**
-   * Manages the beans of the specified class for the given type and with the specified qualifiers. The life-cycle of
-   * the beans, and thus their instantiation, will be taken in charge by the underlying IoC container.
+   * Manages the beans of the specified class for the given type and with the specified qualifiers.
+   * The life-cycle of the beans, and thus their instantiation, will be taken in charge by the
+   * underlying IoC container.
    *
-   * @param beanClass the class of the beans to be managed by the IoC container dedicated to the unit tests
+   * @param beanClass the class of the beans to be managed by the IoC container dedicated to the
+   * unit tests
    * @param type the type for which the beans will be managed.
    * @param qualifiers zero, one or more annotations qualifying the beans. Those must satisfy the
    * {@link javax.inject.Qualifier} annotation.
@@ -83,7 +85,8 @@ public final class TestManagedBeanFeeder {
    * {@link javax.inject.Qualifier} annotation.
    * @param <T> the actual type of the bean.
    */
-  public <T> void manageBean(@NonNull T bean, @NonNull Class<? super T> type, @NonNull Annotation... qualifiers) {
+  public <T> void manageBean(@NonNull T bean, @NonNull Class<? super T> type,
+      @NonNull Annotation... qualifiers) {
     Objects.requireNonNull(bean);
     Objects.requireNonNull(type);
     Objects.requireNonNull(qualifiers);
@@ -91,9 +94,9 @@ public final class TestManagedBeanFeeder {
   }
 
   /**
-   * Removes all the beans that were fed into the IoC container. As the {@link ManagedBeanProvider} wrapping the
-   * {@link BeanContainer} uses also a tread local cache to cache some beans to enhance performance, those are also
-   * cleared.
+   * Removes all the beans that were fed into the IoC container. As the {@link ManagedBeanProvider}
+   * wrapping the {@link BeanContainer} uses also a tread local cache to cache some beans to enhance
+   * performance, those are also cleared.
    */
   public void removeAllManagedBeans() {
     getBeanContainer().clear();

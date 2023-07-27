@@ -24,51 +24,39 @@
 
 package org.silverpeas.kernel.test.extension;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.util.MockUtil;
 import org.silverpeas.kernel.ManagedBeanProvider;
-import org.silverpeas.kernel.test.MyBean;
 import org.silverpeas.kernel.test.MyBean1;
 import org.silverpeas.kernel.test.MyBean2;
 import org.silverpeas.kernel.test.annotations.TestManagedBean;
+import org.silverpeas.kernel.test.annotations.TestManagedMock;
 import org.silverpeas.kernel.test.annotations.TestedBean;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @EnableSilverTestEnv
-class ValuatedManagedBeanFieldTest {
+class ManagedMockParameterTest {
 
-  private static final String FOO = "What you see is what you won't never apprehend";
   private final ManagedBeanProvider beanProvider = ManagedBeanProvider.getInstance();
 
-  @TestManagedBean
-  private final MyBean myBean = new MyBean1();
-
-  @TestedBean
-  private final MyBean2 testedBean = new MyBean2();
-
-  @BeforeEach
-  void initMyBean1() {
-    ((MyBean1)myBean).setFoo(FOO);
-  }
-
-  @BeforeEach
-  void checkTestedBeanInjected() {
-    assertThat(testedBean, notNullValue());
+  @Test
+  void theBeanIsWellInjected(@TestManagedMock MyBean1 myBean1, @TestManagedBean MyBean2 myBean2) {
+    assertThat(myBean2.getMyBean(), notNullValue());
+    assertThat(myBean2.getMyBean(), instanceOf(MyBean1.class));
+    assertThat(myBean2.getMyBean(), is(myBean1));
+    assertThat(MockUtil.isMock(myBean1), is(true));
+    assertThat(MockUtil.isMock(myBean2), is(false));
   }
 
   @Test
-  void theBeanIsWellInjected() {
-    assertThat(testedBean.getMyBean(), notNullValue());
-    assertThat(testedBean.getMyBean(), instanceOf(MyBean1.class));
-    assertThat(testedBean.getMyBean().getFoo(), is(FOO));
-  }
+  void theBeanIsManagedInTheBeanContainer(@TestManagedMock MyBean1 myBean1, @TestManagedBean MyBean2 myBean2) {
+    MyBean1 expectedBean1 = beanProvider.getManagedBean(MyBean1.class);
+    MyBean2 expectedBean2 = beanProvider.getManagedBean(MyBean2.class);
+    assertThat(myBean2.getMyBean(), is(myBean1));
+    assertThat(expectedBean1, is(myBean1));
+    assertThat(myBean2, is(expectedBean2));
 
-  @Test
-  void theBeanIsManagedInTheBeanContainer() {
-    MyBean1 myBean1 = beanProvider.getManagedBean(MyBean1.class);
-    assertThat(testedBean.getMyBean(), is(myBean1));
-    assertThat(myBean1.getFoo(), is(FOO));
   }
 }

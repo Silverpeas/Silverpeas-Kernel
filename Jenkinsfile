@@ -27,13 +27,41 @@ pipeline {
         }
       }
     }
-    stage('Quality Analysis') {
+    stage('Quality Analysis of the project') {
       // quality analyse with our SonarQube service is performed only for PR against our main
-      // repository and for master branch
+      // repository and for main branch
       when {
         expression {
-          env.BRANCH_NAME.startsWith('PR') &&
-              env.CHANGE_URL?.startsWith('https://github.com/Silverpeas')
+          env.BRANCH_NAME == 'main' && env.GIT_URL.startsWith('https://github.com/Silverpeas')
+        }
+      }
+      steps {
+        script {
+          withSonarQubeEnv {
+            sh """
+                mvn ${SONAR_MAVEN_GOAL} -Dsonar.projectKey=Silverpeas_Silverpeas-Kernel \\
+                  -Dsonar.organization=silverpeas \\
+                  -Dsonar.branch.name=${env.BRANCH_NAME} \\
+                  -Dsonar.host.url=${SONAR_HOST_URL} \\
+                  -Dsonar.login=${SONAR_AUTH_TOKEN}
+                """
+          }
+          timeout(time: 30, unit: 'MINUTES') {
+            // Just in case something goes wrong, pipeline will be killed after a timeout
+            def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+            if (qg.status != 'OK' && qg.status != 'WARNING') {
+              error "Pipeline aborted due to quality gate failure: ${qg.status}"
+            }
+          }
+        }
+      }
+    }
+    stage('Quality Analysis of the PR') {
+      // quality analyse with our SonarQube service is performed only for PR against our main
+      // repository and for main branch
+      when {
+        expression {
+          env.BRANCH_NAME.startsWith('PR')  && env.CHANGE_URL?.startsWith('https://github.com/Silverpeas')
         }
       }
       steps {
@@ -44,7 +72,7 @@ pipeline {
                   -Dsonar.organization=silverpeas \\
                   -Dsonar.pullrequest.branch=${env.BRANCH_NAME} \\
                   -Dsonar.pullrequest.key=${env.CHANGE_ID} \\
-                  -Dsonar.pullrequest.base=master \\
+                  -Dsonar.pullrequest.base=main \\
                   -Dsonar.pullrequest.provider=github \\
                   -Dsonar.host.url=${SONAR_HOST_URL} \\
                   -Dsonar.login=${SONAR_AUTH_TOKEN}

@@ -42,24 +42,28 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Implementation of the {@link BeanContainer} interface dedicated to the unit tests implying and requiring an IoC/IoD
- * container. It plays like a simple smart stub of a true IoC container.
+ * Implementation of the {@link BeanContainer} interface dedicated to the unit tests implying and
+ * requiring an IoC/IoD container. It plays like a simple smart stub of a true IoC container.
  * <p>
- * It provides additional methods allowing to register in the container the classes of beans or to put directly into the
- * container the beans to manage. If a class is put into the container, then both the instantiation and its
- * initialization is managed by the container. If a bean is explicitly put into the container, then only its
- * initialization is taken in charge by the container. The initialization of a bean consists of its dependency
- * resolution and of the invocation of its {@link PostConstruct} annotated method (in case there is one). When the
- * container is cleared, an invocation of the @{@link PreDestroy} annotated method is invoked for each bean before to be
- * cleared (in case they have one). This implementation of the {@link BeanContainer} is built upon some assumptions to
- * be kept simple and usable in unit tests:
+ * It provides additional methods allowing to register in the container the classes of beans or to
+ * put directly into the container the beans to manage. If a class is put into the container, then
+ * both the instantiation and its initialization is managed by the container. If a bean is
+ * explicitly put into the container, then only its initialization is taken in charge by the
+ * container. The initialization of a bean consists of its dependency resolution and of the
+ * invocation of its {@link PostConstruct} annotated method (in case there is one). When the
+ * container is cleared, an invocation of the @{@link PreDestroy} annotated method is invoked for
+ * each bean before to be cleared (in case they have one). This implementation of the
+ * {@link BeanContainer} is built upon some assumptions to be kept simple and usable in unit tests:
  * </p>
  * <ul>
  *   <li>Only one bean is managed for a given type and for all the parents of this type.</li>
- *   <li>Only the default constructor without parameters is supported. For classes with a constructor having the
- *   parameters to be resolved by the container, it is recommended to calls it explicitly in the test and to put the
+ *   <li>Only the default constructor without parameters is supported. For classes with a
+ *   constructor having the
+ *   parameters to be resolved by the container, it is recommended to calls it explicitly in the
+ *   test and to put the
  *   created instance directly into the container.</li>
- *   <li>The beans aren't proxied, meaning no resolution of the parameters is performed when a method of a managed
+ *   <li>The beans aren't proxied, meaning no resolution of the parameters is performed when a
+ *   method of a managed
  *   bean is invoked. This has to be taken in charge by the test itself.</li>
  *   <li>The {@link javax.inject.Provider} implementations aren't supported</li>
  * </ul>
@@ -118,8 +122,8 @@ public class TestBeanContainer implements BeanContainer {
   }
 
   /**
-   * Puts directly into the container the specified bean and with the given name so that the bean could be retrieved
-   * later with that name.
+   * Puts directly into the container the specified bean and with the given name so that the bean
+   * could be retrieved later with that name.
    *
    * @param bean the bean to manage.
    * @param name the name inder which the bean will be put into the container.
@@ -134,8 +138,8 @@ public class TestBeanContainer implements BeanContainer {
   }
 
   /**
-   * Asks to manage the specified class of beans under the given name so that the beans could be retrieved later with
-   * that name.
+   * Asks to manage the specified class of beans under the given name so that the beans could be
+   * retrieved later with that name.
    *
    * @param beanType the type of beans to manage.
    * @param name the name with which the beans will be created.
@@ -147,13 +151,14 @@ public class TestBeanContainer implements BeanContainer {
   }
 
   /**
-   * Asks to manage the specified class of beans for the given type and with the specified qualifiers.
+   * Asks to manage the specified class of beans for the given type and with the specified
+   * qualifiers.
    *
-   * @param beanType the class of beans to put into the container at instantiation time. Only one bean will be created
-   * on demand.
+   * @param beanType the class of beans to put into the container at instantiation time. Only one
+   * bean will be created on demand.
    * @param type the type for which the beans will be created and retrieved later.
-   * @param qualifiers zero, one or more annotations qualifying the beans put into the container in order to be
-   * retrieved later with these qualifiers.
+   * @param qualifiers zero, one or more annotations qualifying the beans put into the container in
+   * order to be retrieved later with these qualifiers.
    */
   public <T> void putBean(Class<T> beanType, Class<? super T> type, Annotation... qualifiers) {
     Set<ElectiveBean<?>> beans = container.computeIfAbsent(type.getName(), k -> new HashSet<>());
@@ -161,12 +166,13 @@ public class TestBeanContainer implements BeanContainer {
   }
 
   /**
-   * Puts directly into the container the specified bean for the given type and with the specified qualifiers.
+   * Puts directly into the container the specified bean for the given type and with the specified
+   * qualifiers.
    *
    * @param bean the bean to manage.
    * @param type the type for which the bean will be retrieved later.
-   * @param qualifiers zero, one or more annotations qualifying the bean put into the container in order to be retrieved
-   * later with these qualifiers.
+   * @param qualifiers zero, one or more annotations qualifying the bean put into the container in
+   * order to be retrieved later with these qualifiers.
    * @param <T> the concrete type of the bean.
    */
   public <T> void putBean(T bean, Class<T> type, Annotation... qualifiers) {
@@ -175,8 +181,8 @@ public class TestBeanContainer implements BeanContainer {
   }
 
   /**
-   * Clears the container. The @{@link PreDestroy} annotated method of each managed bean (if such a method exists) will
-   * be invoked before being wiped out.
+   * Clears the container. The @{@link PreDestroy} annotated method of each managed bean (if such a
+   * method exists) will be invoked before being wiped out.
    */
   public void clear() {
     container.values().stream()
@@ -185,7 +191,8 @@ public class TestBeanContainer implements BeanContainer {
     container.clear();
   }
 
-  private static <T> void checkUniqueness(Set<ElectiveBean<T>> theBeans, String key, Annotation... qualifiers) {
+  private static <T> void checkUniqueness(Set<ElectiveBean<T>> theBeans, String key,
+      Annotation... qualifiers) {
     if (theBeans.size() > 1) {
       String q = qualifiersToMsg(qualifiers);
       throw new MultipleCandidateException("More than one elective bean available: " + key + q);
@@ -215,7 +222,8 @@ public class TestBeanContainer implements BeanContainer {
       this.type = type;
     }
 
-    private ElectiveBean(@NonNull T bean, @NonNull Class<T> type, @NonNull Annotation... qualifiers) {
+    private ElectiveBean(@NonNull T bean, @NonNull Class<T> type,
+        @NonNull Annotation... qualifiers) {
       this(type, qualifiers);
       Objects.requireNonNull(bean);
       this.bean = bean;
@@ -245,7 +253,8 @@ public class TestBeanContainer implements BeanContainer {
       } catch (SilverpeasReflectionException | MultipleCandidateException e) {
         throw e;
       } catch (Exception e) {
-        throw new SilverpeasReflectionException("A default constructor without any parameters should be available in " +
+        throw new SilverpeasReflectionException("A default constructor without any parameters " +
+            "should be available in " +
             type.getName(), e);
       }
     }
