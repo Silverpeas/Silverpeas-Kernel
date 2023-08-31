@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.silverpeas.kernel.logging.sys.BufferHandler;
 import org.silverpeas.kernel.logging.test.MyTestBean3;
 
-import java.util.logging.LogManager;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -47,7 +46,8 @@ class LoggingTest {
 
   @BeforeEach
   void redirectLoggingOutput() {
-    Stream.of("silverpeas", "silverpeas.kernel", "silverpeas.kernel.logging", "silverpeas.kernel.logging.test")
+    Stream.of("silverpeas", "silverpeas.kernel", "silverpeas.kernel.logging", "silverpeas.kernel" +
+            ".logging.test")
         .forEach(n -> {
           java.util.logging.Logger logger = java.util.logging.Logger.getLogger(n);
           logger.addHandler(bufferHandler);

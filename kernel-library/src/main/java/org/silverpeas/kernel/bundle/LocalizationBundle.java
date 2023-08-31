@@ -94,6 +94,7 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
    * @since 1.6
    */
   @Override
+  @NonNull
   public Set<String> keySet() {
     ResourceBundle bundle = getWrappedBundle();
     ResourceBundle generalBundle = getGeneralWrappedBundle();
@@ -161,6 +162,7 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
   }
 
   @Override
+  @NonNull
   public Enumeration<String> getKeys() {
     return Collections.enumeration(keySet());
   }

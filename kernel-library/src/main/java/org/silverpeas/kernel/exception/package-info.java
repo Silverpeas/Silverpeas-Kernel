@@ -23,7 +23,7 @@
  */
 
 /**
- * Exceptions used by Silverpeas Kernel.
+ * Technical exceptions whose some of them are used by the Silverpeas Kernel itself.
  * @author mmoquillon
  */
 package org.silverpeas.kernel.exception;

@@ -24,8 +24,6 @@
 
 package org.silverpeas.kernel;
 
-import org.silverpeas.kernel.annotation.Managed;
-
 /**
  * Definition of a bean to test its management by the IoC container.
  */

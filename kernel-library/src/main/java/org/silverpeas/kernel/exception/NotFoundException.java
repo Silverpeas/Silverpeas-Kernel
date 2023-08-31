@@ -40,6 +40,7 @@ public class NotFoundException extends SilverpeasRuntimeException {
     super(message);
   }
 
+  @SuppressWarnings("unused")
   public NotFoundException(String message, Throwable t) {
     super(message, t);
   }

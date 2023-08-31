@@ -30,7 +30,7 @@ import org.hamcrest.Matcher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.silverpeas.kernel.cache.service.ThreadCacheService;
+import org.silverpeas.kernel.cache.service.ThreadCacheAccessor;
 import org.silverpeas.kernel.exception.MultipleCandidateException;
 import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.util.Mutable;
@@ -53,13 +53,12 @@ class ManagedBeanProviderTest {
 
   private final ManagedBeanFeeder feeder = new ManagedBeanFeeder();
   private final ManagedBeanProvider provider = ManagedBeanProvider.getInstance();
-
-  private final ThreadCacheService service = new ThreadCacheService();
+  private final ThreadCacheAccessor accessor = ThreadCacheAccessor.getInstance();
 
   @AfterEach
   void cleanUpAllManagedBeans() {
     feeder.clearAllManagedBeans();
-    service.clearAllCaches();
+    accessor.getCache().clear();
   }
 
   @Test
@@ -82,7 +81,8 @@ class ManagedBeanProviderTest {
   }
 
   @Test
-  @DisplayName("Getting by name a managed single instance of a singleton should return it after caching it")
+  @DisplayName("Getting by name a managed single instance of a singleton should return it after " +
+      "caching it")
   void getExistingSingleInstanceByNameShouldCacheIt() {
     final String name = "foo";
     feeder.manageBeanWithName(MyBean1.class, name);
@@ -94,12 +94,13 @@ class ManagedBeanProviderTest {
   }
 
   @Test
-  @DisplayName("Getting by name an already cached single instance of a singleton should return it directly")
+  @DisplayName("Getting by name an already cached single instance of a singleton should return it" +
+      " directly")
   void getAlreadyCreatedSingleInstanceByName() {
     final String name = "foo";
     MyBean1 expected = new MyBean1();
     String key = computeCacheKey(name);
-    service.getCache().put(key, expected);
+    accessor.getCache().put(key, expected);
 
     MyBean1 actual = provider.getManagedBean(name);
     assertThat(actual, is(expected));
@@ -124,7 +125,8 @@ class ManagedBeanProviderTest {
   }
 
   @Test
-  @DisplayName("Getting by type a managed single instance of a singleton should return it after caching it")
+  @DisplayName("Getting by type a managed single instance of a singleton should return it after " +
+      "caching it")
   void getExistingSingleInstanceByType() {
     feeder.manageBeanForType(MyBean1.class, MyBean1.class);
     Mutable<MyBean1> bean = Mutable.empty();
@@ -135,18 +137,20 @@ class ManagedBeanProviderTest {
   }
 
   @Test
-  @DisplayName("Getting by type an already cached single instance of a singleton should return it directly")
+  @DisplayName("Getting by type an already cached single instance of a singleton should return it" +
+      " directly")
   void getAlreadyCreatedSingleInstanceByType() {
     MyBean1 expected = new MyBean1();
     String key = computeCacheKey(expected.getClass().getName());
-    service.getCache().put(key, expected);
+    accessor.getCache().put(key, expected);
 
     MyBean1 actual = provider.getManagedBean(expected.getClass());
     assertThat(actual, is(expected));
   }
 
   @Test
-  @DisplayName("Getting a bean by a name having several possible candidates should throw MultipleCandidateException")
+  @DisplayName("Getting a bean by a name having several possible candidates should throw " +
+      "MultipleCandidateException")
   void getMoreThanOneBeanByName() {
     final String name = "foo";
     feeder.manageBeanWithName(MyBean2.class, name);
@@ -156,7 +160,8 @@ class ManagedBeanProviderTest {
   }
 
   @Test
-  @DisplayName("Getting a bean for a type having several possible candidates should throw MultipleCandidateException")
+  @DisplayName("Getting a bean for a type having several possible candidates should throw " +
+      "MultipleCandidateException")
   void getMoreThanOneBeanWhenAskedOneBeanByType() {
     feeder.manageBeanForType(MyBean2.class, MyBean.class);
     feeder.manageBeanForType(MyBean1.class, MyBean.class);
@@ -165,7 +170,8 @@ class ManagedBeanProviderTest {
   }
 
   @Test
-  @DisplayName("Getting all the beans satisfying a given type should return them without caching them")
+  @DisplayName("Getting all the beans satisfying a given type should return them without caching " +
+      "them")
   void getAllManagedBeans() {
     feeder.manageBeanForType(MyBean2.class, MyBean.class);
     feeder.manageBeanForType(MyBean1.class, MyBean.class);
@@ -196,11 +202,12 @@ class ManagedBeanProviderTest {
 
   /**
    * Matcher of the presence of a bean into the current thread cache under a given name.
+   *
    * @author mmoquillon
    */
   protected static class IsCached extends BaseMatcher<Object> {
 
-    private static final ThreadCacheService service = new ThreadCacheService();
+    private static final ThreadCacheAccessor accessor = ThreadCacheAccessor.getInstance();
     private final String cacheKey;
 
     private IsCached(String key) {
@@ -209,7 +216,7 @@ class ManagedBeanProviderTest {
 
     @Override
     public boolean matches(Object o) {
-      return service.getCache().has(cacheKey) && Objects.equals(service.getCache().get(cacheKey), o);
+      return accessor.getCache().has(cacheKey) && Objects.equals(accessor.getCache().get(cacheKey), o);
     }
 
     @Override

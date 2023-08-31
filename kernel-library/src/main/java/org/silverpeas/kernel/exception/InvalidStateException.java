@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2023 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -21,31 +21,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.silverpeas.kernel.cache.service;
 
-import org.silverpeas.kernel.cache.model.SimpleCache;
+package org.silverpeas.kernel.exception;
+
+import org.silverpeas.kernel.SilverpeasRuntimeException;
 
 /**
- * A service managing the life-cycle of a given type of caches. The service can manage a single or
- * several caches. A cache service should be a singleton.
+ * Exception thrown when an operation has been invoked on an object that is in a state that doesn't
+ * match with the expectation of the operation execution.
  *
- * @param <T> the concrete type of {@link SimpleCache}
  * @author mmoquillon
  */
-public interface CacheService<T extends SimpleCache> {
+@SuppressWarnings("unused")
+public class InvalidStateException extends SilverpeasRuntimeException {
 
-  /**
-   * Gets a cache from this service. The returned cache is either the same instance at each call or
-   * a new one, in this case the new instance is kept to be tracked by the service.
-   *
-   * @return either a new cache or a single one according to the policy of the service about the
-   * cache(s) on which it works.
-   */
-  T getCache();
+  public InvalidStateException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-  /**
-   * Clears all the caches on which this service works.
-   */
-  void clearAllCaches();
-
+  public InvalidStateException(String message) {
+    super(message);
+  }
 }

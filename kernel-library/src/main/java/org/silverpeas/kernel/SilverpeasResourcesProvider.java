@@ -23,8 +23,8 @@
  */
 package org.silverpeas.kernel;
 
-import org.silverpeas.kernel.cache.service.ApplicationCacheService;
-import org.silverpeas.kernel.cache.service.CacheService;
+import org.silverpeas.kernel.cache.service.ApplicationCacheAccessor;
+import org.silverpeas.kernel.cache.service.CacheAccessor;
 
 import java.nio.file.Path;
 import java.util.ServiceLoader;
@@ -42,8 +42,8 @@ import java.util.ServiceLoader;
 public interface SilverpeasResourcesProvider {
 
   static SilverpeasResourcesProvider getInstance() {
-    CacheService<?> cacheService = ApplicationCacheService.getInstance();
-    return cacheService.getCache().computeIfAbsent(
+    CacheAccessor<?> cacheAccessor = ApplicationCacheAccessor.getInstance();
+    return cacheAccessor.getCache().computeIfAbsent(
         SilverpeasResourcesProvider.class.getSimpleName() + "#instance",
         SilverpeasResourcesProvider.class,
         () -> ServiceLoader.load(SilverpeasResourcesProvider.class)

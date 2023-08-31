@@ -29,7 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A cache per-thread. It uses the {@link ThreadLocal} mechanism to store data.
+ * A cache per-thread. It uses the {@link ThreadLocal} mechanism to access data in the current
+ * thread's cache.
+ *
  * @author Yohann Chastagnier
  * @since 25/10/13
  */
@@ -38,11 +40,11 @@ class ThreadCache extends AbstractSimpleCache {
   private static final ThreadLocal<Map<Object, Object>> cache = new ThreadLocal<>();
 
   ThreadCache() {
-
   }
 
   /**
    * Gets all the content of the cache as a dictionary.
+   *
    * @return a {@link Map} with all the key/value pairs stored in the cache.
    */
   @Override

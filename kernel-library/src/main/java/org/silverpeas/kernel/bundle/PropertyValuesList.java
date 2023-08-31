@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
  *
  * @author Yohann Chastagnier
  */
+@SuppressWarnings("unused")
 public class PropertyValuesList extends ArrayList<String> {
 
   /**

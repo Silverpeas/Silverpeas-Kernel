@@ -26,7 +26,6 @@ package org.silverpeas.kernel.test;
 
 import org.silverpeas.kernel.BeanContainer;
 import org.silverpeas.kernel.exception.MultipleCandidateException;
-import org.silverpeas.kernel.exception.NotFoundException;
 
 import java.lang.annotation.Annotation;
 import java.util.*;

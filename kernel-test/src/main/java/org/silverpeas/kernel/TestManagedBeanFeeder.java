@@ -25,7 +25,7 @@
 package org.silverpeas.kernel;
 
 import org.silverpeas.kernel.annotation.NonNull;
-import org.silverpeas.kernel.cache.service.ThreadCacheService;
+import org.silverpeas.kernel.cache.service.ThreadCacheAccessor;
 import org.silverpeas.kernel.test.TestBeanContainer;
 
 import java.lang.annotation.Annotation;
@@ -100,8 +100,8 @@ public final class TestManagedBeanFeeder {
    */
   public void removeAllManagedBeans() {
     getBeanContainer().clear();
-    ThreadCacheService service = new ThreadCacheService();
-    service.clearAllCaches();
+    ThreadCacheAccessor accessor = ThreadCacheAccessor.getInstance();
+    accessor.getCache().clear();
   }
 
   private TestBeanContainer getBeanContainer() {

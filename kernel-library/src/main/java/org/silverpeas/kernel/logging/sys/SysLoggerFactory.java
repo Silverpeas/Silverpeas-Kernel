@@ -23,6 +23,7 @@
  */
 package org.silverpeas.kernel.logging.sys;
 
+import org.silverpeas.kernel.annotation.Technical;
 import org.silverpeas.kernel.logging.LoggerConfigurationManager.LoggerConfiguration;
 import org.silverpeas.kernel.logging.SilverLogger;
 import org.silverpeas.kernel.logging.SilverLoggerFactory;
@@ -43,6 +44,7 @@ import java.util.WeakHashMap;
  *
  * @author mmoquillon
  */
+@Technical
 public class SysLoggerFactory implements SilverLoggerFactory {
 
   private final Map<SilverLoggerKey, SilverLogger> loggers =

@@ -23,6 +23,7 @@
  */
 package org.silverpeas.kernel.bundle;
 
+import org.silverpeas.kernel.annotation.Technical;
 import org.silverpeas.kernel.logging.SilverLogger;
 
 import java.io.FileNotFoundException;
@@ -34,16 +35,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * The resource bundles and the properties files can be located into a particular directory
- * out of the the classpath of a running Silverpeas application.
- * Therefore this class loader aims to manage the access to the resources in this particular
- * location; it acts as a bridge between the current hierarchy of class loaders and this particular
- * unmanaged location.
+ * The resource bundles and the properties files can be located into a particular directory out of
+ * the the classpath of a running Silverpeas application. Therefore this class loader aims to manage
+ * the access to the resources in this particular location; it acts as a bridge between the current
+ * hierarchy of class loaders and this particular unmanaged location.
  * <p>
  * By default, when a resource is asked, it looks for in the current hierarchy of class loaders
  * before to seek the resource into the resources directory in the Silverpeas home directory.
+ *
  * @author ehugonnet
  */
+@Technical
 public class ConfigurationClassLoader extends ClassLoader {
 
   private final Path resourceRootPath;
@@ -84,8 +86,9 @@ public class ConfigurationClassLoader extends ClassLoader {
           inputStream = Files.newInputStream(file);
         } catch (FileNotFoundException e) {
           SilverLogger.getLogger(this).error("Resource " + name + " not found", e);
-        } catch (IOException e){
-          SilverLogger.getLogger(this).error("Unexpected error while opening the resource " + name, e);
+        } catch (IOException e) {
+          SilverLogger.getLogger(this).error("Unexpected error while opening the resource "
+              + name, e);
         }
       }
     }

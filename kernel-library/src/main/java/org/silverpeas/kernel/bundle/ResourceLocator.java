@@ -62,6 +62,7 @@ import java.util.concurrent.ConcurrentMap;
  * the policy adopted by the {@link SilverpeasBundle} concrete types, please read their
  * corresponding documentation.
  */
+@SuppressWarnings("unused")
 public class ResourceLocator {
 
   private static final int INITIAL_CACHE_SIZE = 128;

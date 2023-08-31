@@ -24,7 +24,6 @@
 
 package org.silverpeas.kernel;
 
-import org.silverpeas.kernel.cache.service.ThreadCacheService;
 import org.silverpeas.kernel.test.TestScopedBeanContainer;
 
 import java.lang.reflect.Constructor;
@@ -32,8 +31,8 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * A feeder of beans to manage in the underlying IoC subsystem. The subsystem is implemented here by
- * {@link TestScopedBeanContainer}. This feeder is to be used by the unit tests to register the beans required by them
- * for the test passes successfully.
+ * {@link TestScopedBeanContainer}. This feeder is to be used by the unit tests to register the
+ * beans required by them for the test passes successfully.
  */
 public final class ManagedBeanFeeder {
 
@@ -45,7 +44,8 @@ public final class ManagedBeanFeeder {
       constructor.trySetAccessible();
       U bean = constructor.newInstance();
       getBeanContainer().putBean(type, bean);
-    } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+    } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
+             InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
@@ -54,7 +54,8 @@ public final class ManagedBeanFeeder {
     try {
       U bean = instantiate(beanClass);
       getBeanContainer().putBean(name, bean);
-    } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+    } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
+             InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }

@@ -25,11 +25,8 @@
 package org.silverpeas.kernel.test;
 
 import org.silverpeas.kernel.SilverpeasResourcesProvider;
-import org.silverpeas.kernel.SilverpeasRuntimeException;
 
-import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.Properties;
 
 /**
  * Implementation of the {@link SilverpeasResourcesProvider} interface to be used in the scope of a

@@ -25,6 +25,7 @@ package org.silverpeas.kernel.logging;
 
 import org.silverpeas.kernel.SilverpeasResourcesProvider;
 import org.silverpeas.kernel.SilverpeasRuntimeException;
+import org.silverpeas.kernel.annotation.Technical;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,6 +73,7 @@ import java.util.stream.Stream;
  * invoked explicitly. The instantiation of a {@link LoggerConfigurationManager} is performed by the
  * {@link SilverLoggerProvider} single instance.
  */
+@Technical
 public class LoggerConfigurationManager {
 
   private static final String LOGGER_CONF_FILE_SUFFIX = "Logging.properties";

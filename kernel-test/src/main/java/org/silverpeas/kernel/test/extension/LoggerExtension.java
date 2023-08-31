@@ -44,7 +44,7 @@ import static org.silverpeas.kernel.logging.SilverLoggerProvider.ROOT_NAMESPACE;
 public class LoggerExtension implements BeforeEachCallback {
 
   @Override
-  public void beforeEach(final ExtensionContext context) throws Exception {
+  public void beforeEach(final ExtensionContext context) {
     final LoggerLevel levelForAll =
         context.getRequiredTestInstance().getClass().getAnnotation(LoggerLevel.class);
     if (levelForAll != null) {

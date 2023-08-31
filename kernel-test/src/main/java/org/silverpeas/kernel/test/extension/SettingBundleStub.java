@@ -51,6 +51,7 @@ import static org.silverpeas.kernel.util.StringUtil.isDefined;
  *
  * @author silveryocha
  */
+@SuppressWarnings("unused")
 public class SettingBundleStub implements BeforeEachCallback, AfterEachCallback {
 
   private final ResourceBundleTest resourceBundle;

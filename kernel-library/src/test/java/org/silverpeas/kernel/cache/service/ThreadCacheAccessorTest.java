@@ -35,12 +35,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
- * Tests the {@link ThreadCacheService} single instance and checks it manages only a single cache per thread.
+ * Tests the {@link ThreadCacheAccessor} single instance and checks it manages only a single cache
+ * per thread.
  *
  * @author mmoquillon
  */
-class ThreadCacheServiceTest {
-  private final ThreadCacheService service = new ThreadCacheService();
+class ThreadCacheAccessorTest {
+  private final ThreadCacheAccessor accessor = new ThreadCacheAccessor();
   private static final String Object1 = "";
   private static final Object Object2 = new Object();
 
@@ -48,10 +49,10 @@ class ThreadCacheServiceTest {
   void clearCaches() {
     final TestPerformer testPerformer = () -> {
       assertThat(itemsCountInCache(), is(0));
-      service.getCache().add(Object1);
-      service.getCache().add(Object2);
+      accessor.getCache().add(Object1);
+      accessor.getCache().add(Object2);
       assertThat(itemsCountInCache(), is(2));
-      service.clearAllCaches();
+      accessor.getCache().clear();
       assertThat(itemsCountInCache(), is(0));
     };
     performTestInTwoThreads(testPerformer, true);
@@ -62,22 +63,23 @@ class ThreadCacheServiceTest {
   void getCachedObject() {
     final TestPerformer testPerformer = () -> {
       assertThat(itemsCountInCache(), is(0));
-      String uniqueKey1 = service.getCache().add(Object1);
-      assertThat(service.getCache().get("dummy"), nullValue());
-      assertThat(service.getCache().get(uniqueKey1), is(Object1));
-      assertThat(service.getCache().get(uniqueKey1, Object.class), is(Object1));
-      assertThat(service.getCache().get(uniqueKey1, String.class), is(Object1));
-      assertThat(service.getCache().get(uniqueKey1, Number.class), nullValue());
+      String uniqueKey1 = accessor.getCache().add(Object1);
+      assertThat(accessor.getCache().get("dummy"), nullValue());
+      assertThat(accessor.getCache().get(uniqueKey1), is(Object1));
+      assertThat(accessor.getCache().get(uniqueKey1, Object.class), is(Object1));
+      assertThat(accessor.getCache().get(uniqueKey1, String.class), is(Object1));
+      assertThat(accessor.getCache().get(uniqueKey1, Number.class), nullValue());
     };
     performTestInTwoThreads(testPerformer, true);
     performTestInTwoThreads(testPerformer, false);
   }
 
   @Test
-  @DisplayName("Put an object with a given cache service and get it with another cache service has to work")
+  @DisplayName("Put an object with a given cache service and get it with another cache service " +
+      "has to work")
   void useTwoCacheServicesInTheSameThread() {
-    ThreadCacheService service1 = new ThreadCacheService();
-    ThreadCacheService service2 = new ThreadCacheService();
+    ThreadCacheAccessor service1 = new ThreadCacheAccessor();
+    ThreadCacheAccessor service2 = new ThreadCacheAccessor();
 
     String key = service1.getCache().add(Object2);
     Object actual = service2.getCache().get(key);
@@ -85,20 +87,21 @@ class ThreadCacheServiceTest {
   }
 
   @Test
-  @DisplayName("Put an object with a given cache service in one thread and get it with another cache service in " +
+  @DisplayName("Put an object with a given cache service in one thread and get it with another " +
+      "cache service in " +
       "another thread doesn't work")
   void useTwoCacheServicesInTwoDifferentThreads() throws InterruptedException {
     Mutable<String> key = Mutable.empty();
     Thread t1 = new Thread(() -> {
-      ThreadCacheService service1 = new ThreadCacheService();
+      ThreadCacheAccessor service1 = new ThreadCacheAccessor();
       String k = service1.getCache().add(Object2);
       key.set(k);
     });
 
     Mutable<Object> actual = Mutable.empty();
     Thread t2 = new Thread(() -> {
-      ThreadCacheService service2 = new ThreadCacheService();
-      Object o = service2.getCache().get(key.get());;
+      ThreadCacheAccessor service2 = new ThreadCacheAccessor();
+      Object o = service2.getCache().get(key.get());
       actual.set(o);
     });
 
@@ -115,8 +118,8 @@ class ThreadCacheServiceTest {
   void addIntoCache() {
     final TestPerformer testPerformer = () -> {
       assertThat(itemsCountInCache(), is(0));
-      String uniqueKey1 = service.getCache().add(Object1);
-      String uniqueKey2 = service.getCache().add(Object2);
+      String uniqueKey1 = accessor.getCache().add(Object1);
+      String uniqueKey2 = accessor.getCache().add(Object2);
       assertThat(uniqueKey1, notNullValue());
       assertThat(uniqueKey2, notNullValue());
       assertThat(uniqueKey2, not(is(uniqueKey1)));
@@ -130,8 +133,8 @@ class ThreadCacheServiceTest {
   void putObjectIntoCacheWithDifferentKeys() {
     final TestPerformer testPerformer = () -> {
       assertThat(itemsCountInCache(), is(0));
-      service.getCache().put("A", Object1);
-      service.getCache().put("B", Object2);
+      accessor.getCache().put("A", Object1);
+      accessor.getCache().put("B", Object2);
       assertThat(itemsCountInCache(), is(2));
     };
     performTestInTwoThreads(testPerformer, true);
@@ -142,8 +145,8 @@ class ThreadCacheServiceTest {
   void putObjectIntoCacheWithIdenticalKey() {
     final TestPerformer testPerformer = () -> {
       assertThat(itemsCountInCache(), is(0));
-      service.getCache().put("A", Object1);
-      service.getCache().put("A", Object2);
+      accessor.getCache().put("A", Object1);
+      accessor.getCache().put("A", Object2);
       assertThat(itemsCountInCache(), is(1));
     };
     performTestInTwoThreads(testPerformer, true);
@@ -154,16 +157,16 @@ class ThreadCacheServiceTest {
   void removeObjectFromCache() {
     final TestPerformer testPerformer = () -> {
       assertThat(itemsCountInCache(), is(0));
-      String uniqueKey1 = service.getCache().add(Object1);
-      String uniqueKey2 = service.getCache().add(Object2);
+      String uniqueKey1 = accessor.getCache().add(Object1);
+      String uniqueKey2 = accessor.getCache().add(Object2);
       assertThat(itemsCountInCache(), is(2));
-      service.getCache().remove("lkjlkj");
+      accessor.getCache().remove("lkjlkj");
       assertThat(itemsCountInCache(), is(2));
-      service.getCache().remove(uniqueKey1, Number.class);
+      accessor.getCache().remove(uniqueKey1, Number.class);
       assertThat(itemsCountInCache(), is(2));
-      service.getCache().remove(uniqueKey1, Object.class);
+      accessor.getCache().remove(uniqueKey1, Object.class);
       assertThat(itemsCountInCache(), is(1));
-      service.getCache().remove(uniqueKey2);
+      accessor.getCache().remove(uniqueKey2);
       assertThat(itemsCountInCache(), is(0));
     };
     performTestInTwoThreads(testPerformer, true);
@@ -192,7 +195,7 @@ class ThreadCacheServiceTest {
   }
 
   private int itemsCountInCache() {
-    return ((ThreadCache) service.getCache()).getAll().size();
+    return ((ThreadCache) accessor.getCache()).getAll().size();
   }
 
   private interface TestPerformer {

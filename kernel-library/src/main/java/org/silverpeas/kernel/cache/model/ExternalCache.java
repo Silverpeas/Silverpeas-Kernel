@@ -23,12 +23,14 @@
  */
 package org.silverpeas.kernel.cache.model;
 
+import org.silverpeas.kernel.cache.service.ApplicationCacheAccessor;
+
 import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
  * A more complete cache provided by an external library. The cache loaded and used by the
- * {@link org.silverpeas.kernel.cache.service.ApplicationCacheService} have to extend this abstract
+ * {@link ApplicationCacheAccessor} have to extend this abstract
  * class.
  *
  * @author Yohann Chastagnier

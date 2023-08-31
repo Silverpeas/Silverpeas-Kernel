@@ -35,33 +35,33 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Unit tests on the {@link ApplicationCacheService} using under the hood a single
+ * Unit tests on the {@link ApplicationCacheAccessor} using under the hood a single
  * {@link InMemoryCache} service.getCache().
  * @author mmoquillon
  */
-class ApplicationCacheServiceTest {
+class ApplicationCacheAccessorTest {
 
-  private static final ApplicationCacheService service = ApplicationCacheService.getInstance();
+  private static final ApplicationCacheAccessor accessor = ApplicationCacheAccessor.getInstance();
 
   private static final String Object1 = "";
   private static final Object Object2 = new Object();
 
   @AfterEach
   void clearAllCaches() {
-    service.clearAllCaches();
+    accessor.getCache().clear();
   }
 
   @Test
   void ensureApplicationCacheServiceIsASingleton() {
-    ApplicationCacheService cacheService1 = ApplicationCacheService.getInstance();
-    ApplicationCacheService cacheService2 = ApplicationCacheService.getInstance();
+    ApplicationCacheAccessor cacheService1 = ApplicationCacheAccessor.getInstance();
+    ApplicationCacheAccessor cacheService2 = ApplicationCacheAccessor.getInstance();
     assertThat(cacheService2, is(cacheService1));
   }
 
   @Test
   void ensureASingleCacheIsUsed() {
-    Cache cache1 = service.getCache();
-    Cache cache2 = service.getCache();
+    Cache cache1 = accessor.getCache();
+    Cache cache2 = accessor.getCache();
     assertThat(cache2, is(cache1));
   }
 
@@ -70,8 +70,8 @@ class ApplicationCacheServiceTest {
     Mutable<Cache> cache1 = Mutable.empty();
     Mutable<Cache> cache2 = Mutable.empty();
 
-    Thread t1 = new Thread(() -> cache1.set(service.getCache()));
-    Thread t2 = new Thread(() -> cache2.set(service.getCache()));
+    Thread t1 = new Thread(() -> cache1.set(accessor.getCache()));
+    Thread t2 = new Thread(() -> cache2.set(accessor.getCache()));
     t1.start();
     t2.start();
     t1.join();
@@ -82,32 +82,32 @@ class ApplicationCacheServiceTest {
 
   @Test
   void clearCache() {
-    String key1 = service.getCache().add(Object1);
-    String key2 = service.getCache().add(Object2);
+    String key1 = accessor.getCache().add(Object1);
+    String key2 = accessor.getCache().add(Object2);
     assertThat(itemsCountInCache(), is(2));
-    assertThat(service.getCache().get(key1), is(Object1));
-    assertThat(service.getCache().get(key2), is(Object2));
+    assertThat(accessor.getCache().get(key1), is(Object1));
+    assertThat(accessor.getCache().get(key2), is(Object2));
 
-    service.getCache().clear();
+    accessor.getCache().clear();
     assertThat(itemsCountInCache(), is(0));
-    assertThat(service.getCache().get(key1), nullValue());
-    assertThat(service.getCache().get(key1), nullValue());
+    assertThat(accessor.getCache().get(key1), nullValue());
+    assertThat(accessor.getCache().get(key1), nullValue());
   }
 
   @Test
   void getCachedObject() {
-    String uniqueKey1 = service.getCache().add(Object1);
-    assertThat(service.getCache().get("dummy"), nullValue());
-    assertThat(service.getCache().get(uniqueKey1), is(Object1));
-    assertThat(service.getCache().get(uniqueKey1, Object.class), is(Object1));
-    assertThat(service.getCache().get(uniqueKey1, String.class), is(Object1));
-    assertThat(service.getCache().get(uniqueKey1, Number.class), nullValue());
+    String uniqueKey1 = accessor.getCache().add(Object1);
+    assertThat(accessor.getCache().get("dummy"), nullValue());
+    assertThat(accessor.getCache().get(uniqueKey1), is(Object1));
+    assertThat(accessor.getCache().get(uniqueKey1, Object.class), is(Object1));
+    assertThat(accessor.getCache().get(uniqueKey1, String.class), is(Object1));
+    assertThat(accessor.getCache().get(uniqueKey1, Number.class), nullValue());
   }
 
   @Test
   void addIntoCache() {
-    String uniqueKey1 = service.getCache().add(Object1);
-    String uniqueKey2 = service.getCache().add(Object2);
+    String uniqueKey1 = accessor.getCache().add(Object1);
+    String uniqueKey2 = accessor.getCache().add(Object2);
     assertThat(uniqueKey1, notNullValue());
     assertThat(uniqueKey2, notNullValue());
     assertThat(uniqueKey2, not(is(uniqueKey1)));
@@ -115,59 +115,59 @@ class ApplicationCacheServiceTest {
 
   @Test
   void addIntoCacheWithExplicitLiveExpiry() {
-    ExternalCache cache = service.getCache();
+    ExternalCache cache = accessor.getCache();
     assertThrows(UnsupportedOperationException.class, () -> cache.add(Object1, 1));
   }
 
   @Test
   void addIntoCacheWithExplicitIdleExpiry() {
-    ExternalCache cache = service.getCache();
+    ExternalCache cache = accessor.getCache();
     assertThrows(UnsupportedOperationException.class, () -> cache.add(Object1, 5, 1));
   }
 
   @Test
   void putObjectIntoCacheWithDifferentKeys() {
-    service.getCache().put("A", Object1);
-    service.getCache().put("B", Object2);
-    assertThat(service.getCache().get("A"), is(Object1));
-    assertThat(service.getCache().get("B"), is(Object2));
+    accessor.getCache().put("A", Object1);
+    accessor.getCache().put("B", Object2);
+    assertThat(accessor.getCache().get("A"), is(Object1));
+    assertThat(accessor.getCache().get("B"), is(Object2));
   }
 
   @Test
   void putObjectIntoCacheWithIdenticalKey() {
-    service.getCache().put("A", Object1);
-    service.getCache().put("A", Object2);
-    assertThat(service.getCache().get("A"), is(Object2));
+    accessor.getCache().put("A", Object1);
+    accessor.getCache().put("A", Object2);
+    assertThat(accessor.getCache().get("A"), is(Object2));
   }
 
   @Test
   void putObjectIntoCacheWithExplicitLiveExpiry() {
-    ExternalCache cache = service.getCache();
+    ExternalCache cache = accessor.getCache();
     assertThrows(UnsupportedOperationException.class, () -> cache.put("A", Object1, 1));
   }
 
   @Test
   void putObjectIntoCacheWithExplicitIdleExpiry() {
-    ExternalCache cache = service.getCache();
+    ExternalCache cache = accessor.getCache();
     assertThrows(UnsupportedOperationException.class, () -> cache.put("A", Object1, 5, 1));
   }
 
   @Test
   void removeObjectFromCache() {
-    String uniqueKey1 = service.getCache().add(Object1);
-    String uniqueKey2 = service.getCache().add(Object2);
+    String uniqueKey1 = accessor.getCache().add(Object1);
+    String uniqueKey2 = accessor.getCache().add(Object2);
     assertThat(itemsCountInCache(), is(2));
-    service.getCache().remove("lkjlkj");
+    accessor.getCache().remove("lkjlkj");
     assertThat(itemsCountInCache(), is(2));
-    service.getCache().remove(uniqueKey1, Number.class);
+    accessor.getCache().remove(uniqueKey1, Number.class);
     assertThat(itemsCountInCache(), is(2));
-    service.getCache().remove(uniqueKey1, Object.class);
+    accessor.getCache().remove(uniqueKey1, Object.class);
     assertThat(itemsCountInCache(), is(1));
-    service.getCache().remove(uniqueKey2);
+    accessor.getCache().remove(uniqueKey2);
     assertThat(itemsCountInCache(), is(0));
   }
   
   private int itemsCountInCache() {
-    return service.getCache().getAll().size();
+    return accessor.getCache().getAll().size();
   }
 }

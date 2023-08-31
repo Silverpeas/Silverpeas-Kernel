@@ -92,6 +92,7 @@ public interface SystemWrapper {
    * or if the property to set isn't valid.
    * @see System#setProperty(String, String)
    */
+  @SuppressWarnings("UnusedReturnValue")
   String setProperty(String key, String value);
 
   /**

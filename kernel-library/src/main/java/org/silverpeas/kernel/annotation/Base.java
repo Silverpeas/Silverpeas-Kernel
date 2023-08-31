@@ -30,8 +30,10 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Annotation to indicate a class is the base of a hierarchy of a given functionality. All the
- * classes inherited from the base class adds specific behaviours to the base one.
+ * Annotation to indicate a class is the base of an hierarchical tree of classes of managed beans
+ * implementing a given functionality. The base class means to provide the common and base behaviour
+ * of the functionality whereas each of its subclasses specializes this behaviour.
+ *
  * @author Yohann Chastagnier
  */
 @Qualifier

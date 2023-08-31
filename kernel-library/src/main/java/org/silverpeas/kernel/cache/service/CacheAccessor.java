@@ -26,27 +26,23 @@ package org.silverpeas.kernel.cache.service;
 import org.silverpeas.kernel.cache.model.SimpleCache;
 
 /**
- * A service that uses the cache of the current thread to store data. This means the data are
- * per-thread cached.
- * <p>
- * <strong>BE VERY VERY CAREFUL:</strong> with thread pool management, the thread is usually never
- * killed because thread creation is time consuming and hence the thread is reused to perform
- * another treatment. So, the cache is never cleared. This is why you have to clear explicitly the
- * cache with the {@link ThreadCacheService#clearAllCaches()} method.
+ * An accessor to a cache. A cache accessor should be a singleton. Each type of cache should have
+ * their own accessor and this is by the accessor a cache is got. The accessor is a way to abstract
+ * the life-cycle of a cache as this life-cycle shouldn't be managed by the clients but by the
+ * Silverpeas Cache API implementation itself.
  *
+ * @param <T> the concrete type of {@link SimpleCache}
  * @author mmoquillon
  */
-public class ThreadCacheService implements CacheService<SimpleCache> {
+public interface CacheAccessor<T extends SimpleCache> {
 
-  private final ThreadCache cache = new ThreadCache();
+  /**
+   * Gets an instance of the cache referred by this accessor. Despite the method can return at each
+   * call either the same instance or different instances, the cache represented by the instances
+   * will be the same.
+   *
+   * @return the cache referred by this accessor.
+   */
+  T getCache();
 
-  @Override
-  public SimpleCache getCache() {
-    return cache;
-  }
-
-  @Override
-  public void clearAllCaches() {
-    cache.clear();
-  }
 }

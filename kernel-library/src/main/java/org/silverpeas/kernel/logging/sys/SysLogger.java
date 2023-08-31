@@ -23,6 +23,7 @@
  */
 package org.silverpeas.kernel.logging.sys;
 
+import org.silverpeas.kernel.annotation.Technical;
 import org.silverpeas.kernel.logging.Level;
 import org.silverpeas.kernel.logging.SilverLogger;
 import org.silverpeas.kernel.logging.SilverLoggerProvider;
@@ -36,6 +37,7 @@ import java.util.logging.Logger;
  * This logger implementation uses the Java logging system to write actually the messages into logs.
  * @author mmoquillon
  */
+@Technical
 public class SysLogger implements SilverLogger {
 
   private static final Logger ROOT_LOGGER = Logger.getLogger(SilverLoggerProvider.ROOT_NAMESPACE);

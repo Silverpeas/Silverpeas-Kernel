@@ -22,8 +22,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Provides service to access a cache whose the lifetime is within a given runtime scope: the whole
- * application runtime, the time of a user session, or the time spent by a thread to perform its
- * task are some examples of such scopes.
+ * Provides services to access a cache whose the lifetime is within a given of the following runtime
+ * scope: the whole application runtime, the time of a user session, or the time spent by a thread
+ * to perform its task; these are some examples of such scopes.
  */
 package org.silverpeas.kernel.cache.service;

@@ -26,7 +26,7 @@ package org.silverpeas.kernel;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.silverpeas.kernel.cache.service.ApplicationCacheService;
+import org.silverpeas.kernel.cache.service.ApplicationCacheAccessor;
 import org.silverpeas.kernel.test.TestContext;
 import org.silverpeas.kernel.test.TestScopedResourcesProvider;
 
@@ -57,7 +57,7 @@ class SilverpeasResourcesProviderTest {
   void getInstanceWillCacheTheSingleInstance() {
     SilverpeasResourcesProvider instance = SilverpeasResourcesProvider.getInstance();
     SilverpeasResourcesProvider cachedInstance =
-        ApplicationCacheService.getInstance().getCache()
+        ApplicationCacheAccessor.getInstance().getCache()
             .get(SilverpeasResourcesProvider.class.getSimpleName() + "#instance",
                 SilverpeasResourcesProvider.class);
     assertThat(cachedInstance, is(instance));

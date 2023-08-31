@@ -30,33 +30,33 @@ import java.util.ServiceLoader;
 import java.util.function.Supplier;
 
 /**
- * A service to handle a cache whose lifetime is within the whole application runtime. This service
- * uses a specific implementation of the cache that is retrieved by using the Java Service Loader
- * mechanism. So, through this service you can use tiers caching subsystem like Infinispan or
- * EhCache for example, for better performance. This is why this service maintains only a single
- * instance of such a cache. In the case no external cache is available, then by default a in-memory
- * cache is used, meaning no additional cache functionalities (like time-to-live for example) are
- * supported.
+ * An accessor to a cache whose lifetime is within the whole application runtime. This accessor uses
+ * a specific implementation of the cache that is retrieved by using the Java Service Loader
+ * mechanism. So, through this accessor you can use tiers caching subsystem like Infinispan or
+ * EhCache for example, for better performance. This is why this accessor maintains only a single
+ * instance of such a cache. In the case no external cache is available, then by default an
+ * in-memory cache is used, meaning no additional cache functionalities (like time-to-live for
+ * example) are supported.
  *
  * @author mmoquillon
- * @apiNote The {@link ApplicationCacheService} is a singleton.
+ * @apiNote The {@link ApplicationCacheAccessor} is a singleton.
  */
-public class ApplicationCacheService implements CacheService<ExternalCache> {
+public class ApplicationCacheAccessor implements CacheAccessor<ExternalCache> {
 
-  private static final ApplicationCacheService instance = new ApplicationCacheService();
+  private static final ApplicationCacheAccessor instance = new ApplicationCacheAccessor();
 
   /**
-   * Gets the single instance of {@link ApplicationCacheService}.
+   * Gets the single instance of {@link ApplicationCacheAccessor}.
    *
    * @return the single instance of this class.
    */
-  public static ApplicationCacheService getInstance() {
+  public static ApplicationCacheAccessor getInstance() {
     return instance;
   }
 
   private final ExternalCache cache;
 
-  ApplicationCacheService() {
+  ApplicationCacheAccessor() {
     cache = ServiceLoader.load(ExternalCache.class)
         .findFirst()
         .orElseGet(DefaultCache::new);
@@ -67,16 +67,11 @@ public class ApplicationCacheService implements CacheService<ExternalCache> {
     return cache;
   }
 
-  @Override
-  public void clearAllCaches() {
-    getCache().clear();
-  }
-
   /**
    * Default cache to use when no external cache is provided by SPI. The default cache stores the
    * data in memory. For doing it wraps an {@link InMemoryCache} instance. No additional cache
-   * functionalities (like time-to-live) are implemented by this cache. If these functionalities are used
-   * an {@link UnsupportedOperationException} exception is thrown.
+   * functionalities (like time-to-live) are implemented by this cache. If these functionalities are
+   * used an {@link UnsupportedOperationException} exception is thrown.
    */
   private static class DefaultCache extends ExternalCache {
 
@@ -84,6 +79,7 @@ public class ApplicationCacheService implements CacheService<ExternalCache> {
 
     /**
      * Operation not supported.
+     *
      * @see ExternalCache#put(Object, Object, int, int)
      */
     @Override
@@ -93,6 +89,7 @@ public class ApplicationCacheService implements CacheService<ExternalCache> {
 
     /**
      * Operation not supported.
+     *
      * @see ExternalCache#computeIfAbsent(Object, Class, int, int, Supplier)
      */
     @Override

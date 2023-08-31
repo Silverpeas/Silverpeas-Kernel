@@ -24,8 +24,8 @@
 
 package org.silverpeas.kernel.test.extension;
 
-import org.silverpeas.kernel.cache.service.ApplicationCacheService;
-import org.silverpeas.kernel.cache.service.ThreadCacheService;
+import org.silverpeas.kernel.cache.service.ApplicationCacheAccessor;
+import org.silverpeas.kernel.cache.service.ThreadCacheAccessor;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -61,8 +61,8 @@ public abstract class SilverTestEnvContext {
     @Override
     public void clear() {
       // clear the current thread local cache (others threads are ignored at this point)
-      new ThreadCacheService().clearAllCaches();
-      ApplicationCacheService.getInstance().clearAllCaches();
+      ThreadCacheAccessor.getInstance().getCache().clear();
+      ApplicationCacheAccessor.getInstance().getCache().clear();
     }
 
     @Override
@@ -82,6 +82,7 @@ public abstract class SilverTestEnvContext {
    * @{@link org.silverpeas.kernel.test.extension.EnableSilverTestEnv} annotation once this one is
    * bootstrapped and initialized.
    */
+  @SuppressWarnings("unused")
   public abstract void init();
 
   /**
@@ -143,6 +144,7 @@ public abstract class SilverTestEnvContext {
      *
      * @return an object of a unit test class.
      */
+    @SuppressWarnings("unused")
     public Object getInstance() {
       return instance;
     }

@@ -42,8 +42,10 @@ class SilverLoggerProviderTest {
 
   @Test
   void ensureASingleLoggerConfigurationManagerIsUsed() {
-    LoggerConfigurationManager manager1 = SilverLoggerProvider.getInstance().getConfigurationManager();
-    LoggerConfigurationManager manager2 = SilverLoggerProvider.getInstance().getConfigurationManager();
+    LoggerConfigurationManager manager1 =
+        SilverLoggerProvider.getInstance().getConfigurationManager();
+    LoggerConfigurationManager manager2 =
+        SilverLoggerProvider.getInstance().getConfigurationManager();
     assertThat(manager2, is(manager1));
   }
 

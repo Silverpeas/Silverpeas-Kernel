@@ -24,7 +24,7 @@
 package org.silverpeas.kernel;
 
 import org.silverpeas.kernel.annotation.NonNull;
-import org.silverpeas.kernel.cache.service.ThreadCacheService;
+import org.silverpeas.kernel.cache.service.ThreadCacheAccessor;
 import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.util.Mutable;
 
@@ -75,7 +75,7 @@ public class ManagedBeanProvider {
   private static ManagedBeanProvider instance;
 
   static final String CACHE_KEY_PREFIX = "ManagedBeanProvider:CacheKey:";
-  private final ThreadCacheService cacheService = new ThreadCacheService();
+  private final ThreadCacheAccessor cacheAccessor = ThreadCacheAccessor.getInstance();
   private final BeanContainer currentContainer;
 
   /**
@@ -117,7 +117,8 @@ public class ManagedBeanProvider {
   @NonNull
   public <T> T getManagedBean(Class<T> type, Annotation... qualifiers) {
     Mutable<T> bean = Mutable.empty();
-    T cachedBean = cacheService.getCache().computeIfAbsent(cacheKey(type, qualifiers), type, () -> {
+    T cachedBean = cacheAccessor.getCache().computeIfAbsent(cacheKey(type, qualifiers), type,
+        () -> {
       bean.set(beanContainer()
           .getBeanByType(type)
           .orElseThrow(() -> {
@@ -134,7 +135,7 @@ public class ManagedBeanProvider {
    * Gets an object of the single type implementation that is qualified with the specified name. The
    * bean is first looked for in the cache of the current thead before asking it to the bean
    * container. If the implementation is a singleton and it's not yet cached, then the bean is put
-   * in the cache of the current thread for * further retrieval.
+   * in the cache of the current thread for further retrieval.
    *
    * @param name the unique name identifying the bean in the container.
    * @param <T> the type of the bean to return.
@@ -148,14 +149,14 @@ public class ManagedBeanProvider {
   @NonNull
   public <T> T getManagedBean(String name) {
     Mutable<T> bean = Mutable.empty();
-    T cachedBean = (T) cacheService.getCache().computeIfAbsent(CACHE_KEY_PREFIX + name,
+    T cachedBean = (T) cacheAccessor.getCache().computeIfAbsent(CACHE_KEY_PREFIX + name,
         Object.class, () -> {
-      bean.set(beanContainer()
-          .getBeanByName(name)
-          .map(b -> (T) b)
-          .orElseThrow(() -> new NotFoundException("No such bean named " + name)));
-      return bean.get().getClass().isAnnotationPresent(Singleton.class) ? bean.get() : null;
-    });
+          bean.set(beanContainer()
+              .getBeanByName(name)
+              .map(b -> (T) b)
+              .orElseThrow(() -> new NotFoundException("No such bean named " + name)));
+          return bean.get().getClass().isAnnotationPresent(Singleton.class) ? bean.get() : null;
+        });
     return cachedBean == null ? bean.get() : cachedBean;
   }
 

@@ -23,6 +23,7 @@
  */
 package org.silverpeas.kernel.bundle;
 
+import org.silverpeas.kernel.annotation.Technical;
 import org.silverpeas.kernel.util.StringUtil;
 
 import java.util.Locale;
@@ -35,6 +36,7 @@ import java.util.ResourceBundle;
  *
  * @author ehugonnet
  */
+@Technical
 class ConfigurationControl extends ResourceBundle.Control {
 
   public static final long DEFAULT_RELOAD = 14400000L; // 4 hours
