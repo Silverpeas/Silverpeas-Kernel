@@ -26,6 +26,7 @@ package org.silverpeas.kernel.bundle;
 import org.silverpeas.kernel.SilverpeasResourcesProvider;
 import org.silverpeas.kernel.SilverpeasRuntimeException;
 import org.silverpeas.kernel.annotation.Nullable;
+import org.silverpeas.kernel.util.StringUtil;
 
 import java.io.*;
 import java.util.*;
@@ -98,7 +99,8 @@ public class ResourceLocator {
    * @return a resource bundle with the asked localized resources plus the general ones.
    */
   public static LocalizationBundle getLocalizationBundle(String name, String locale) {
-    return getLocalizationBundle(name, new Locale(locale));
+    final Locale localToUse = StringUtil.isNotDefined(locale) ? Locale.ROOT : new Locale(locale);
+    return getLocalizationBundle(name, localToUse);
   }
 
   /**

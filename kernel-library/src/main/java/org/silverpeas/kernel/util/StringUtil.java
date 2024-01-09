@@ -45,7 +45,7 @@ import static java.util.Optional.ofNullable;
 public class StringUtil {
 
   public static final String EMPTY = StringUtils.EMPTY;
-  public static final String NEWLINE = System.getProperty("line.separator");
+  public static final String NEWLINE = System.lineSeparator();
 
   private static final String PATTERN_START = "{";
   private static final String PATTERN_END = "}";
