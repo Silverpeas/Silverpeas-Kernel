@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -28,11 +28,12 @@ package org.silverpeas.kernel.bundle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.silverpeas.kernel.ManagedBeanFeeder;
-import org.silverpeas.kernel.test.TestScopedSystemWrapper;
 import org.silverpeas.kernel.util.SystemWrapper;
 
-import java.util.*;
+import java.util.List;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -44,14 +45,8 @@ class SettingBundleTest {
   private static SettingBundle settingBundle;
 
   @BeforeAll
-  public static void registerManagedBeans() {
-    ManagedBeanFeeder feeder = new ManagedBeanFeeder();
-    feeder.manageBeanForType(TestScopedSystemWrapper.class, SystemWrapper.class);
-  }
-
-  @BeforeAll
   public static void initSystemProperties() {
-    SystemWrapper.get().setProperty("STAMP", "234558373");
+    SystemWrapper.getInstance().setProperty("STAMP", "234558373");
   }
 
   @BeforeAll

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -43,14 +43,14 @@ public class SilverLoggerProvider {
   private static SilverLoggerProvider instance;
 
   private final LoggerConfigurationManager configurationManager;
-  private final SilverLoggerFactory loggerFactory = SilverLoggerFactory.get();
+  private final SilverLoggerFactory loggerFactory = SilverLoggerFactory.getInstance();
 
   /**
    * Gets the single instance of this provider of {@link SilverLogger} objects.
    *
    * @return a {@link SilverLoggerProvider} instance.
    */
-  protected static synchronized SilverLoggerProvider getInstance() {
+  public static synchronized SilverLoggerProvider getInstance() {
     if (instance == null) {
       instance = new SilverLoggerProvider();
     }

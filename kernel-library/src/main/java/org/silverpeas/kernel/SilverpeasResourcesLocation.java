@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,33 +23,34 @@
  */
 package org.silverpeas.kernel;
 
-import org.silverpeas.kernel.cache.service.ApplicationCacheAccessor;
-import org.silverpeas.kernel.cache.service.CacheAccessor;
+import org.silverpeas.kernel.util.ServiceLoader;
 
 import java.nio.file.Path;
-import java.util.ServiceLoader;
 
 /**
- * Provider of the different resource files required by Silverpeas.
+ * Location of the different resource files required by Silverpeas. These resources include the
+ * loggers configuration files, the Silverpeas properties files, the L10n bundles, and so on.
  *
  * @author mmoquillon
- * @implSpec The {@link SilverpeasResourcesProvider} implementation is loaded from the the Java SPI
- * (Java Service Provider Interface) and its instance is cached into the application cache to be
- * easily retrieved later.
+ * @implSpec The {@link SilverpeasResourcesLocation} implementation is loaded from the the Java SPI
+ * (Java Service Provider Interface) and the single instance is kept in memory for further
+ * retrieval.
  * @implNote Whatever the number of available implementations of this interface, only the first
- * found one is used.
+ * found one is used. Nevertheless, by using the @{@link javax.annotation.Priority} annotation, the
+ * implementation to use can be explicitly indicated.
  */
-public interface SilverpeasResourcesProvider {
+public interface SilverpeasResourcesLocation {
 
-  static SilverpeasResourcesProvider getInstance() {
-    CacheAccessor<?> cacheAccessor = ApplicationCacheAccessor.getInstance();
-    return cacheAccessor.getCache().computeIfAbsent(
-        SilverpeasResourcesProvider.class.getSimpleName() + "#instance",
-        SilverpeasResourcesProvider.class,
-        () -> ServiceLoader.load(SilverpeasResourcesProvider.class)
-            .findFirst()
-            .orElseThrow(() -> new SilverpeasRuntimeException(
-                "No SilverpeasResourcesProvider found! At least one should be available!")));
+  /**
+   * Gets the single object of the {@link SilverpeasResourcesLocation} singleton. If the
+   * implementation isn't yet loaded, then it is loaded and instantiated once time.
+   *
+   * @return the single instance of {@link SilverpeasResourcesLocation}
+   * @implNote The implementation is loaded and instantiated by Java SPI at first call. The single
+   * instance is then kept in memory so that it is returned at each next call.
+   */
+  static SilverpeasResourcesLocation getInstance() {
+    return ServiceLoader.get(SilverpeasResourcesLocation.class);
   }
 
   /**

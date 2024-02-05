@@ -29,7 +29,8 @@ import java.lang.annotation.*;
 /**
  * Annotation used to declare a set of classes to be managed by the IoC container used in the unit
  * tests so that the dependencies of others managed beans and that are required by the unit tests
- * could be resolved.
+ * could be resolved. If the type is annotated with the {@link javax.inject.Named} qualifier, it
+ * will be also registered as being managed under this specified name.
  *
  * @author mmoquillon
  */

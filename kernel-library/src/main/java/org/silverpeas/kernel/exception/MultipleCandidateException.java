@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,11 +24,12 @@
 
 package org.silverpeas.kernel.exception;
 
+import org.silverpeas.kernel.BeanContainer;
 import org.silverpeas.kernel.SilverpeasRuntimeException;
 
 /**
  * Exception thrown when there are more than one candidate at a request for a single object to a
- * service. This exception is used by the {@link org.silverpeas.kernel.BeanContainer}.
+ * service. This exception is used by the {@link BeanContainer}.
  *
  * @author mmoquillon
  */
@@ -36,5 +37,13 @@ public class MultipleCandidateException extends SilverpeasRuntimeException {
 
   public MultipleCandidateException(String message) {
     super(message);
+  }
+
+  public MultipleCandidateException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public MultipleCandidateException(Throwable cause) {
+    super(cause);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -66,7 +66,7 @@ class ManagedBeanProviderTest {
   void getExistingManagedBeanByName() {
     final String name = "foo";
     feeder.manageBeanWithName(MyBean2.class, name);
-    Mutable<MyBean2> bean = Mutable.empty();
+    Mutable<MyBean> bean = Mutable.empty();
     assertDoesNotThrow(() -> bean.set(provider.getManagedBean(name)));
     assertThat(bean.isPresent(), is(true));
     assertThat(bean.get(), instanceOf(MyBean2.class));
@@ -86,7 +86,7 @@ class ManagedBeanProviderTest {
   void getExistingSingleInstanceByNameShouldCacheIt() {
     final String name = "foo";
     feeder.manageBeanWithName(MyBean1.class, name);
-    Mutable<MyBean1> bean = Mutable.empty();
+    Mutable<MyBean> bean = Mutable.empty();
     assertDoesNotThrow(() -> bean.set(provider.getManagedBean(name)));
     assertThat(bean.isPresent(), is(true));
     assertThat(bean.get(), instanceOf(MyBean1.class));
@@ -107,10 +107,36 @@ class ManagedBeanProviderTest {
   }
 
   @Test
+  @DisplayName("Getting by name a managed single instance of a service should return it after " +
+      "caching it")
+  void getExistingSingleServiceInstanceByNameShouldCacheIt() {
+    final String name = "foo";
+    feeder.manageBeanWithName(MyService1.class, name);
+    Mutable<MyService> bean = Mutable.empty();
+    assertDoesNotThrow(() -> bean.set(provider.getManagedBean(name)));
+    assertThat(bean.isPresent(), is(true));
+    assertThat(bean.get(), instanceOf(MyService1.class));
+    assertThat(bean.get(), isCachedUnder(computeCacheKey(name)));
+  }
+
+  @Test
+  @DisplayName("Getting by name an already cached single instance of a service should return it" +
+      " directly")
+  void getAlreadyCreatedSingleServiceInstanceByName() {
+    final String name = "foo";
+    MyService1 expected = new MyService1();
+    String key = computeCacheKey(name);
+    accessor.getCache().put(key, expected);
+
+    MyService1 actual = provider.getManagedBean(name);
+    assertThat(actual, is(expected));
+  }
+
+  @Test
   @DisplayName("Getting by type a managed bean should return it without caching it")
   void getExistingManagedBeanByType() {
     feeder.manageBeanForType(MyBean2.class, MyBean2.class);
-    Mutable<MyBean2> bean = Mutable.empty();
+    Mutable<MyBean> bean = Mutable.empty();
     assertDoesNotThrow(() -> bean.set(provider.getManagedBean(MyBean2.class)));
     assertThat(bean.isPresent(), is(true));
     assertThat(bean.get(), instanceOf(MyBean2.class));
@@ -128,12 +154,12 @@ class ManagedBeanProviderTest {
   @DisplayName("Getting by type a managed single instance of a singleton should return it after " +
       "caching it")
   void getExistingSingleInstanceByType() {
-    feeder.manageBeanForType(MyBean1.class, MyBean1.class);
-    Mutable<MyBean1> bean = Mutable.empty();
-    assertDoesNotThrow(() -> bean.set(provider.getManagedBean(MyBean1.class)));
+    feeder.manageBeanForType(MyBean1.class, MyBean.class);
+    Mutable<MyBean> bean = Mutable.empty();
+    assertDoesNotThrow(() -> bean.set(provider.getManagedBean(MyBean.class)));
     assertThat(bean.isPresent(), is(true));
     assertThat(bean.get(), instanceOf(MyBean1.class));
-    assertThat(bean.get(), isCachedUnder(computeCacheKey(MyBean1.class.getName())));
+    assertThat(bean.get(), isCachedUnder(computeCacheKey(MyBean.class.getName())));
   }
 
   @Test
@@ -145,6 +171,30 @@ class ManagedBeanProviderTest {
     accessor.getCache().put(key, expected);
 
     MyBean1 actual = provider.getManagedBean(expected.getClass());
+    assertThat(actual, is(expected));
+  }
+
+  @Test
+  @DisplayName("Getting by type a managed single instance of a service should return it after " +
+      "caching it")
+  void getExistingSingleServiceInstanceByType() {
+    feeder.manageBeanForType(MyService1.class, MyService.class);
+    Mutable<MyService> bean = Mutable.empty();
+    assertDoesNotThrow(() -> bean.set(provider.getManagedBean(MyService.class)));
+    assertThat(bean.isPresent(), is(true));
+    assertThat(bean.get(), instanceOf(MyService1.class));
+    assertThat(bean.get(), isCachedUnder(computeCacheKey(MyService.class.getName())));
+  }
+
+  @Test
+  @DisplayName("Getting by type an already cached single instance of a service should return it" +
+      " directly")
+  void getAlreadyCreatedSingleServiceInstanceByType() {
+    MyService1 expected = new MyService1();
+    String key = computeCacheKey(expected.getClass().getName());
+    accessor.getCache().put(key, expected);
+
+    MyService1 actual = provider.getManagedBean(expected.getClass());
     assertThat(actual, is(expected));
   }
 

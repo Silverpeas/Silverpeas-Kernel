@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -30,14 +30,15 @@ import java.util.Set;
 /**
  * The bean container is a wrapper of an IoC (Inversion of Control) by IoD (Inversion of Dependency)
  * system. Only one IoC system should be available and used in the whole Silverpeas runtime, meaning
- * only one implementation of this interface will be used. The expectation here is the IoC subsystem
- * should implement the JSR-330 and as such it should support IoD; examples of such subsystems are
- * Spring, Micronaut or CDI (JSR-365). Moreover, the bean container imposes an additional constrain
- * to ease the use of IoD in Silverpeas whatever the underlying implementation: the dependencies
- * shouldn't be resolved through constructor or method parameters but instead by using the
- * {@link javax.inject.Inject} annotation on fields or by using a {@link ManagedBeanProvider}
- * instance. Keep in mind to leave your code agnostic from any specific code of an IoC solution so
- * it should be more easy later to change such a solution.
+ * only one implementation of this interface will be used. The expectations here is first the IoC
+ * subsystem should implement the JSR-330 and as such it should support IoD; examples of such
+ * subsystems are Spring, Micronaut or CDI (JSR-365). Second, the IoC subsystem must provide a way
+ * to get a managed bean within a non-managed bean. Moreover, the bean container imposes an
+ * additional constrain to ease the use of IoD in Silverpeas whatever the underlying implementation:
+ * the dependencies shouldn't be resolved through constructor or method parameters but instead by
+ * using the {@link javax.inject.Inject} annotation on fields or by using a
+ * {@link ManagedBeanProvider} instance. Keep in mind to leave your code agnostic from any specific
+ * code of an IoC solution so it should be more easy later to change such a solution.
  * <p>
  * The goal of the bean container is to manage the life-cycle of some objects (named here beans), to
  * resolve and to satisfy automatically and in a transparent way their dependencies. For doing, the
@@ -48,14 +49,14 @@ import java.util.Set;
  *
  * @author mmoquillon
  * @apiNote The {@link BeanContainer} isn't to be used directly by codes. It is just a wrapper of a
- * true IoC/IoD solution for the {@link ManagedBeanProvider}. Latter has to be used instead.
+ * true IoC by IoD solution for the {@link ManagedBeanProvider}. Latter has to be used instead.
  * @implSpec The {@link BeanContainer} has to be bound to its implementation by the Java SPI (Java
  * Service Provider Interface)
  */
 public interface BeanContainer {
 
   /**
-   * Gets a bean managed in this container by its name. If no such bean or exists in the bean
+   * Gets a bean managed in this container by its name. If no such bean exists in the bean
    * container, nothing is returned.
    *
    * @param name the name of the bean.
@@ -63,6 +64,9 @@ public interface BeanContainer {
    * @return the bean matching the specified name or nothing
    * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one
    * bean with the given name as the name must be unique for each bean.
+   * @throws org.silverpeas.kernel.exception.ExpectationViolationException if the inner expectations
+   * of the container on the bean to get aren't satisfied.
+   * @throws IllegalStateException if the container isn't in the state of answering.
    */
   <T> Optional<T> getBeanByName(String name);
 
@@ -76,6 +80,9 @@ public interface BeanContainer {
    * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one
    * bean matching the given type and qualifiers as there is an ambiguous decision in selecting the
    * bean to return.
+   * @throws org.silverpeas.kernel.exception.ExpectationViolationException if the inner expectations
+   * of the container on the bean to get or on the qualifiers aren't satisfied.
+   * @throws IllegalStateException if the container isn't in the state of answering.
    */
   <T> Optional<T> getBeanByType(Class<T> type, Annotation... qualifiers);
 
@@ -88,6 +95,9 @@ public interface BeanContainer {
    * @param <T> the type of the bean to return.
    * @return a set of beans satisfying the expected type and, if any, the expected qualifiers, or an
    * empty set otherwise.
+   * @throws org.silverpeas.kernel.exception.ExpectationViolationException if the inner expectations
+   * of the container on the beans to get or on the qualifiers aren't satisfied.
+   * @throws IllegalStateException if the container isn't in the state of answering.
    */
   <T> Set<T> getAllBeansByType(Class<T> type, Annotation... qualifiers);
 }

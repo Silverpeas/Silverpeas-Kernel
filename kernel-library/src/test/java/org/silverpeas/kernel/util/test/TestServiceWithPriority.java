@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,34 +22,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test;
-
-import org.silverpeas.kernel.SilverpeasResourcesProvider;
-
-import java.nio.file.Path;
+package org.silverpeas.kernel.util.test;
 
 /**
- * Implementation of the {@link SilverpeasResourcesProvider} interface to be used in the scope of a
- * unit test.
- *
+ * Service to load by Java SPI and dedicated for unit tests.
  * @author mmoquillon
  */
-public class TestScopedResourcesProvider implements SilverpeasResourcesProvider {
-  private final TestContext context = new TestContext();
-
-  @Override
-  public Path getLoggersRootPath() {
-    return context.getLoggerRootHomePath();
-  }
-
-  @Override
-  public Path getL10nBundlesRootPath() {
-    return getConfigurationFilesRootPath();
-  }
-
-  @Override
-  public Path getConfigurationFilesRootPath() {
-    return context.getPathOfTestResources();
-  }
-
+public interface TestServiceWithPriority {
 }

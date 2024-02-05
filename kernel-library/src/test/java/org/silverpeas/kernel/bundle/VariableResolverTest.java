@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General License as
@@ -23,11 +23,8 @@
  */
 package org.silverpeas.kernel.bundle;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.silverpeas.kernel.ManagedBeanFeeder;
-import org.silverpeas.kernel.test.TestScopedSystemWrapper;
 import org.silverpeas.kernel.util.SystemWrapper;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,18 +32,12 @@ import static org.hamcrest.Matchers.is;
 
 class VariableResolverTest {
 
-  @BeforeAll
-  public static void registerManagedBeans() {
-    ManagedBeanFeeder feeder = new ManagedBeanFeeder();
-    feeder.manageBeanForType(TestScopedSystemWrapper.class, SystemWrapper.class);
-  }
-
   @BeforeEach
   void setUpVariables() {
-    SystemWrapper.get().setProperty("Foo", "Toto");
-    SystemWrapper.get().getenv().put("Foo", "Titi");
-    SystemWrapper.get().setProperty("Home", "D:\\users\\toto");
-    SystemWrapper.get().getenv().put("Home", "D:\\users\\titi");
+    SystemWrapper.getInstance().setProperty("Foo", "Toto");
+    SystemWrapper.getInstance().getenv().put("Foo", "Titi");
+    SystemWrapper.getInstance().setProperty("Home", "D:\\users\\toto");
+    SystemWrapper.getInstance().getenv().put("Home", "D:\\users\\titi");
   }
 
   @Test

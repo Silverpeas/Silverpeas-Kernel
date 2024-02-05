@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,6 +24,7 @@
 
 package org.silverpeas.kernel.test;
 
+import org.silverpeas.kernel.BeanContainer;
 import org.silverpeas.kernel.ManagedBeanProvider;
 import org.silverpeas.kernel.annotation.NonNull;
 import org.silverpeas.kernel.exception.MultipleCandidateException;
@@ -31,6 +32,7 @@ import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.test.util.Reflections;
 import org.silverpeas.kernel.test.util.SilverpeasReflectionException;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Qualifier;
 import java.lang.annotation.Annotation;
@@ -46,7 +48,7 @@ import static org.mockito.Mockito.mock;
  * A resolver of dependencies on managed beans in a given object itself managed by the underlying
  * IoC container. This class can be extended to provide a custom dependency resolution for specific
  * IoD system like Spring DI or CDI. By default, it provides a simple resolution mechanism in which
- * when a dependency isn't found in the {@link org.silverpeas.kernel.BeanContainer} then it is
+ * when a dependency isn't found in the {@link BeanContainer} then it is
  * mocked. The new implementation will be loaded by the Java SPI when a dependency resolver will be
  * demanded.
  *
@@ -96,7 +98,7 @@ public class DependencyResolver {
     Reflections.loopInheritance(bean.getClass(), typeToLookup -> {
       Field[] beanFields = typeToLookup.getDeclaredFields();
       Stream.of(beanFields)
-          .filter(f -> f.isAnnotationPresent(Inject.class))
+          .filter(f -> f.isAnnotationPresent(Inject.class) || f.isAnnotationPresent(Resource.class))
           .forEach(f -> {
             Annotation[] qualifiers = getQualifiers(f);
             Optional<Object> resolved = resolveCustomDependency(f, qualifiers);

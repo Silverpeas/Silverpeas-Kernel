@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,16 +24,14 @@
 
 package org.silverpeas.kernel.exception;
 
-import org.silverpeas.kernel.SilverpeasRuntimeException;
-
 /**
  * Exception thrown when an operation has been invoked on an object that is in a state that doesn't
- * match with the expectation of the operation execution.
+ * match with the expectation of the operation execution or requirements.
  *
  * @author mmoquillon
  */
 @SuppressWarnings("unused")
-public class InvalidStateException extends SilverpeasRuntimeException {
+public class InvalidStateException extends ExpectationViolationException {
 
   public InvalidStateException(String message, Throwable cause) {
     super(message, cause);

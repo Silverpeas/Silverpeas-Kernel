@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -25,10 +25,10 @@
 /**
  * Provides the mechanism to load any l10n bundles and configuration properties for Silverpeas.
  * These resources are expected to be located into a peculiar home directory whose the path is given
- * by {@link org.silverpeas.kernel.SilverpeasResourcesProvider#getL10nBundlesRootPath()} for
+ * by {@link org.silverpeas.kernel.SilverpeasResourcesLocation#getL10nBundlesRootPath()} for
  * l10n bundles and
  * {@link
- * org.silverpeas.kernel.SilverpeasResourcesProvider#getConfigurationFilesRootPath()}
+ * org.silverpeas.kernel.SilverpeasResourcesLocation#getConfigurationFilesRootPath()}
  * for configuration properties.
  *
  * @author mmoquillon

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -26,8 +26,6 @@ package org.silverpeas.kernel.bundle;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.silverpeas.kernel.ManagedBeanFeeder;
-import org.silverpeas.kernel.test.TestScopedSystemWrapper;
 import org.silverpeas.kernel.util.SystemWrapper;
 
 import java.util.List;
@@ -36,21 +34,15 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class XmlSettingBundleTest {
 
   private static final String XML_SETTING_BUNDLE = "org.silverpeas.test.settings.dbDriverSettings";
 
   @BeforeAll
-  public static void registerManagedBeans() {
-    ManagedBeanFeeder feeder = new ManagedBeanFeeder();
-    feeder.manageBeanForType(TestScopedSystemWrapper.class, SystemWrapper.class);
-  }
-
-  @BeforeAll
   public static void initSystemProperties() {
-    SystemWrapper.get().setProperty("JDBC_URL", "jdbc:postgresql://localhost:5432/SilverpeasV5DLE");
+    SystemWrapper.getInstance().setProperty("JDBC_URL", "jdbc:postgresql://localhost:5432/SilverpeasV5DLE");
   }
 
   @Test

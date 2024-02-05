@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -39,7 +39,15 @@ import java.util.Properties;
 @SuppressWarnings("unused")
 public class TestContext {
 
+  private static final TestContext INSTANCE = new TestContext();
   private Properties mavenProperties;
+
+  public static TestContext getInstance() {
+    return INSTANCE;
+  }
+
+  private TestContext() {
+  }
 
   /**
    * Gets the properties of the project with which the unit test is configured.
@@ -73,5 +81,27 @@ public class TestContext {
     Properties testProperties = getMavenProperties();
     String pathProperty = testProperties.getProperty("test.resources.directory", "");
     return Path.of(pathProperty);
+  }
+
+  /**
+   * Gets the path of the directory into which are build the source code of the project and into
+   * which the resources of the project are also copied. This doesn't concern the test code and the
+   * test resources; please see {@link TestContext#getPathOfTestResources()} for that.
+   * @return the path of the project build directory.
+   */
+  public Path getPathOfBuildDirectory() {
+    Properties testProperties = getMavenProperties();
+    String pathProperty = testProperties.getProperty("project.build.directory", "");
+    return Path.of(pathProperty);
+  }
+
+  /**
+   * Gets the path of the directory in which are located the logger configuration files that are
+   * available to the unit test during its execution.
+   *
+   * @return the path of the logger configurations root directory.
+   */
+  public Path getLoggerRootHomePath() {
+    return getPathOfTestResources().resolve(Path.of("org", "silverpeas", "util", "logging"));
   }
 }

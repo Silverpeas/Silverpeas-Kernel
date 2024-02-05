@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -71,9 +71,9 @@ class VariableResolver {
         String[] statement = matching.group(2).split("\\.");
         String resolution;
         if (statement[0].equals("env")) {
-          resolution = SystemWrapper.get().getenv(statement[1]);
+          resolution = SystemWrapper.getInstance().getenv(statement[1]);
         } else {
-          resolution = SystemWrapper.get().getProperty(statement[1]);
+          resolution = SystemWrapper.getInstance().getProperty(statement[1]);
         }
         matching = VAR_REPLACEMENT.matcher(value);
         resolvedValue = matching.replaceAll(resolution.replace("\\", "/"));

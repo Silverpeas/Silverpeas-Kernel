@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,6 +24,8 @@
 
 package org.silverpeas.kernel.test.extension;
 
+import org.silverpeas.kernel.BeanContainer;
+import org.silverpeas.kernel.annotation.NonNull;
 import org.silverpeas.kernel.cache.service.ApplicationCacheAccessor;
 import org.silverpeas.kernel.cache.service.ThreadCacheAccessor;
 
@@ -66,11 +68,13 @@ public abstract class SilverTestEnvContext {
     }
 
     @Override
+    @NonNull
     public List<Object> getMocksToManage() {
       return List.of();
     }
 
     @Override
+    @NonNull
     public List<Class<?>> getBeansToManage() {
       return List.of();
     }
@@ -79,8 +83,12 @@ public abstract class SilverTestEnvContext {
   /**
    * Initializes the test environment context. This method is usually invoked by the Silverpeas unit
    * test environment that was enabled with the
-   * @{@link org.silverpeas.kernel.test.extension.EnableSilverTestEnv} annotation once this one is
-   * bootstrapped and initialized.
+   * {@link org.silverpeas.kernel.test.extension.EnableSilverTestEnv} annotation once this one is
+   * bootstrapped and initialized. The initialization is done once the
+   * {@link org.silverpeas.kernel.test.annotations.SystemProperties} and
+   * {@link org.silverpeas.kernel.test.annotations.SystemProperty} annotations are processed so that
+   * any additional properties can be found from {@link org.silverpeas.kernel.util.SystemWrapper} by
+   * the context for its initialization.
    */
   @SuppressWarnings("unused")
   public abstract void init();
@@ -104,6 +112,7 @@ public abstract class SilverTestEnvContext {
    *
    * @return a non-null list of already preconfigured mocks to manage for the unit tests.
    */
+  @NonNull
   public abstract List<Object> getMocksToManage();
 
   /**
@@ -111,10 +120,11 @@ public abstract class SilverTestEnvContext {
    * beans will be managed by the IoC/IoD subsystem, meaning their
    * {@link javax.annotation.PostConstruct} annotated methods will be invoked and their dependencies
    * satisfied (by mock unless there is a bean available in the
-   * {@link org.silverpeas.kernel.BeanContainer} and satisfying the dependency).
+   * {@link BeanContainer} and satisfying the dependency).
    *
    * @return a non-null list of classes of beans to manage for the unit tests.
    */
+  @NonNull
   public abstract List<Class<?>> getBeansToManage();
 
 

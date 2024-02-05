@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -28,9 +28,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.silverpeas.kernel.ManagedBeanFeeder;
-import org.silverpeas.kernel.SilverpeasResourcesProvider;
-import org.silverpeas.kernel.test.TestScopedSystemWrapper;
+import org.silverpeas.kernel.SilverpeasResourcesLocation;
 import org.silverpeas.kernel.util.SystemWrapper;
 
 import java.io.IOException;
@@ -51,14 +49,8 @@ class LocalizationBundleTest {
   private static final String LOCALIZATION_BUNDLE = "org.silverpeas.test.multilang.l10n";
 
   @BeforeAll
-  public static void registerManagedBeans() {
-    ManagedBeanFeeder feeder = new ManagedBeanFeeder();
-    feeder.manageBeanForType(TestScopedSystemWrapper.class, SystemWrapper.class);
-  }
-
-  @BeforeAll
   public static void initSystemProperties() {
-    SystemWrapper.get().setProperty("FOO", "/home/silveruser/webapp/images/logos");
+    SystemWrapper.getInstance().setProperty("FOO", "/home/silveruser/webapp/images/logos");
   }
 
   @Test
@@ -146,7 +138,7 @@ class LocalizationBundleTest {
   }
 
   Properties loadBundleAsProperties(final String bundleRelativePath) throws IOException {
-    Path l10nRootPath = SilverpeasResourcesProvider.getInstance().getL10nBundlesRootPath();
+    Path l10nRootPath = SilverpeasResourcesLocation.getInstance().getL10nBundlesRootPath();
     Path bundlePath = l10nRootPath.resolve(bundleRelativePath);
     Properties properties = new Properties();
     properties.load(Files.newInputStream(bundlePath));

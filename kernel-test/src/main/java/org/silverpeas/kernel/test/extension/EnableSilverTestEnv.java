@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -32,12 +32,28 @@ import java.lang.annotation.*;
 
 /**
  * Enables the Silverpeas environment dedicated to the unit tests. It extends the unit test with the
- * {@link SilverTestEnv} JUnit extension. This annotation is used to ask for an IoC/IoD environment
- * to be bootstrapped for the beans managed by the IoC container as well as the resolution of their
- * dependencies to be taken in charge during the execution of a unit test. This environment supports
- * the JSR-330 annotations in business or technical codes. The IoC/IoD subsystem is implemented by
- * the {@link TestBeanContainer} container that provides a simple solution dedicated only to the
- * unit tests.
+ * {@link SilverTestEnv} JUnit extension. This annotation is used to ask for an IoC/IoD subsystem to
+ * be bootstrapped for the beans eligible for management by an IoC container. The resolution of the
+ * dependencies will be then taken in charge during the execution of a unit test. This environment
+ * supports the JSR-330 annotations in business and technical codes. The IoC/IoD subsystem is
+ * implemented here by the {@link TestBeanContainer} container that provides a simple solution
+ * dedicated only to the unit tests.
+ * <p>
+ * In unit tests, to declare beans or mocks, required by the test, to be managed by the bean
+ * container, use respectively the annotations
+ * {@link org.silverpeas.kernel.test.annotations.TestManagedBeans}/
+ * {@link org.silverpeas.kernel.test.annotations.TestManagedBean} and
+ * {@link org.silverpeas.kernel.test.annotations.TestManagedMocks}/
+ * {@link org.silverpeas.kernel.test.annotations.TestManagedMock} annotations. The processing of
+ * these annotations take in charge the {@link javax.inject.Named} annotation: the bean will be also
+ * registered under the name given by this peculiar qualifier.
+ * </p>
+ * <p>
+ * Some mocks or beans can be pre-registered into the bean container through a custom object
+ * deriving of the {@link SilverTestEnvContext} class. Such mocks and beans can then be got in the
+ * unit test either by using the {@link org.silverpeas.kernel.ManagedBeanProvider} single instance
+ * or by using the {@link javax.inject.Inject} annotation.
+ * </p>
  *
  * @author mmoquillon
  * @see SilverTestEnv

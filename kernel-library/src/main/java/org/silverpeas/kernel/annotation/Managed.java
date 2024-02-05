@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,15 +24,17 @@
 
 package org.silverpeas.kernel.annotation;
 
+import org.silverpeas.kernel.BeanContainer;
+
 import javax.annotation.ManagedBean;
 import java.lang.annotation.*;
 
 /**
  * This annotation is to tag a class as to be managed by the underlying IoC/IoD container. This
  * means the life-cycle of the  objects of the annotated class are taken in charge by the container.
- * All classes whose the objects have to be managed by such a bean container must be annotated with
- * this annotation, otherwise their instantiation and the life-cycle of their instances is done in
- * plain usual code.
+ * All classes whose the objects have to be managed by such a bean container should be annotated
+ * with this annotation, otherwise their instantiation and the life-cycle of their instances is
+ * done in plain usual code.
  * <p>
  * The annotation is an abstraction above the IoC container used by Silverpeas so that it is can
  * possible to change the IoC container (Spring or CDI for example) by changing the wrapped
@@ -41,7 +43,7 @@ import java.lang.annotation.*;
  * </p>
  *
  * @author mmoquillon
- * @see org.silverpeas.kernel.BeanContainer
+ * @see BeanContainer
  */
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)

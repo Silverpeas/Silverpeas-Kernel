@@ -52,20 +52,21 @@ import java.util.stream.Stream;
  * container. The initialization of a bean consists of its dependency resolution and of the
  * invocation of its {@link PostConstruct} annotated method (in case there is one). When the
  * container is cleared, an invocation of the @{@link PreDestroy} annotated method is invoked for
- * each bean before to be cleared (in case they have one). This implementation of the
- * {@link BeanContainer} is built upon some assumptions to be kept simple and usable in unit tests:
+ * each bean before to be cleared (in case they have one). The dependency injection is done for all
+ * fields annotated with either {@link javax.inject.Inject} or {@link javax.annotation.Resource}
+ * annotations. This implementation of the {@link BeanContainer} is built upon some assumptions to
+ * be kept simple and usable in unit tests:
  * </p>
  * <ul>
  *   <li>Only one bean is managed for a given type and for all the parents of this type.</li>
  *   <li>Only the default constructor without parameters is supported. For classes with a
- *   constructor having the
- *   parameters to be resolved by the container, it is recommended to calls it explicitly in the
- *   test and to put the
- *   created instance directly into the container.</li>
+ *   constructor having the parameters to be resolved by the container, it is recommended to
+ *   calls it explicitly in the test and to put the created instance directly into the
+ *   container.</li>
  *   <li>The beans aren't proxied, meaning no resolution of the parameters is performed when a
- *   method of a managed
- *   bean is invoked. This has to be taken in charge by the test itself.</li>
- *   <li>The {@link javax.inject.Provider} implementations aren't supported</li>
+ *   method of a managed bean is invoked. This has to be taken in charge by the test itself.</li>
+ *   <li>The {@link javax.inject.Provider} annotation isn't supported</li>
+ *   <li>Any specific IoC/IoD annotations and extensions aren't supported</li>
  * </ul>
  *
  * @author mmoquillon
@@ -73,48 +74,48 @@ import java.util.stream.Stream;
 public class TestBeanContainer implements BeanContainer {
 
   private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
-  private final Map<String, Set<ElectiveBean<?>>> container = new ConcurrentHashMap<>();
+  private final Map<String, Set<EligibleBean<?>>> container = new ConcurrentHashMap<>();
 
   @Override
   public <T> Optional<T> getBeanByName(String name) {
-    Set<ElectiveBean<T>> theBeans = getBeans(name);
+    Set<EligibleBean<T>> theBeans = getBeans(name);
     checkUniqueness(theBeans, name);
     return theBeans.stream()
-        .map(ElectiveBean::make)
+        .map(EligibleBean::make)
         .findAny();
   }
 
   @Override
   public <T> Optional<T> getBeanByType(Class<T> type, Annotation... qualifiers) {
-    Set<ElectiveBean<T>> theBeans = getBeans(type.getName(), qualifiers);
+    Set<EligibleBean<T>> theBeans = getBeans(type.getName(), qualifiers);
     checkUniqueness(theBeans, type.getName());
     return theBeans.stream()
-        .map(ElectiveBean::make)
+        .map(EligibleBean::make)
         .findAny();
   }
 
   @Override
   public <T> Set<T> getAllBeansByType(Class<T> type, Annotation... qualifiers) {
     try {
-      Set<ElectiveBean<T>> theBeans = getBeans(type.getName(), qualifiers);
+      Set<EligibleBean<T>> theBeans = getBeans(type.getName(), qualifiers);
       return theBeans.stream()
-          .map(ElectiveBean::make)
+          .map(EligibleBean::make)
           .collect(Collectors.toSet());
     } catch (ClassCastException e) {
       return Set.of();
     }
   }
 
-  private <T> Set<ElectiveBean<T>> getBeans(String key, Annotation... qualifiers) {
-    Set<ElectiveBean<?>> electiveBeans = container.get(key);
-    if (electiveBeans == null || electiveBeans.isEmpty()) {
+  private <T> Set<EligibleBean<T>> getBeans(String key, Annotation... qualifiers) {
+    Set<EligibleBean<?>> eligibleBeans = container.get(key);
+    if (eligibleBeans == null || eligibleBeans.isEmpty()) {
       return Set.of();
     }
     try {
       //noinspection unchecked
-      return electiveBeans.stream()
+      return eligibleBeans.stream()
           .filter(e -> e.satisfies(qualifiers))
-          .map(e -> (ElectiveBean<T>) e)
+          .map(e -> (EligibleBean<T>) e)
           .collect(Collectors.toSet());
     } catch (ClassCastException e) {
       return Set.of();
@@ -130,10 +131,10 @@ public class TestBeanContainer implements BeanContainer {
    * @param <T> the concrete type of the bean
    */
   public <T> void putBean(T bean, String name) {
-    Set<ElectiveBean<?>> beans = container.computeIfAbsent(name, k -> new HashSet<>());
+    Set<EligibleBean<?>> beans = container.computeIfAbsent(name, k -> new HashSet<>());
     //noinspection unchecked
     Class<T> type = (Class<T>) bean.getClass();
-    var electiveBean = new ElectiveBean<>(bean, type);
+    var electiveBean = new EligibleBean<>(bean, type);
     beans.add(electiveBean);
   }
 
@@ -146,8 +147,8 @@ public class TestBeanContainer implements BeanContainer {
    * @param <T> the concrete type of the beans
    */
   public <T> void putBean(Class<T> beanType, String name) {
-    Set<ElectiveBean<?>> beans = container.computeIfAbsent(name, k -> new HashSet<>());
-    beans.add(new ElectiveBean<>(beanType));
+    Set<EligibleBean<?>> beans = container.computeIfAbsent(name, k -> new HashSet<>());
+    beans.add(new EligibleBean<>(beanType));
   }
 
   /**
@@ -161,8 +162,8 @@ public class TestBeanContainer implements BeanContainer {
    * order to be retrieved later with these qualifiers.
    */
   public <T> void putBean(Class<T> beanType, Class<? super T> type, Annotation... qualifiers) {
-    Set<ElectiveBean<?>> beans = container.computeIfAbsent(type.getName(), k -> new HashSet<>());
-    beans.add(new ElectiveBean<>(beanType, qualifiers));
+    Set<EligibleBean<?>> beans = container.computeIfAbsent(type.getName(), k -> new HashSet<>());
+    beans.add(new EligibleBean<>(beanType, qualifiers));
   }
 
   /**
@@ -176,8 +177,8 @@ public class TestBeanContainer implements BeanContainer {
    * @param <T> the concrete type of the bean.
    */
   public <T> void putBean(T bean, Class<T> type, Annotation... qualifiers) {
-    Set<ElectiveBean<?>> beans = container.computeIfAbsent(type.getName(), k -> new HashSet<>());
-    beans.add(new ElectiveBean<>(bean, type, qualifiers));
+    Set<EligibleBean<?>> beans = container.computeIfAbsent(type.getName(), k -> new HashSet<>());
+    beans.add(new EligibleBean<>(bean, type, qualifiers));
   }
 
   /**
@@ -187,11 +188,11 @@ public class TestBeanContainer implements BeanContainer {
   public void clear() {
     container.values().stream()
         .flatMap(Collection::stream)
-        .forEach(ElectiveBean::dispose);
+        .forEach(EligibleBean::dispose);
     container.clear();
   }
 
-  private static <T> void checkUniqueness(Set<ElectiveBean<T>> theBeans, String key,
+  private static <T> void checkUniqueness(Set<EligibleBean<T>> theBeans, String key,
       Annotation... qualifiers) {
     if (theBeans.size() > 1) {
       String q = qualifiersToMsg(qualifiers);
@@ -210,19 +211,21 @@ public class TestBeanContainer implements BeanContainer {
     return q;
   }
 
-  private static class ElectiveBean<T> {
-    private final Set<Annotation> qualifiers;
+  private static class EligibleBean<T> {
+    private final Set<Class<? extends Annotation>> qualifiers;
     private final Class<T> type;
     private T bean = null;
 
-    private ElectiveBean(@NonNull Class<T> type, @NonNull Annotation... qualifiers) {
+    private EligibleBean(@NonNull Class<T> type, @NonNull Annotation... qualifiers) {
       Objects.requireNonNull(type);
       Objects.requireNonNull(qualifiers);
-      this.qualifiers = new HashSet<>(List.of(qualifiers));
+      this.qualifiers = Stream.of(qualifiers)
+          .map(Annotation::annotationType)
+          .collect(Collectors.toSet());
       this.type = type;
     }
 
-    private ElectiveBean(@NonNull T bean, @NonNull Class<T> type,
+    private EligibleBean(@NonNull T bean, @NonNull Class<T> type,
         @NonNull Annotation... qualifiers) {
       this(type, qualifiers);
       Objects.requireNonNull(bean);
@@ -235,8 +238,12 @@ public class TestBeanContainer implements BeanContainer {
     }
 
     boolean satisfies(Annotation... qualifiers) {
-      List<Annotation> q = List.of(qualifiers);
-      return (this.qualifiers.isEmpty() && q.isEmpty()) || this.qualifiers.containsAll(q);
+      if (qualifiers.length == 0 && this.qualifiers.isEmpty()) {
+        return true;
+      }
+      return Stream.of(qualifiers)
+          .map(Annotation::annotationType)
+          .allMatch(this.qualifiers::contains);
     }
 
     @NonNull

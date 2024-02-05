@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,11 +24,10 @@
 
 package org.silverpeas.kernel.test;
 
-import org.silverpeas.kernel.annotation.Managed;
-import org.silverpeas.kernel.annotation.Technical;
+import org.silverpeas.kernel.SilverpeasResourcesLocation;
 import org.silverpeas.kernel.util.SystemWrapper;
 
-import javax.inject.Singleton;
+import javax.annotation.Priority;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,15 +38,15 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author mmoquillon
  */
-@Technical
-@Managed
-@Singleton
+@Priority(100)
 public class TestSystemWrapper implements SystemWrapper {
 
   private final Map<String, String> extendedEnvs = new ConcurrentHashMap<>();
 
   public TestSystemWrapper() {
     extendedEnvs.putAll(System.getenv());
+    extendedEnvs.putIfAbsent("SILVERPEAS_HOME",
+        TestContext.getInstance().getPathOfTestResources().toString());
   }
 
   @Override
@@ -61,11 +60,6 @@ public class TestSystemWrapper implements SystemWrapper {
   }
 
   @Override
-  public Properties getProperties() {
-    return System.getProperties();
-  }
-
-  @Override
   public void setProperties(Properties props) {
     System.setProperties(props);
   }
@@ -75,13 +69,4 @@ public class TestSystemWrapper implements SystemWrapper {
     return System.setProperty(key, value);
   }
 
-  @Override
-  public String getProperty(String key) {
-    return System.getProperty(key);
-  }
-
-  @Override
-  public String getProperty(String key, String def) {
-    return System.getProperty(key, def);
-  }
 }

@@ -28,12 +28,14 @@ import java.lang.annotation.*;
 
 /**
  * This annotation is used to indicate that the type of a field or a parameter of a test (method) in
- * the unit test class has to be managed by the IoC container used by the unit tests. The field or
- * the parameter is then valued with an expected managed bean before executing any unit test. For
- * doing, the bean type must have a default constructor. Once instantiated, the dependencies on
- * others managed beans will be resolved and if the bean has a
- * {@link javax.annotation.PostConstruct} annotated method, then this method will be invoked. This
- * annotation is for classes for which a true instance is preferred to a mock in a unit test.
+ * the unit test class has to be managed by the IoC container used by the unit tests. If the type is
+ * annotated with the {@link javax.inject.Named} qualifier, it will be also registered as being
+ * managed under this specified name. The field or the parameter is then valued with an expected
+ * managed bean before executing any unit test. For doing, the bean type must have a default
+ * constructor. Once instantiated, the dependencies on others managed beans will be resolved and if
+ * the bean has a {@link javax.annotation.PostConstruct} annotated method, then this method will be
+ * invoked. This annotation is for classes for which a true instance is preferred to a mock in a
+ * unit test.
  * <p>
  * The field annotated with this annotation can be explicitly instantiated, in that case the
  * instance will be put directly into the IoC container. The dependencies of the instance on others

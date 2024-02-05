@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,7 @@
  */
 package org.silverpeas.kernel.bundle;
 
-import org.silverpeas.kernel.SilverpeasResourcesProvider;
+import org.silverpeas.kernel.SilverpeasResourcesLocation;
 import org.silverpeas.kernel.SilverpeasRuntimeException;
 import org.silverpeas.kernel.annotation.Nullable;
 import org.silverpeas.kernel.util.StringUtil;
@@ -37,8 +37,8 @@ import java.util.concurrent.ConcurrentMap;
  * The resource locator gives access to the resource bundles (bundles of localized resources and of
  * settings) that are located each of them into a particular directory. This directory can be the
  * same location, the Silverpeas resources home directory. The location of the l10n resources is
- * given by {@link SilverpeasResourcesProvider#getL10nBundlesRootPath()} and the one of the settings
- * is given by {@link SilverpeasResourcesProvider#getConfigurationFilesRootPath()}.
+ * given by {@link SilverpeasResourcesLocation#getL10nBundlesRootPath()} and the one of the settings
+ * is given by {@link SilverpeasResourcesLocation#getConfigurationFilesRootPath()}.
  * <p>
  * The mechanism used to access the files containing these resources is wrapped by this class. The
  * resource bundles, according to the type of the resources, are represented by a concrete type
@@ -68,10 +68,10 @@ public class ResourceLocator {
 
   private static final int INITIAL_CACHE_SIZE = 128;
   private static final ClassLoader l10nLoader = new ConfigurationClassLoader(
-      SilverpeasResourcesProvider.getInstance().getL10nBundlesRootPath(),
+      SilverpeasResourcesLocation.getInstance().getL10nBundlesRootPath(),
       ResourceLocator.class.getClassLoader());
   private static final ClassLoader settingsLoader = new ConfigurationClassLoader(
-      SilverpeasResourcesProvider.getInstance().getConfigurationFilesRootPath(),
+      SilverpeasResourcesLocation.getInstance().getConfigurationFilesRootPath(),
       ResourceLocator.class.getClassLoader());
 
   private static final ConfigurationControl configurationControl = new ConfigurationControl();

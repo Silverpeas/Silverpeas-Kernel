@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.silverpeas.kernel.cache.service.ApplicationCacheAccessor;
 import org.silverpeas.kernel.test.TestContext;
-import org.silverpeas.kernel.test.TestScopedResourcesProvider;
+import org.silverpeas.kernel.test.TestScopedResourcesLocation;
 
 import java.nio.file.Path;
 
@@ -36,38 +36,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
- * Test the expected {@link SilverpeasResourcesProvider} implementation is well loaded by SPI and only a single instance
+ * Test the expected {@link SilverpeasResourcesLocation} implementation is well loaded by SPI and only a single instance
  * is returned. The properties for the unit tests should be defined from the maven.properties resource file in the
  * classpath of the tests.
  *
  * @author mmoquillon
  */
-class SilverpeasResourcesProviderTest {
+class SilverpeasResourcesLocationTest {
 
   @Test
   @DisplayName("The instance of the expected implementation is well loaded by SPI")
   void getInstanceLoadsInstanceBySPI() {
-    SilverpeasResourcesProvider instance = SilverpeasResourcesProvider.getInstance();
+    SilverpeasResourcesLocation instance = SilverpeasResourcesLocation.getInstance();
     assertThat(instance, notNullValue());
-    assertThat(instance, instanceOf(TestScopedResourcesProvider.class));
+    assertThat(instance, instanceOf(TestScopedResourcesLocation.class));
   }
 
   @Test
-  @DisplayName("The instance of the expected implementation is well loaded by SPI")
-  void getInstanceWillCacheTheSingleInstance() {
-    SilverpeasResourcesProvider instance = SilverpeasResourcesProvider.getInstance();
-    SilverpeasResourcesProvider cachedInstance =
-        ApplicationCacheAccessor.getInstance().getCache()
-            .get(SilverpeasResourcesProvider.class.getSimpleName() + "#instance",
-                SilverpeasResourcesProvider.class);
-    assertThat(cachedInstance, is(instance));
-  }
-
-  @Test
-  @DisplayName("The SilverpeasResourcesProvider class is a singleton")
+  @DisplayName("The SilverpeasResourcesLocation class is a singleton")
   void theSilverpeasResourcesProviderIsASingleton() {
-    SilverpeasResourcesProvider instance = SilverpeasResourcesProvider.getInstance();
-    SilverpeasResourcesProvider another = SilverpeasResourcesProvider.getInstance();
+    SilverpeasResourcesLocation instance = SilverpeasResourcesLocation.getInstance();
+    SilverpeasResourcesLocation another = SilverpeasResourcesLocation.getInstance();
     assertThat(another, is(instance));
   }
 
@@ -76,8 +65,8 @@ class SilverpeasResourcesProviderTest {
       "the Maven test target directory")
   void getLoggersRootPath() {
     TestContext context = new TestContext();
-    TestScopedResourcesProvider provider =
-        (TestScopedResourcesProvider) SilverpeasResourcesProvider.getInstance();
+    TestScopedResourcesLocation provider =
+        (TestScopedResourcesLocation) SilverpeasResourcesLocation.getInstance();
     Path rootPath = provider.getLoggersRootPath();
     assertThat(rootPath, notNullValue());
     assertThat(rootPath.toString(), startsWith(context.getMavenProperties().getProperty("test.resources.directory")));
@@ -88,8 +77,8 @@ class SilverpeasResourcesProviderTest {
       " the Maven test target directory")
   void getL10nBundlesRootPath() {
     TestContext context = new TestContext();
-    TestScopedResourcesProvider provider =
-        (TestScopedResourcesProvider) SilverpeasResourcesProvider.getInstance();
+    TestScopedResourcesLocation provider =
+        (TestScopedResourcesLocation) SilverpeasResourcesLocation.getInstance();
     Path rootPath = provider.getL10nBundlesRootPath();
     assertThat(rootPath, notNullValue());
     assertThat(rootPath.toString(),
@@ -101,8 +90,8 @@ class SilverpeasResourcesProviderTest {
       "located in the Maven test target directory")
   void getConfigurationFilesRootPath() {
     TestContext context = new TestContext();
-    TestScopedResourcesProvider provider =
-        (TestScopedResourcesProvider) SilverpeasResourcesProvider.getInstance();
+    TestScopedResourcesLocation provider =
+        (TestScopedResourcesLocation) SilverpeasResourcesLocation.getInstance();
     Path rootPath = provider.getL10nBundlesRootPath();
     assertThat(rootPath, notNullValue());
     assertThat(rootPath.toString(),

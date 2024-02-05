@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,30 +23,40 @@
  */
 package org.silverpeas.kernel.util;
 
-import org.silverpeas.kernel.ManagedBeanProvider;
-
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 
 /**
  * This wrapper aims to allow to load additional and custom system properties without passing them
- * explicitly and directly to the JVM. For doing it wraps the {@link System} class; hence its name.
- * The way those custom system properties are loaded is at the discretion of the implementor. In
- * opposite to the {@link System} class in which all the methods are static, this class has to be a
- * singleton managed by the underlying IoC container.
+ * explicitly and directly to the JVM. Usually in Silverpeas, these custom system properties define
+ * the context of its execution.
+ * <p>
+ * By default it wraps the {@link System} class; hence its name. The way those custom system
+ * properties are loaded is at the discretion of the implementor. In opposite to the {@link System}
+ * class in which all the methods are static, this class allowed to be instantiated so that
+ * different context can be prepared for the tests without implying necessarily the {@link System}
+ * class.
  *
  * @author Yohann Chastagnier
- * @implSpec the SystemWrapper implementation must be a singleton.
+ * @implSpec The {@link SystemWrapper} implementation is loaded from the the Java SPI (Java Service
+ * Provider Interface) and its instance is kept in memory for further retrieval.
+ * @implNote Whatever the number of available implementations of this interface, only the first
+ * found one is used. Nevertheless, by using the @{@link javax.annotation.Priority} annotation, the
+ * implementation to use can be explicitly indicated.
  */
 public interface SystemWrapper {
 
   /**
-   * Gets the wrapped single {@link System} instance of the {@link SystemWrapper}.
+   * Gets the wrapped single {@link System} instance of the {@link SystemWrapper}. If the
+   * implementation isn't yet loaded, then it is loaded and instantiated once time.
    *
    * @return the instance of the System Wrapper.
+   * @implNote The implementation is loaded and instantiated by Java SPI at first call. The single
+   * instance is then kept in memory so that it is returned at each next call.
    */
-  static SystemWrapper get() {
-    return ManagedBeanProvider.getInstance().getManagedBean(SystemWrapper.class);
+  static SystemWrapper getInstance() {
+    return ServiceLoader.get(SystemWrapper.class);
   }
 
   /**
@@ -55,14 +65,18 @@ public interface SystemWrapper {
    * @param name the name of the variable.
    * @return the value of the requested environment variable.
    */
-  String getenv(String name);
+  default String getenv(String name) {
+    return System.getenv(name);
+  }
 
   /**
    * Gets all the environment variables.
    *
    * @return the map of environment variables.
    */
-  Map<String, String> getenv();
+  default Map<String, String> getenv() {
+    return System.getenv();
+  }
 
   /**
    * Gets the system properties.
@@ -70,7 +84,9 @@ public interface SystemWrapper {
    * @return the system properties.
    * @see System#getProperties()
    */
-  Properties getProperties();
+  default Properties getProperties() {
+    return System.getProperties();
+  }
 
   /**
    * Sets the specified properties in the system properties. Opposite to the method
@@ -80,7 +96,13 @@ public interface SystemWrapper {
    * @param props the system properties to add.
    * @see Properties#putAll(Map)
    */
-  void setProperties(Properties props);
+  default void setProperties(Properties props) {
+    Enumeration<?> propertyNames = props.propertyNames();
+    while (propertyNames.hasMoreElements()) {
+      String key = (String) propertyNames.nextElement();
+      setProperty(key, props.getProperty(key));
+    }
+  }
 
   /**
    * Sets a new system property. If the property isn't valued, id est has a null or an empty value,
@@ -93,7 +115,13 @@ public interface SystemWrapper {
    * @see System#setProperty(String, String)
    */
   @SuppressWarnings("UnusedReturnValue")
-  String setProperty(String key, String value);
+  default String setProperty(String key, String value) {
+    String previousValue = null;
+    if (StringUtil.isDefined(value)) {
+      previousValue = System.setProperty(key, value);
+    }
+    return previousValue;
+  }
 
   /**
    * Gets a system property.
@@ -102,7 +130,9 @@ public interface SystemWrapper {
    * @return the string value of the system property, or <code>null</code> if there is no property
    * with that key.
    */
-  String getProperty(String key);
+  default String getProperty(String key) {
+    return System.getProperty(key);
+  }
 
   /**
    * Gets a system property.
@@ -112,5 +142,7 @@ public interface SystemWrapper {
    * @return the string value of the system property, or the default value if there is no property
    * with that key.
    */
-  String getProperty(String key, String def);
+  default String getProperty(String key, String def) {
+    return System.getProperty(key, def);
+  }
 }

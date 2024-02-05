@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -55,6 +55,5 @@ class ManagedBeanParameterTest {
     assertThat(myBean2.getMyBean(), is(myBean1));
     assertThat(expectedBean1, is(myBean1));
     assertThat(myBean2, is(expectedBean2));
-
   }
 }

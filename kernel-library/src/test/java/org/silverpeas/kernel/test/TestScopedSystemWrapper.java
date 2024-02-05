@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2023 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,11 +24,8 @@
 
 package org.silverpeas.kernel.test;
 
-import org.silverpeas.kernel.annotation.Managed;
-import org.silverpeas.kernel.annotation.Technical;
 import org.silverpeas.kernel.util.SystemWrapper;
 
-import javax.inject.Singleton;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,9 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Simple implementation of the {@link SystemWrapper} to be used in the unit tests. It wraps
  * {@link System} by allowing to set additional both system properties and environment variables.
  */
-@Technical
-@Managed
-@Singleton
 public class TestScopedSystemWrapper implements SystemWrapper {
 
   private final Map<String, String> extendedEnvs = new ConcurrentHashMap<>();
@@ -59,11 +53,6 @@ public class TestScopedSystemWrapper implements SystemWrapper {
   }
 
   @Override
-  public Properties getProperties() {
-    return System.getProperties();
-  }
-
-  @Override
   public void setProperties(Properties props) {
     System.setProperties(props);
   }
@@ -71,15 +60,5 @@ public class TestScopedSystemWrapper implements SystemWrapper {
   @Override
   public String setProperty(String key, String value) {
     return System.setProperty(key, value);
-  }
-
-  @Override
-  public String getProperty(String key) {
-    return System.getProperty(key);
-  }
-
-  @Override
-  public String getProperty(String key, String def) {
-    return System.getProperty(key, def);
   }
 }

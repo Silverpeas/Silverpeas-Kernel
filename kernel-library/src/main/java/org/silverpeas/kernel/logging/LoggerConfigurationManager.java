@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,7 @@
  */
 package org.silverpeas.kernel.logging;
 
-import org.silverpeas.kernel.SilverpeasResourcesProvider;
+import org.silverpeas.kernel.SilverpeasResourcesLocation;
 import org.silverpeas.kernel.SilverpeasRuntimeException;
 import org.silverpeas.kernel.annotation.Technical;
 
@@ -54,7 +54,7 @@ import java.util.stream.Stream;
  * <p>
  * A logging configuration for a Silverpeas module is stored into a properties file that must be
  * located in the loggers root directory indicated by
- * {@link SilverpeasResourcesProvider#getLoggersRootPath()}. The following properties are expected
+ * {@link SilverpeasResourcesLocation#getLoggersRootPath()}. The following properties are expected
  * into such a file:
  * </p>
  * <ul>
@@ -95,7 +95,7 @@ public class LoggerConfigurationManager {
   protected void loadAllConfigurationFiles() {
     java.util.logging.Logger.getLogger(THIS_LOGGER_NAMESPACE)
         .log(java.util.logging.Level.INFO, "Silverpeas Logging Engine initialization...");
-    Path configurationHome = SilverpeasResourcesProvider.getInstance().getLoggersRootPath();
+    Path configurationHome = SilverpeasResourcesLocation.getInstance().getLoggersRootPath();
 
     try (Stream<Path> loggers = Files.list(configurationHome)) {
       configs.clear();

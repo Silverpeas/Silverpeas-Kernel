@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022 Silverpeas
+ * Copyright (C) 2000 - 2024 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -25,11 +25,13 @@ package org.silverpeas.kernel;
 
 import org.silverpeas.kernel.annotation.NonNull;
 import org.silverpeas.kernel.cache.service.ThreadCacheAccessor;
+import org.silverpeas.kernel.exception.ExpectationViolationException;
+import org.silverpeas.kernel.exception.MultipleCandidateException;
 import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.util.Mutable;
 
 import javax.inject.Singleton;
-import java.lang.annotation.Annotation;
+import java.lang.annotation.*;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,16 +39,16 @@ import java.util.stream.Stream;
 
 
 /**
- * A provider of objects whose the life-cycle is managed by an underlying IoC/IoD container that
+ * A provider of objects whose the life-cycle is managed by an underlying IoC by IoD container that
  * must satisfy the {@link BeanContainer} interface. This provider is just an access point to the
  * beans for which their class has been elective for life-cycle management and registered for this.
  * The election and the registration of the classes in the bean container are left to the
- * implementation of the IoC/IoD solution.
+ * implementation of the IoC by IoD solution.
  * <p>
  * Usually, the dependencies between beans managed by the container are resolved during their
  * instantiation and this mechanism is usually done transparently by the IoC/IoD solution itself.
- * Nevertheless, some IoC/IoD solutions resolves them at compilation time instead of at runtime. And
- * some supports a lazy dependency resolution whereas others not. So, the resolution of the
+ * Nevertheless, some IoC by IoD solutions resolves them at compilation time instead of at runtime.
+ * And some supports a lazy dependency resolution whereas others not. So, the resolution of the
  * dependencies on other managed objects is expected to be automatically performed by the container.
  * Nevertheless, some objects non managed by the container (like objects got from data source) can
  * require to access some of the beans in the container. This provider is for them; it allows them
@@ -68,11 +70,18 @@ import java.util.stream.Stream;
  * Dependencies) mechanism.) The bind between the {@link BeanContainer} interface and its
  * implementation is performed by the Java SPI (Java Service Provider Interface). Only the first
  * available bean container implementation is loaded by the {@code ManagedBeanProvider} class.
+ * <p>
+ * This managed bean provider manages a thread cache to access more fastly managed objects of
+ * singletons. With this mechanism, several asks to the underlying bean container for a given single
+ * bean can be avoided along the thread execution; the bean is fetched only one time within the
+ * thread. For doing, to figure out a bean is the single instance of a singleton, this provider
+ * walks across the annotations tree of the bean until to find or not the @{@link Singleton}
+ * annotation.
  * </p>
  */
 public class ManagedBeanProvider {
 
-  private static ManagedBeanProvider instance;
+  private static final ManagedBeanProvider instance = new ManagedBeanProvider();
 
   static final String CACHE_KEY_PREFIX = "ManagedBeanProvider:CacheKey:";
   private final ThreadCacheAccessor cacheAccessor = ThreadCacheAccessor.getInstance();
@@ -84,9 +93,6 @@ public class ManagedBeanProvider {
    * @return the {@link ManagedBeanProvider} single instance.
    */
   public static synchronized ManagedBeanProvider getInstance() {
-    if (instance == null) {
-      instance = new ManagedBeanProvider();
-    }
     return instance;
   }
 
@@ -109,9 +115,12 @@ public class ManagedBeanProvider {
    * @return the bean satisfying the expected type and, if any, the expected qualifiers.
    * @throws NotFoundException if no bean of the specified type and with the specified qualifiers
    * can be found.
-   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one
-   * bean matching the given type and qualifiers as there is an ambiguous decision in selecting the
-   * bean to return.
+   * @throws MultipleCandidateException if there is more than one bean matching the given type and
+   * qualifiers as there is an ambiguous decision in selecting the bean to return.
+   * @throws ExpectationViolationException if the expectations of the underlying container on the
+   * bean or on the qualifiers aren't fulfilled.
+   * @throws IllegalStateException if the underlying container isn't in a valid state when asking
+   * a managed bean.
    * @see BeanContainer#getBeanByType(Class, Annotation...)
    */
   @NonNull
@@ -119,15 +128,16 @@ public class ManagedBeanProvider {
     Mutable<T> bean = Mutable.empty();
     T cachedBean = cacheAccessor.getCache().computeIfAbsent(cacheKey(type, qualifiers), type,
         () -> {
-      bean.set(beanContainer()
-          .getBeanByType(type)
-          .orElseThrow(() -> {
-            String q = qualifiers.length > 0 ? " and qualifiers " +
-                Stream.of(qualifiers).map(a -> a.getClass().getName()).collect(Collectors.joining(", ")) : "";
-            return new NotFoundException("No such bean satisfying type " + type.getName() + q);
-          }));
-      return bean.get().getClass().isAnnotationPresent(Singleton.class) ? bean.get() : null;
-    });
+          T foundBean = beanContainer()
+              .getBeanByType(type, qualifiers)
+              .orElseThrow(() -> {
+                String q = qualifiers.length > 0 ? " and qualifiers " +
+                    Stream.of(qualifiers).map(a -> a.getClass().getName()).collect(Collectors.joining(", ")) : "";
+                return new NotFoundException("No such bean satisfying type " + type.getName() + q);
+              });
+          bean.set(foundBean);
+          return isSingleton(foundBean) ? foundBean : null;
+        });
     return cachedBean == null ? bean.get() : cachedBean;
   }
 
@@ -141,8 +151,12 @@ public class ManagedBeanProvider {
    * @param <T> the type of the bean to return.
    * @return the bean matching the specified name.
    * @throws NotFoundException if no bean can be found with the specified name.
-   * @throws org.silverpeas.kernel.exception.MultipleCandidateException if there is more than one
-   * bean with the given name as the name must be unique for each bean.
+   * @throws MultipleCandidateException if there is more than one bean with the given name as the
+   * name must be unique for each bean.
+   * @throws ExpectationViolationException if the expectations of the underlying container on the
+   * bean aren't fulfilled.
+   * @throws IllegalStateException if the underlying container isn't in a valid state when asking
+   * a managed bean.
    * @see BeanContainer#getBeanByName(String)
    */
   @SuppressWarnings("unchecked")
@@ -151,11 +165,12 @@ public class ManagedBeanProvider {
     Mutable<T> bean = Mutable.empty();
     T cachedBean = (T) cacheAccessor.getCache().computeIfAbsent(CACHE_KEY_PREFIX + name,
         Object.class, () -> {
-          bean.set(beanContainer()
+          T foundBean = beanContainer()
               .getBeanByName(name)
               .map(b -> (T) b)
-              .orElseThrow(() -> new NotFoundException("No such bean named " + name)));
-          return bean.get().getClass().isAnnotationPresent(Singleton.class) ? bean.get() : null;
+              .orElseThrow(() -> new NotFoundException("No such bean named " + name));
+          bean.set(foundBean);
+          return isSingleton(foundBean) ? foundBean : null;
         });
     return cachedBean == null ? bean.get() : cachedBean;
   }
@@ -169,6 +184,10 @@ public class ManagedBeanProvider {
    * @param <T> the type of the bean to return.
    * @return a set of beans satisfying the expected type and, if any, the expected qualifiers, or an
    * empty set otherwise.
+   * @throws ExpectationViolationException if the expectations of the underlying container on the
+   * beans or on the qualifiers aren't fulfilled.
+   * @throws IllegalStateException if the underlying container isn't in a valid state when asking
+   * a managed bean.
    * @see BeanContainer#getAllBeansByType(Class, Annotation...)
    */
   public <T> Set<T> getAllManagedBeans(Class<T> type, Annotation... qualifiers) {
@@ -185,5 +204,44 @@ public class ManagedBeanProvider {
       cacheKey.append(":").append(qualifier.annotationType().getName());
     }
     return cacheKey.toString();
+  }
+
+  /**
+   * Walks recursively across all the annotations of the specified bean to find if one is the
+   * {@link Singleton} annotation. Indeed, the bean class can be indirectly annotated with the
+   * {@link Singleton} annotation by one of its annotation (and this recursively). The walk across
+   * the annotations tree is only performed for the Silverpeas annotations. Nevertheless, we expect
+   * to find this annotation (if any) no more than one level of the annotations annotated
+   * themselves.
+   *
+   * @param bean a bean.
+   * @return true if the bean class is either directly annotated with the {@link Singleton}
+   * annotation or if one of its annotations is itself recursively annotated with the
+   * {@link Singleton} annotation.
+   */
+  private boolean isSingleton(Object bean) {
+    if (bean.getClass().isAnnotationPresent(Singleton.class)) {
+      return true;
+    }
+    return isOneAnnotatedSingleton(bean.getClass().getAnnotations());
+  }
+
+  private boolean isSingletonAnnotated(Class<? extends Annotation> annotationType) {
+    if (annotationType.isAnnotationPresent(Singleton.class)) {
+      return true;
+    }
+    if (!annotationType.getName().startsWith("org.silverpeas")) {
+      return false;
+    }
+    return isOneAnnotatedSingleton(annotationType.getAnnotations());
+  }
+
+  private boolean isOneAnnotatedSingleton(Annotation[] annotations) {
+    for (Annotation annotation : annotations) {
+      if (isSingletonAnnotated(annotation.annotationType())) {
+        return true;
+      }
+    }
+    return false;
   }
 }
