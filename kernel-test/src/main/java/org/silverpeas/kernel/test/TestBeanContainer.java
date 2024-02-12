@@ -134,8 +134,8 @@ public class TestBeanContainer implements BeanContainer {
     Set<EligibleBean<?>> beans = container.computeIfAbsent(name, k -> new HashSet<>());
     //noinspection unchecked
     Class<T> type = (Class<T>) bean.getClass();
-    var electiveBean = new EligibleBean<>(bean, type);
-    beans.add(electiveBean);
+    var eligibleBean = new EligibleBean<>(bean, type);
+    beans.add(eligibleBean);
   }
 
   /**
@@ -196,7 +196,7 @@ public class TestBeanContainer implements BeanContainer {
       Annotation... qualifiers) {
     if (theBeans.size() > 1) {
       String q = qualifiersToMsg(qualifiers);
-      throw new MultipleCandidateException("More than one elective bean available: " + key + q);
+      throw new MultipleCandidateException("More than one eligible bean available: " + key + q);
     }
   }
 

@@ -37,13 +37,15 @@ pipeline {
       }
       steps {
         script {
+          String jdkHome = sh(script: 'echo ${SONAR_JDK_HOME}', returnStdout: true).trim()
           withSonarQubeEnv {
             sh """
-                mvn ${SONAR_MAVEN_GOAL} -Dsonar.projectKey=Silverpeas_Silverpeas-Kernel \\
+                JAVA_HOME=$jdkHome mvn ${SONAR_MAVEN_GOAL} \\
+                  -Dsonar.projectKey=Silverpeas_Silverpeas-Kernel \\
                   -Dsonar.organization=silverpeas \\
                   -Dsonar.branch.name=${env.BRANCH_NAME} \\
                   -Dsonar.host.url=${SONAR_HOST_URL} \\
-                  -Dsonar.login=${SONAR_AUTH_TOKEN}
+                  -Dsonar.token=${SONAR_AUTH_TOKEN}
                 """
           }
           timeout(time: 30, unit: 'MINUTES') {
@@ -66,9 +68,11 @@ pipeline {
       }
       steps {
         script {
+          String jdkHome = sh(script: 'echo ${SONAR_JDK_HOME}', returnStdout: true).trim()
           withSonarQubeEnv {
             sh """
-                mvn ${SONAR_MAVEN_GOAL} -Dsonar.projectKey=Silverpeas_Silverpeas-Kernel \\
+                JAVA_HOME=$jdkHome mvn ${SONAR_MAVEN_GOAL} \\
+                  -Dsonar.projectKey=Silverpeas_Silverpeas-Kernel \\
                   -Dsonar.organization=silverpeas \\
                   -Dsonar.pullrequest.branch=${env.BRANCH_NAME} \\
                   -Dsonar.pullrequest.key=${env.CHANGE_ID} \\

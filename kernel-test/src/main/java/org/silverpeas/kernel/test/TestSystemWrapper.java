@@ -24,7 +24,6 @@
 
 package org.silverpeas.kernel.test;
 
-import org.silverpeas.kernel.SilverpeasResourcesLocation;
 import org.silverpeas.kernel.util.SystemWrapper;
 
 import javax.annotation.Priority;
