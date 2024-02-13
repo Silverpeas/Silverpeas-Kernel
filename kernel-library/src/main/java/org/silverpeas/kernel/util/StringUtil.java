@@ -29,10 +29,7 @@ import org.silverpeas.kernel.SilverpeasException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -203,7 +200,7 @@ public class StringUtil {
    * @param defaultStr the default CharSequence to return if the input is whitespace, empty ("") or
    * {@code null}, may be null
    * @return the passed in CharSequence, or the default
-   * @see StringUtils#defaultString(String, String)
+   * @see StringUtils#defaultIfBlank(CharSequence, CharSequence)
    */
   public static <T extends CharSequence> T defaultIfBlank(final T str, final T defaultStr) {
     return StringUtils.defaultIfBlank(str, defaultStr);
@@ -476,7 +473,7 @@ public class StringUtil {
    * {@code not defined}, may be null, blank or filled by spaces
    * @return the passed in String, or the default if it was {@code null}
    * @see StringUtil#isNotDefined(String)
-   * @see StringUtils#defaultString(String, String)
+   * @see java.util.Objects#toString(Object, String)
    */
   public static String defaultStringIfNotDefined(String string) {
     return defaultStringIfNotDefined(string, StringUtils.EMPTY);
@@ -499,10 +496,10 @@ public class StringUtil {
    * null, blank or filled by spaces
    * @return the passed in String, or the default if it was {@code null}
    * @see StringUtil#isNotDefined(String)
-   * @see StringUtils#defaultString(String, String)
+   * @see Objects#toString(Object, String)
    */
   public static String defaultStringIfNotDefined(String string, String defaultString) {
-    return StringUtils.defaultString((isDefined(string) ? string : null), defaultString);
+    return Objects.toString((isDefined(string) ? string : null), defaultString);
   }
 
   /**

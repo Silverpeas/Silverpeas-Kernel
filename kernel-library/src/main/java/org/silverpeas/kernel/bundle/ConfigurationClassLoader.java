@@ -80,7 +80,8 @@ public class ConfigurationClassLoader extends ClassLoader {
   public InputStream getResourceAsStream(String name) {
     InputStream inputStream = super.getResourceAsStream(name);
     if (inputStream == null && name != null) {
-      Path file = resourceRootPath.resolve(name);
+      String relativePath = name.startsWith("/") ? name.substring(1) : name;
+      Path file = resourceRootPath.resolve(relativePath);
       if (Files.exists(file) && Files.isRegularFile(file)) {
         try {
           inputStream = Files.newInputStream(file);

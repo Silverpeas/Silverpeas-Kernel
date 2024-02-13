@@ -24,6 +24,7 @@
 
 package org.silverpeas.kernel.test.extension;
 
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.silverpeas.kernel.logging.Level;
 
 import java.lang.annotation.*;
@@ -39,6 +40,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
+@ExtendWith(LoggerExtension.class)
 public @interface LoggerLevel {
 
   Level value();

@@ -245,8 +245,12 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
 
   private ResourceBundle getWrappedBundle() {
     ResourceBundle bundle = (loader == null ? NONE : loader.apply(this.name, this.locale));
-    locale = bundle.getLocale();
-    return bundle;
+    if (bundle != null) {
+      // in the case of a default locale because no bundle has been found for the asked locale
+      locale = bundle.getLocale();
+      return bundle;
+    }
+    return NONE;
   }
 
   private ResourceBundle getGeneralWrappedBundle() {

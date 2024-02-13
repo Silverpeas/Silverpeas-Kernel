@@ -31,9 +31,10 @@ import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.util.Mutable;
 
 import javax.inject.Singleton;
-import java.lang.annotation.*;
+import java.lang.annotation.Annotation;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,7 +42,7 @@ import java.util.stream.Stream;
 /**
  * A provider of objects whose the life-cycle is managed by an underlying IoC by IoD container that
  * must satisfy the {@link BeanContainer} interface. This provider is just an access point to the
- * beans for which their class has been elective for life-cycle management and registered for this.
+ * beans for which their class has been eligible for life-cycle management and registered for this.
  * The election and the registration of the classes in the bean container are left to the
  * implementation of the IoC by IoD solution.
  * <p>
@@ -56,11 +57,14 @@ import java.util.stream.Stream;
  * </p>
  * <p>
  * For managed beans, according to the IoC system used, their dependency resolution should be left
- * to the underlying container because it is less expensive in time than using this provider to
- * access the dependencies. This is why this provider should be used only by unmanaged beans.
+ * to the underlying container because it is less expensive in time and CPU than using this provider
+ * to access the dependencies. This is why this provider should be used only by unmanaged beans.
  * Anyway, to improve lightly the performance, the thread local cache is used to store single bean
- * of singleton, avoiding then to invoke explicitly the underlying bean container. It is when such a
- * single instance isn't found in the cache the container is implied to get it.
+ * of singleton (or singleton alike), avoiding then to invoke explicitly the underlying bean
+ * container. It is when such a single instance isn't found in the cache the container is implied to
+ * get it. The goal to use a thread cache (instead of an application one) is to balance the print in
+ * memory and the fastest way to get such managed single beans; the performance is chosen in getting
+ * the beans of singleton when asked several times along the same processing thread.
  * </p>
  *
  * @author mmoquillon
@@ -76,7 +80,10 @@ import java.util.stream.Stream;
  * bean can be avoided along the thread execution; the bean is fetched only one time within the
  * thread. For doing, to figure out a bean is the single instance of a singleton, this provider
  * walks across the annotations tree of the bean until to find or not the @{@link Singleton}
- * annotation.
+ * annotation. This is the default behavior. Nevertheless, it is possible to ask for the same
+ * behavior with other {@link javax.inject.Scope} annotations. In this case, the side-effect of
+ * caching a non singleton's bean is of the responsibility of the project. To extend the caching to
+ * other {@link javax.inject.Scope} annotation, just implement the interface SingletonFinder
  * </p>
  */
 public class ManagedBeanProvider {
@@ -86,6 +93,7 @@ public class ManagedBeanProvider {
   static final String CACHE_KEY_PREFIX = "ManagedBeanProvider:CacheKey:";
   private final ThreadCacheAccessor cacheAccessor = ThreadCacheAccessor.getInstance();
   private final BeanContainer currentContainer;
+  private final SingletonDetector detector = new SingletonDetector();
 
   /**
    * Gets the single instance of this {@link ManagedBeanProvider} class.
@@ -119,8 +127,8 @@ public class ManagedBeanProvider {
    * qualifiers as there is an ambiguous decision in selecting the bean to return.
    * @throws ExpectationViolationException if the expectations of the underlying container on the
    * bean or on the qualifiers aren't fulfilled.
-   * @throws IllegalStateException if the underlying container isn't in a valid state when asking
-   * a managed bean.
+   * @throws IllegalStateException if the underlying container isn't in a valid state when asking a
+   * managed bean.
    * @see BeanContainer#getBeanByType(Class, Annotation...)
    */
   @NonNull
@@ -132,7 +140,9 @@ public class ManagedBeanProvider {
               .getBeanByType(type, qualifiers)
               .orElseThrow(() -> {
                 String q = qualifiers.length > 0 ? " and qualifiers " +
-                    Stream.of(qualifiers).map(a -> a.getClass().getName()).collect(Collectors.joining(", ")) : "";
+                    Stream.of(qualifiers)
+                        .map(a -> a.getClass().getName())
+                        .collect(Collectors.joining(", ")) : "";
                 return new NotFoundException("No such bean satisfying type " + type.getName() + q);
               });
           bean.set(foundBean);
@@ -155,8 +165,8 @@ public class ManagedBeanProvider {
    * name must be unique for each bean.
    * @throws ExpectationViolationException if the expectations of the underlying container on the
    * bean aren't fulfilled.
-   * @throws IllegalStateException if the underlying container isn't in a valid state when asking
-   * a managed bean.
+   * @throws IllegalStateException if the underlying container isn't in a valid state when asking a
+   * managed bean.
    * @see BeanContainer#getBeanByName(String)
    */
   @SuppressWarnings("unchecked")
@@ -186,8 +196,8 @@ public class ManagedBeanProvider {
    * empty set otherwise.
    * @throws ExpectationViolationException if the expectations of the underlying container on the
    * beans or on the qualifiers aren't fulfilled.
-   * @throws IllegalStateException if the underlying container isn't in a valid state when asking
-   * a managed bean.
+   * @throws IllegalStateException if the underlying container isn't in a valid state when asking a
+   * managed bean.
    * @see BeanContainer#getAllBeansByType(Class, Annotation...)
    */
   public <T> Set<T> getAllManagedBeans(Class<T> type, Annotation... qualifiers) {
@@ -206,42 +216,56 @@ public class ManagedBeanProvider {
     return cacheKey.toString();
   }
 
-  /**
-   * Walks recursively across all the annotations of the specified bean to find if one is the
-   * {@link Singleton} annotation. Indeed, the bean class can be indirectly annotated with the
-   * {@link Singleton} annotation by one of its annotation (and this recursively). The walk across
-   * the annotations tree is only performed for the Silverpeas annotations. Nevertheless, we expect
-   * to find this annotation (if any) no more than one level of the annotations annotated
-   * themselves.
-   *
-   * @param bean a bean.
-   * @return true if the bean class is either directly annotated with the {@link Singleton}
-   * annotation or if one of its annotations is itself recursively annotated with the
-   * {@link Singleton} annotation.
-   */
   private boolean isSingleton(Object bean) {
-    if (bean.getClass().isAnnotationPresent(Singleton.class)) {
-      return true;
-    }
-    return isOneAnnotatedSingleton(bean.getClass().getAnnotations());
+    return detector.test(bean.getClass());
   }
 
-  private boolean isSingletonAnnotated(Class<? extends Annotation> annotationType) {
-    if (annotationType.isAnnotationPresent(Singleton.class)) {
-      return true;
-    }
-    if (!annotationType.getName().startsWith("org.silverpeas")) {
-      return false;
-    }
-    return isOneAnnotatedSingleton(annotationType.getAnnotations());
-  }
+  /**
+   * A predicate to detect a given class is annotated directly or by transitivity (through another
+   * annotation) with the {@link Singleton} annotation. It is used  by the
+   * {@link ManagedBeanProvider} to figure out whether a bean obtained from the bean container is
+   * eligible to the caching.
+   */
+  private static class SingletonDetector implements Predicate<Class<?>> {
 
-  private boolean isOneAnnotatedSingleton(Annotation[] annotations) {
-    for (Annotation annotation : annotations) {
-      if (isSingletonAnnotated(annotation.annotationType())) {
+    /**
+     * Walks recursively across all the annotations of the specified class to find if one is a
+     * {@link Singleton} scope. Indeed, the class of a managed bean can be indirectly annotated with
+     * such an annotation by one of its other annotation (and this recursively). The walk across the
+     * annotations tree is only performed for the Silverpeas annotations. Nevertheless, we expect to
+     * find this annotation (if any) no more than one level of the annotations annotated
+     * themselves.
+     *
+     * @param aClass the type of a managed bean.
+     * @return true if the bean class is either directly annotated with the {@link Singleton} scope
+     * or if one of its Silverpeas custom annotations is itself recursively annotated with this
+     * annotation.
+     */
+    @Override
+    public boolean test(Class<?> aClass) {
+      if (aClass.isAnnotationPresent(Singleton.class)) {
         return true;
       }
+      return isOneAnnotatedSingleton(aClass.getAnnotations());
     }
-    return false;
+
+    private boolean isSingletonAnnotated(Class<? extends Annotation> annotationType) {
+      if (annotationType.isAnnotationPresent(Singleton.class)) {
+        return true;
+      }
+      if (!annotationType.getName().startsWith("org.silverpeas")) {
+        return false;
+      }
+      return isOneAnnotatedSingleton(annotationType.getAnnotations());
+    }
+
+    private boolean isOneAnnotatedSingleton(Annotation[] annotations) {
+      for (Annotation annotation : annotations) {
+        if (isSingletonAnnotated(annotation.annotationType())) {
+          return true;
+        }
+      }
+      return false;
+    }
   }
 }
