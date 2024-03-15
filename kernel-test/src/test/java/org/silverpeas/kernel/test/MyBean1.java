@@ -24,7 +24,7 @@
 
 package org.silverpeas.kernel.test;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * A managed bean to use for testing the IoC/IoD mechanism dedicated to the unit tests.
@@ -48,8 +48,7 @@ public class MyBean1 implements MyBean {
     return foo;
   }
 
-  public MyBean1 setFoo(String foo) {
+  public void setFoo(String foo) {
     this.foo = foo;
-    return this;
   }
 }

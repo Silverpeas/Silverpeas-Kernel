@@ -65,7 +65,7 @@ public final class TestManagedBeanFeeder {
    * unit tests
    * @param type the type for which the beans will be managed.
    * @param qualifiers zero, one or more annotations qualifying the beans. Those must satisfy the
-   * {@link javax.inject.Qualifier} annotation.
+   * {@link jakarta.inject.Qualifier} annotation.
    * @param <T> the concrete type of the beans to register.
    */
   public <T> void manageBeanForType(@NonNull Class<T> beanClass, @NonNull Class<? super T> type,
@@ -82,7 +82,7 @@ public final class TestManagedBeanFeeder {
    * @param bean the object to manage into the IoC container dedicated to the unit tests.
    * @param type the type for which the bean is registered.
    * @param qualifiers zero, one or more annotations qualifying the beans. Those must satisfy the
-   * {@link javax.inject.Qualifier} annotation.
+   * {@link jakarta.inject.Qualifier} annotation.
    * @param <T> the actual type of the bean.
    */
   public <T> void manageBean(@NonNull T bean, @NonNull Class<? super T> type,

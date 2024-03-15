@@ -26,7 +26,7 @@ package org.silverpeas.kernel.util.test.impl;
 
 import org.silverpeas.kernel.util.test.TestServiceWithPriority;
 
-import javax.annotation.Priority;
+import jakarta.annotation.Priority;
 
 @Priority(value = 5)
 public class TestServiceWithPriority4 implements TestServiceWithPriority {

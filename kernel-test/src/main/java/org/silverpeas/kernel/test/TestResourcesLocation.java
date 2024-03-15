@@ -26,7 +26,7 @@ package org.silverpeas.kernel.test;
 
 import org.silverpeas.kernel.SilverpeasResourcesLocation;
 
-import javax.annotation.Priority;
+import jakarta.annotation.Priority;
 import java.nio.file.Path;
 
 /**

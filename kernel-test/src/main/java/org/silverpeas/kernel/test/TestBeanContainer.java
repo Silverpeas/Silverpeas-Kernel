@@ -30,8 +30,8 @@ import org.silverpeas.kernel.exception.MultipleCandidateException;
 import org.silverpeas.kernel.test.util.Reflections;
 import org.silverpeas.kernel.test.util.SilverpeasReflectionException;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -53,7 +53,7 @@ import java.util.stream.Stream;
  * invocation of its {@link PostConstruct} annotated method (in case there is one). When the
  * container is cleared, an invocation of the @{@link PreDestroy} annotated method is invoked for
  * each bean before to be cleared (in case they have one). The dependency injection is done for all
- * fields annotated with either {@link javax.inject.Inject} or {@link javax.annotation.Resource}
+ * fields annotated with either {@link jakarta.inject.Inject} or {@link jakarta.annotation.Resource}
  * annotations. This implementation of the {@link BeanContainer} is built upon some assumptions to
  * be kept simple and usable in unit tests:
  * </p>
@@ -65,7 +65,7 @@ import java.util.stream.Stream;
  *   container.</li>
  *   <li>The beans aren't proxied, meaning no resolution of the parameters is performed when a
  *   method of a managed bean is invoked. This has to be taken in charge by the test itself.</li>
- *   <li>The {@link javax.inject.Provider} annotation isn't supported</li>
+ *   <li>The {@link jakarta.inject.Provider} annotation isn't supported</li>
  *   <li>Any specific IoC/IoD annotations and extensions aren't supported</li>
  * </ul>
  *

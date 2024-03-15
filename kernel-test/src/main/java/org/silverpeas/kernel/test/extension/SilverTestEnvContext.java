@@ -118,7 +118,7 @@ public abstract class SilverTestEnvContext {
   /**
    * Gets the classes of the beans to preload into the IoC/IoD subsystem used in the tests. Theses
    * beans will be managed by the IoC/IoD subsystem, meaning their
-   * {@link javax.annotation.PostConstruct} annotated methods will be invoked and their dependencies
+   * {@link jakarta.annotation.PostConstruct} annotated methods will be invoked and their dependencies
    * satisfied (by mock unless there is a bean available in the
    * {@link BeanContainer} and satisfying the dependency).
    *

@@ -25,7 +25,6 @@ package org.silverpeas.kernel.bundle;
 
 import org.silverpeas.kernel.annotation.NonNull;
 
-import javax.annotation.Nonnull;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -61,7 +60,7 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
 
   private static final ResourceBundle NONE = new ResourceBundle() {
     @Override
-    protected Object handleGetObject(@Nonnull final String key) {
+    protected Object handleGetObject(@NonNull final String key) {
       return null;
     }
 

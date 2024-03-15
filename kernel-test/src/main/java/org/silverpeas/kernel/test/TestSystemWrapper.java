@@ -26,7 +26,7 @@ package org.silverpeas.kernel.test;
 
 import org.silverpeas.kernel.util.SystemWrapper;
 
-import javax.annotation.Priority;
+import jakarta.annotation.Priority;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;

@@ -36,7 +36,7 @@ import java.util.Set;
  * to get a managed bean within a non-managed bean. Moreover, the bean container imposes an
  * additional constrain to ease the use of IoD in Silverpeas whatever the underlying implementation:
  * the dependencies shouldn't be resolved through constructor or method parameters but instead by
- * using the {@link javax.inject.Inject} annotation on fields or by using a
+ * using the {@link jakarta.inject.Inject} annotation on fields or by using a
  * {@link ManagedBeanProvider} instance. Keep in mind to leave your code agnostic from any specific
  * code of an IoC solution so it should be more easy later to change such a solution.
  * <p>

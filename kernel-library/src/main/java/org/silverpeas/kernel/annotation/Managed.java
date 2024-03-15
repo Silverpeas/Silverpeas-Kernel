@@ -26,7 +26,7 @@ package org.silverpeas.kernel.annotation;
 
 import org.silverpeas.kernel.BeanContainer;
 
-import javax.annotation.ManagedBean;
+import jakarta.annotation.ManagedBean;
 import java.lang.annotation.*;
 
 /**

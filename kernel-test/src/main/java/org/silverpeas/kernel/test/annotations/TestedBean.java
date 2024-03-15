@@ -34,14 +34,14 @@ import java.lang.annotation.*;
  * {@link SilverTestEnv} extension. When such an annotation is discovered by the extension, the type
  * of the field is automatically registered as to be managed by the IoC container and the field is
  * valued with the resulting managed bean. If the type is annotated with the
- * {@link javax.inject.Named} qualifier, the bean will be also registered under this specified name.
+ * {@link jakarta.inject.Named} qualifier, the bean will be also registered under this specified name.
  * For doing, the bean type must have a default constructor. Once instantiated, the dependencies on
  * others managed beans will be resolved and if the bean has a
- * {@link javax.annotation.PostConstruct} annotated method, then this method will be invoked.
+ * {@link jakarta.annotation.PostConstruct} annotated method, then this method will be invoked.
  * <p>
  * The field annotated with this annotation can be explicitly instantiated, in this case the
  * instance will be put directly into the IoC container. The dependencies of the instance on others
- * managed bean will be then resolved and the {@link javax.annotation.PostConstruct} annotated
+ * managed bean will be then resolved and the {@link jakarta.annotation.PostConstruct} annotated
  * method, if any, will be invoked.
  * </p>
  *

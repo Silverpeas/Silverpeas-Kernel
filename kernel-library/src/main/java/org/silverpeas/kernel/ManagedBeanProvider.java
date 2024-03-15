@@ -30,7 +30,7 @@ import org.silverpeas.kernel.exception.MultipleCandidateException;
 import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.util.Mutable;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.lang.annotation.Annotation;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -81,9 +81,9 @@ import java.util.stream.Stream;
  * thread. For doing, to figure out a bean is the single instance of a singleton, this provider
  * walks across the annotations tree of the bean until to find or not the @{@link Singleton}
  * annotation. This is the default behavior. Nevertheless, it is possible to ask for the same
- * behavior with other {@link javax.inject.Scope} annotations. In this case, the side-effect of
+ * behavior with other {@link jakarta.inject.Scope} annotations. In this case, the side-effect of
  * caching a non singleton's bean is of the responsibility of the project. To extend the caching to
- * other {@link javax.inject.Scope} annotation, just implement the interface SingletonFinder
+ * other {@link jakarta.inject.Scope} annotation, just implement the interface SingletonFinder
  * </p>
  */
 public class ManagedBeanProvider {

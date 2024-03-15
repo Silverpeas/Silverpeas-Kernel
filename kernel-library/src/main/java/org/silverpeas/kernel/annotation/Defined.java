@@ -27,7 +27,7 @@ package org.silverpeas.kernel.annotation;
 
 import org.silverpeas.kernel.util.StringUtil;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifier;
 import javax.annotation.meta.TypeQualifierValidator;
 import javax.annotation.meta.When;
