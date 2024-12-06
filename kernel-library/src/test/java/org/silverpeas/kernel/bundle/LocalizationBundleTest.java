@@ -94,6 +94,29 @@ class LocalizationBundleTest {
   }
 
   @Test
+  void getParametrizedTextWithXSS() {
+    LocalizationBundle bundle = ResourceLocator.getLocalizationBundle(LOCALIZATION_BUNDLE, Locale.FRENCH);
+    String value = bundle.getStringWithParams("cle.param.2", "Bidule",
+        "<img src=x onerror=prompt(document.cookie)/>");
+    assertThat(value, is("\"Bidule\" est plus petit que \"&lt;img src=x onerror=prompt(document" +
+        ".cookie)/&gt;\""));
+  }
+
+  @Test
+  void getParametrizedTextWithNumber() {
+    LocalizationBundle bundle = ResourceLocator.getLocalizationBundle(LOCALIZATION_BUNDLE,
+        Locale.ENGLISH);
+    String value1 = bundle.getStringWithParams("cle.param.1", 0);
+    assertThat(value1, is("just"));
+
+    String value2= bundle.getStringWithParams("cle.param.1", 1);
+    assertThat(value2, is("1 hour"));
+
+    String value3= bundle.getStringWithParams("cle.param.1", 3);
+    assertThat(value3, is("3 hours"));
+  }
+
+  @Test
   void getMissingPropertyShouldThrowMissingResourceException() {
     LocalizationBundle bundle = ResourceLocator.getLocalizationBundle(LOCALIZATION_BUNDLE);
     assertThat(bundle.containsKey("Foo"), is(false));

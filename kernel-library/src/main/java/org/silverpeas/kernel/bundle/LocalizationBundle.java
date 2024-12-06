@@ -217,9 +217,11 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
     String msgPattern = getString(resName);
     // we encode the parameters as they can be provided by a user and they can have XSS statements
     return MessageFormat.format(msgPattern, Arrays.stream(params)
-        .map(Object::toString)
-        .map(Encode::forHtml)
-        .toArray());
+            .map(p -> Optional.of(p)
+                .filter(String.class::isInstance)
+                .map(o -> (Object) Encode.forHtml((String) o))
+                .orElse(p)
+            ).toArray());
   }
 
   @Override
