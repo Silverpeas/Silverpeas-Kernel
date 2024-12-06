@@ -23,6 +23,7 @@
  */
 package org.silverpeas.kernel.bundle;
 
+import org.owasp.encoder.Encode;
 import org.silverpeas.kernel.annotation.NonNull;
 
 import javax.annotation.Nonnull;
@@ -214,7 +215,11 @@ public class LocalizationBundle extends ResourceBundle implements SilverpeasBund
 
   public String getStringWithParams(String resName, Object... params) {
     String msgPattern = getString(resName);
-    return MessageFormat.format(msgPattern, params);
+    // we encode the parameters as they can be provided by a user and they can have XSS statements
+    return MessageFormat.format(msgPattern, Arrays.stream(params)
+        .map(Object::toString)
+        .map(Encode::forHtml)
+        .toArray());
   }
 
   @Override
