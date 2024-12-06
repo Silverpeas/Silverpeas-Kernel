@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.silverpeas</groupId>
     <artifactId>kernel</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
   </parent>
 
   <groupId>org.silverpeas.kernel</groupId>
