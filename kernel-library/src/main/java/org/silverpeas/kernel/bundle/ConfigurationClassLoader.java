@@ -64,7 +64,7 @@ public class ConfigurationClassLoader extends ClassLoader {
   public URL getResource(String name) {
     URL resource = super.getResource(name);
     if (resource == null && name != null) {
-      Path file = resourceRootPath.resolve(name);
+      Path file = getPath(name);
       if (Files.exists(file) && Files.isRegularFile(file)) {
         try {
           resource = file.toUri().toURL();
@@ -80,8 +80,7 @@ public class ConfigurationClassLoader extends ClassLoader {
   public InputStream getResourceAsStream(String name) {
     InputStream inputStream = super.getResourceAsStream(name);
     if (inputStream == null && name != null) {
-      String relativePath = name.startsWith("/") ? name.substring(1) : name;
-      Path file = resourceRootPath.resolve(relativePath);
+      Path file = getPath(name);
       if (Files.exists(file) && Files.isRegularFile(file)) {
         try {
           inputStream = Files.newInputStream(file);
@@ -115,6 +114,11 @@ public class ConfigurationClassLoader extends ClassLoader {
   @Override
   public synchronized void setPackageAssertionStatus(String packageName, boolean enabled) {
     super.setPackageAssertionStatus(packageName, enabled);
+  }
+
+  private Path getPath(String name) {
+    String relativePath = name.startsWith("/") ? name.substring(1) : name;
+    return resourceRootPath.resolve(relativePath);
   }
 
 }

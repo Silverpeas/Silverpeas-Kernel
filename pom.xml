@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -12,7 +12,8 @@
   <url>https://www.silverpeas.org/docs/kernel</url>
 
   <description>
-    Silverpeas Kernel is the technical foundation of all of the Silverpeas projects. It is built upon an IoC by IoD
+    Silverpeas Kernel is the technical foundation of all of the Silverpeas projects. It is built
+    upon an IoC by IoD
     mechanism that has to be provided by an external framework.
   </description>
 
@@ -23,7 +24,8 @@
 
   <scm>
     <connection>scm:git:git@github.com:Silverpeas/Silverpeas-Kernel.git</connection>
-    <developerConnection>scm:git:git@github.com:Silverpeas/Silverpeas-Kernel.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:Silverpeas/Silverpeas-Kernel.git
+    </developerConnection>
     <url>https://github.com/Silverpeas/Silverpeas-Kernel</url>
     <tag>HEAD</tag>
   </scm>
@@ -75,11 +77,11 @@
     <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <next.release>1.3</next.release>
-    <junit.version>5.10.1</junit.version>
-    <junit.runner.version>1.10.1</junit.runner.version>
-    <mockito.version>5.10.0</mockito.version>
+    <junit.version>5.13.4</junit.version>
+    <junit.runner.version>1.13.4</junit.runner.version>
+    <mockito.version>5.19.0</mockito.version>
     <!-- bytebuddy deps version should be the one required by Mockito -->
-    <bytebuddy.version>1.14.11</bytebuddy.version>
+    <bytebuddy.version>1.17.7</bytebuddy.version>
   </properties>
 
   <dependencyManagement>
@@ -105,13 +107,13 @@
       <dependency>
         <groupId>org.owasp.encoder</groupId>
         <artifactId>encoder</artifactId>
-        <version>[1.2.3,)</version>
+        <version>1.3.1</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>[3.14.0,)</version>
+        <version>3.18.0</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -147,7 +149,7 @@
       <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest</artifactId>
-        <version>2.2</version>
+        <version>3.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -177,7 +179,7 @@
       <dependency>
         <groupId>org.awaitility</groupId>
         <artifactId>awaitility</artifactId>
-        <version>4.2.0</version>
+        <version>4.3.0</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
@@ -203,6 +205,25 @@
 
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>2.18.0</version>
+          <configuration>
+            <ruleSet>
+              <ignoreVersions>
+                <ignoreVersion>
+                  <type>regex</type>
+                  <version>(.+-SNAPSHOT|.+-RC\d|.+M\d|.+-PFD.+)</version>
+                </ignoreVersion>
+              </ignoreVersions>
+            </ruleSet>
+            <excludes>
+              <exclude>javax.inject:javax.inject</exclude>
+              <exclude>javax.annotation:javax.annotation-api</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jarsigner-plugin</artifactId>
@@ -340,6 +361,10 @@
     </pluginManagement>
 
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
