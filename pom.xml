@@ -6,7 +6,7 @@
 
   <groupId>org.silverpeas</groupId>
   <artifactId>kernel</artifactId>
-  <version>1.3-SNAPSHOT</version>
+  <version>1.3</version>
   <packaging>pom</packaging>
   <name>Silverpeas Kernel</name>
   <url>https://www.silverpeas.org/docs/kernel</url>
