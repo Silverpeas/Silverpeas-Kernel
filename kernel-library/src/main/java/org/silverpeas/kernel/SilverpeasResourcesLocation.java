@@ -36,7 +36,7 @@ import java.nio.file.Path;
  * (Java Service Provider Interface) and the single instance is kept in memory for further
  * retrieval.
  * @implNote Whatever the number of available implementations of this interface, only the first
- * found one is used. Nevertheless, by using the @{@link javax.annotation.Priority} annotation, the
+ * found one is used. Nevertheless, by using the @{@link jakarta.annotation.Priority} annotation, the
  * implementation to use can be explicitly indicated.
  */
 public interface SilverpeasResourcesLocation {

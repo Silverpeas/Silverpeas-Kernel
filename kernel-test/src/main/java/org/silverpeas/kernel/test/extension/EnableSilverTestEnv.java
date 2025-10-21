@@ -45,14 +45,14 @@ import java.lang.annotation.*;
  * {@link org.silverpeas.kernel.test.annotations.TestManagedBean} and
  * {@link org.silverpeas.kernel.test.annotations.TestManagedMocks}/
  * {@link org.silverpeas.kernel.test.annotations.TestManagedMock} annotations. The processing of
- * these annotations take in charge the {@link javax.inject.Named} annotation: the bean will be also
+ * these annotations take in charge the {@link jakarta.inject.Named} annotation: the bean will be also
  * registered under the name given by this peculiar qualifier.
  * </p>
  * <p>
  * Some mocks or beans can be pre-registered into the bean container through a custom object
  * deriving of the {@link SilverTestEnvContext} class. Such mocks and beans can then be got in the
  * unit test either by using the {@link org.silverpeas.kernel.ManagedBeanProvider} single instance
- * or by using the {@link javax.inject.Inject} annotation.
+ * or by using the {@link jakarta.inject.Inject} annotation.
  * </p>
  *
  * @author mmoquillon

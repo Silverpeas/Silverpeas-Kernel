@@ -25,16 +25,16 @@ package org.silverpeas.kernel.util;
 
 import org.silverpeas.kernel.SilverpeasRuntimeException;
 
-import javax.annotation.Priority;
+import jakarta.annotation.Priority;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Service loader which takes into account of the {@link javax.annotation.Priority} annotation to
+ * Service loader which takes into account of the {@link jakarta.annotation.Priority} annotation to
  * load the correct single implementation of a service interface when several implementations are
  * available. If several implementations are available for a given service and no ones are annotated
- * with {@link javax.annotation.Priority}, then the first found one is loaded. This service
+ * with {@link jakarta.annotation.Priority}, then the first found one is loaded. This service
  * loader provides also the possibility to kept in cache the instance of the loaded implementation
  * so that is can be get without having to load it again.
  *
@@ -51,7 +51,7 @@ public class ServiceLoader {
    * Loads an instance of the specified service by using the Java SPI API. If there are several
    * implementations of the service available in the classpath, then the one with higher priority is
    * got, otherwise this is the first one found. The priority is given with the
-   * {@link javax.annotation.Priority} annotation.
+   * {@link jakarta.annotation.Priority} annotation.
    *
    * @param service the service to load.
    * @param <T> the type of the service.

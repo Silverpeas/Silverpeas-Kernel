@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 - 2022-2023 Silverpeas
+ * Copyright (C) 2000 - 2025 Silverpeas
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -22,23 +22,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.silverpeas.kernel.test.annotations;
+package org.silverpeas.kernel;
 
-import java.lang.annotation.*;
+import jakarta.inject.Scope;
+import org.silverpeas.kernel.annotation.Cacheable;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Annotation used to declare a set of classes to be managed by the IoC container used in the unit
- * tests so that the dependencies of others managed beans and that are required by the unit tests
- * could be resolved. If the type is annotated with the {@link jakarta.inject.Named} qualifier, it
- * will be also registered as being managed under this specified name.
- *
+ * Annotation to qualify a bean as being a functional component to be managed by the IoC
+ * container and that can be cached by {@link ManagedBeanProvider}.
  * @author mmoquillon
  */
-@Target({ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Inherited
-@Documented
-public @interface TestManagedBeans {
-
-  Class<?>[] value();
+@Cacheable
+@Scope
+public @interface Component {
 }

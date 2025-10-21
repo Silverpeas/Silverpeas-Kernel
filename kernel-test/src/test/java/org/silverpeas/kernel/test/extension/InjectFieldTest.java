@@ -30,7 +30,7 @@ import org.silverpeas.kernel.ManagedBeanProvider;
 import org.silverpeas.kernel.test.MyBean1;
 import org.silverpeas.kernel.test.annotations.TestManagedBeans;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;

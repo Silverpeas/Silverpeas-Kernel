@@ -26,7 +26,6 @@ package org.silverpeas.kernel.annotation;
 
 import org.silverpeas.kernel.BeanContainer;
 
-import javax.annotation.ManagedBean;
 import java.lang.annotation.*;
 
 /**
@@ -47,7 +46,6 @@ import java.lang.annotation.*;
  */
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@ManagedBean
 @Documented
 @Inherited
 public @interface Managed {

@@ -32,9 +32,9 @@ import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.test.util.Reflections;
 import org.silverpeas.kernel.test.util.SilverpeasReflectionException;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Qualifier;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
+import jakarta.inject.Qualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Objects;
