@@ -24,7 +24,7 @@
 
 package org.silverpeas.kernel.test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A managed bean to use for testing the IoC/IoD mechanism dedicated to the unit tests.

@@ -9,8 +9,6 @@ import org.silverpeas.kernel.test.MyBean2;
 import org.silverpeas.kernel.test.annotations.TestManagedBean;
 import org.silverpeas.kernel.test.annotations.TestManagedMock;
 
-import javax.inject.Inject;
-
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
@@ -41,10 +39,10 @@ class ManagedBeanMockFieldParameterTest {
 
   @Test
   void theMockIsManagedInTheBeanContainer(@TestManagedBean MyBean2 myBean2) {
-    MyBean1 myBean1 = beanProvider.getManagedBean(MyBean1.class);
-    assertThat(MockUtil.isMock(myBean1), is(true));
-    assertThat(myBean2.getMyBean(), is(myBean1));
-    assertThat(myBean1.getFoo(), is(FOO));
+    MyBean1 myBean = beanProvider.getManagedBean(MyBean1.class);
+    assertThat(MockUtil.isMock(myBean), is(true));
+    assertThat(myBean2.getMyBean(), is(myBean));
+    assertThat(myBean.getFoo(), is(FOO));
   }
 
   @Test

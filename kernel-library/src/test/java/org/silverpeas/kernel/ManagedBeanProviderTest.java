@@ -30,11 +30,12 @@ import org.hamcrest.Matcher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.silverpeas.kernel.cache.service.ThreadCacheAccessor;
+import org.silverpeas.kernel.cache.model.SimpleCache;
 import org.silverpeas.kernel.exception.MultipleCandidateException;
 import org.silverpeas.kernel.exception.NotFoundException;
 import org.silverpeas.kernel.util.Mutable;
 
+import java.lang.ref.SoftReference;
 import java.util.Objects;
 import java.util.Set;
 
@@ -53,12 +54,12 @@ class ManagedBeanProviderTest {
 
   private final ManagedBeanFeeder feeder = new ManagedBeanFeeder();
   private final ManagedBeanProvider provider = ManagedBeanProvider.getInstance();
-  private final ThreadCacheAccessor accessor = ThreadCacheAccessor.getInstance();
+  private final SimpleCache cache = provider.getCache();
 
   @AfterEach
   void cleanUpAllManagedBeans() {
     feeder.clearAllManagedBeans();
-    accessor.getCache().clear();
+    cache.clear();
   }
 
   @Test
@@ -89,7 +90,19 @@ class ManagedBeanProviderTest {
     Mutable<MyBean> bean = Mutable.empty();
     assertDoesNotThrow(() -> bean.set(provider.getManagedBean(name)));
     assertThat(bean.isPresent(), is(true));
-    assertThat(bean.get(), instanceOf(MyBean1.class));
+    assertThat(bean.get(), instanceOf(MyBean.class));
+    assertThat(bean.get(), isCachedUnder(computeCacheKey(name)));
+  }
+
+  @Test
+  @DisplayName("Getting by name a managed cacheable bean should return it after caching it")
+  void getExistingCacheableBeanByNameShouldCacheIt() {
+    final String name = "foo";
+    feeder.manageBeanWithName(MyBean3.class, name);
+    Mutable<MyBean> bean = Mutable.empty();
+    assertDoesNotThrow(() -> bean.set(provider.getManagedBean(name)));
+    assertThat(bean.isPresent(), is(true));
+    assertThat(bean.get(), instanceOf(MyBean3.class));
     assertThat(bean.get(), isCachedUnder(computeCacheKey(name)));
   }
 
@@ -100,9 +113,21 @@ class ManagedBeanProviderTest {
     final String name = "foo";
     MyBean1 expected = new MyBean1();
     String key = computeCacheKey(name);
-    accessor.getCache().put(key, expected);
+    cache.put(key, new SoftReference<>(expected));
 
     MyBean1 actual = provider.getManagedBean(name);
+    assertThat(actual, is(expected));
+  }
+
+  @Test
+  @DisplayName("Getting by name an already cached bean should return it directly")
+  void getAlreadyCreatedCachableBeanByName() {
+    final String name = "foo";
+    MyBean3 expected = new MyBean3();
+    String key = computeCacheKey(name);
+    cache.put(key, new SoftReference<>(expected));
+
+    MyBean3 actual = provider.getManagedBean(name);
     assertThat(actual, is(expected));
   }
 
@@ -120,13 +145,26 @@ class ManagedBeanProviderTest {
   }
 
   @Test
+  @DisplayName("Getting by name a managed cacheable instance of a service should return it after " +
+      "caching it")
+  void getExistingCacheableServiceInstanceByNameShouldCacheIt() {
+    final String name = "foo";
+    feeder.manageBeanWithName(MyService2.class, name);
+    Mutable<MyService> bean = Mutable.empty();
+    assertDoesNotThrow(() -> bean.set(provider.getManagedBean(name)));
+    assertThat(bean.isPresent(), is(true));
+    assertThat(bean.get(), instanceOf(MyService2.class));
+    assertThat(bean.get(), isCachedUnder(computeCacheKey(name)));
+  }
+
+  @Test
   @DisplayName("Getting by name an already cached single instance of a service should return it" +
       " directly")
   void getAlreadyCreatedSingleServiceInstanceByName() {
     final String name = "foo";
     MyService1 expected = new MyService1();
     String key = computeCacheKey(name);
-    accessor.getCache().put(key, expected);
+    cache.put(key, new SoftReference<>(expected));
 
     MyService1 actual = provider.getManagedBean(name);
     assertThat(actual, is(expected));
@@ -163,12 +201,23 @@ class ManagedBeanProviderTest {
   }
 
   @Test
+  @DisplayName("Getting by type a managed cacheable bean should return it after caching it")
+  void getExistingCacheableBeanByType() {
+    feeder.manageBeanForType(MyBean3.class, MyBean.class);
+    Mutable<MyBean> bean = Mutable.empty();
+    assertDoesNotThrow(() -> bean.set(provider.getManagedBean(MyBean.class)));
+    assertThat(bean.isPresent(), is(true));
+    assertThat(bean.get(), instanceOf(MyBean3.class));
+    assertThat(bean.get(), isCachedUnder(computeCacheKey(MyBean.class.getName())));
+  }
+
+  @Test
   @DisplayName("Getting by type an already cached single instance of a singleton should return it" +
       " directly")
   void getAlreadyCreatedSingleInstanceByType() {
     MyBean1 expected = new MyBean1();
     String key = computeCacheKey(expected.getClass().getName());
-    accessor.getCache().put(key, expected);
+    cache.put(key, new SoftReference<>(expected));
 
     MyBean1 actual = provider.getManagedBean(expected.getClass());
     assertThat(actual, is(expected));
@@ -192,9 +241,21 @@ class ManagedBeanProviderTest {
   void getAlreadyCreatedSingleServiceInstanceByType() {
     MyService1 expected = new MyService1();
     String key = computeCacheKey(expected.getClass().getName());
-    accessor.getCache().put(key, expected);
+    cache.put(key, new SoftReference<>(expected));
 
     MyService1 actual = provider.getManagedBean(expected.getClass());
+    assertThat(actual, is(expected));
+  }
+
+  @Test
+  @DisplayName("Getting by type an already cached cacheable instance of a service should return " +
+      "it directly")
+  void getAlreadyCreatedCacheableServiceInstanceByType() {
+    MyService2 expected = new MyService2();
+    String key = computeCacheKey(expected.getClass().getName());
+    cache.put(key, new SoftReference<>(expected));
+
+    MyService2 actual = provider.getManagedBean(expected.getClass());
     assertThat(actual, is(expected));
   }
 
@@ -223,15 +284,18 @@ class ManagedBeanProviderTest {
   @DisplayName("Getting all the beans satisfying a given type should return them without caching " +
       "them")
   void getAllManagedBeans() {
+    feeder.manageBeanForType(MyBean3.class, MyBean.class);
     feeder.manageBeanForType(MyBean2.class, MyBean.class);
     feeder.manageBeanForType(MyBean1.class, MyBean.class);
 
     Set<MyBean> beans = provider.getAllManagedBeans(MyBean.class);
     assertThat(beans, notNullValue());
-    assertThat(beans.size(), is(2));
+    assertThat(beans.size(), is(3));
     assertThat(beans.stream()
         .map(MyBean::getClass)
-        .allMatch(c -> c.equals(MyBean1.class) || c.equals(MyBean2.class)), is(true));
+        .allMatch(c -> c.equals(MyBean1.class)
+            || c.equals(MyBean2.class)
+            || c.equals(MyBean3.class)), is(true));
     beans.forEach(b -> {
       assertThat(b, not(isCachedUnder(computeCacheKey(MyBean.class.getName()))));
       assertThat(b, not(isCachedUnder(computeCacheKey(b.getClass().getName()))));
@@ -257,7 +321,7 @@ class ManagedBeanProviderTest {
    */
   protected static class IsCached extends BaseMatcher<Object> {
 
-    private static final ThreadCacheAccessor accessor = ThreadCacheAccessor.getInstance();
+    private final SimpleCache cache = ManagedBeanProvider.getInstance().getCache();
     private final String cacheKey;
 
     private IsCached(String key) {
@@ -266,7 +330,10 @@ class ManagedBeanProviderTest {
 
     @Override
     public boolean matches(Object o) {
-      return accessor.getCache().has(cacheKey) && Objects.equals(accessor.getCache().get(cacheKey), o);
+      //noinspection DataFlowIssue
+      return cache.has(cacheKey) &&
+          cache.get(cacheKey) instanceof SoftReference &&
+          Objects.equals(cache.get(cacheKey, SoftReference.class).get(), o);
     }
 
     @Override

@@ -49,14 +49,14 @@ import java.lang.annotation.RetentionPolicy;
  * </p>
  * <p>
  * By defining our own annotations we ensure to be agnostic from any checking library or framework
- * because, despite of the JSR-305, a lot of tiers provide its own incompatible solution.
+ * because, despite the JSR-305, a lot of tiers provide its own incompatible solution.
  * </p>
  *
  * @author mmoquillon
  */
 @Documented
 @TypeQualifierNickname
-@Nonnull(when = When.MAYBE)
+@Nonnull(when = When.UNKNOWN)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Nullable {
 }

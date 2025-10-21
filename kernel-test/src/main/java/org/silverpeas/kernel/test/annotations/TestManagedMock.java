@@ -30,7 +30,7 @@ import java.lang.annotation.*;
  * This annotation is used to indicate that a field or a parameter of a test (method) in a unit test
  * class has to be mocked and the resulting mock put into the IoC container used in the unit tests
  * and this before any execution of any unit tests. If the type is annotated with the
- * {@link javax.inject.Named} qualifier, the mock will be also registered under this specified
+ * {@link jakarta.inject.Named} qualifier, the mock will be also registered under this specified
  * name.
  * <p>
  * If the test class declares several annotated fields having a common type among their ancestor,

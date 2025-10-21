@@ -24,7 +24,7 @@
 
 package org.silverpeas.kernel.test;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * A managed bean to use for testing the IoC/IoD mechanism dedicated to the unit tests.

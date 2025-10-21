@@ -37,11 +37,11 @@ import org.silverpeas.kernel.test.extension.SilverTestEnvContext.TestExecutionCo
 import org.silverpeas.kernel.test.util.Reflections;
 import org.silverpeas.kernel.util.SystemWrapper;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Qualifier;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Qualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.Arrays;
@@ -371,7 +371,7 @@ public class SilverTestEnv
    * Registers in the {@link BeanContainer} the specified class for his instances to be managed by
    * it. By registering a class instead of directly a bean, the life-cycle of the beans of the class
    * will be taken in charge by the container, meaning their instantiation will be done on demand
-   * (the singleton pattern is taken in charge with the {@link javax.inject.Singleton} annotation).
+   * (the singleton pattern is taken in charge with the {@link jakarta.inject.Singleton} annotation).
    *
    * @param beanType the class of the beans to manage.
    * @param <T> the concrete type of the bean.

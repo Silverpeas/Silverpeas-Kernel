@@ -24,7 +24,7 @@
 
 package org.silverpeas.kernel.test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class MyBean3 {
 

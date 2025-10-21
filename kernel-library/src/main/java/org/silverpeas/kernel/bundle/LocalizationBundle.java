@@ -26,7 +26,7 @@ package org.silverpeas.kernel.bundle;
 import org.owasp.encoder.Encode;
 import org.silverpeas.kernel.annotation.NonNull;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.BiFunction;

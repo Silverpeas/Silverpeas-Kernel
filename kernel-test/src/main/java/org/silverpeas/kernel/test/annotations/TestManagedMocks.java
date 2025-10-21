@@ -29,7 +29,7 @@ import java.lang.annotation.*;
 /**
  * Annotation used to declare a set of classes to mock. The resulting mock will be put into the IoC
  * container in order to satisfy the dependencies of the managed beans used in the unit tests.
- * If the type is annotated with the {@link javax.inject.Named} qualifier, the mock will be also
+ * If the type is annotated with the {@link jakarta.inject.Named} qualifier, the mock will be also
  * registered into the bean container under this specified name.
  *
  * @author mmoquillon

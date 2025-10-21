@@ -27,7 +27,7 @@ package org.silverpeas.kernel;
 import org.silverpeas.kernel.annotation.Base;
 import org.silverpeas.kernel.annotation.Managed;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Managed
 @Base
